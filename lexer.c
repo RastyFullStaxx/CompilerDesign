@@ -114,9 +114,9 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
         switch (state) {
 
 // START case for recursive use ------------------------------------------------------------------------------------------------
-            case START:
+case START:
     if (c == '~' && line[j + 1] == '~') {
-        // Single-line comment indicator (~~)
+        /// Single-line comment indicator (~~)
         currentToken[i++] = c;
         currentToken[i++] = line[++j]; // Consume the second '~'
         currentToken[i] = '\0';
@@ -124,177 +124,105 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
         i = 0;
         state = START; // Reset state
         return; // Skip the rest of the line
-    } else if (c == '=' && line[j + 1] == '=') {
-        // Equal to operator (==)
+    } else if ((c == '=' && line[j + 1] == '=') || 
+               (c == '!' && line[j + 1] == '=') || 
+               (c == '>' && line[j + 1] == '=') || 
+               (c == '<' && line[j + 1] == '=')) {
+        // Relational operators with '='
         currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume the second '='
+        currentToken[i++] = line[++j];
         currentToken[i] = '\0';
-        writeToken(symbolTable, "Relational Operator (Equal To)", currentToken, lineNumber);
+        const char* type = (c == '=') ? "Relational Operator (Equal To)" :
+                           (c == '!') ? "Relational Operator (Not Equal To)" :
+                           (c == '>') ? "Relational Operator (Greater Than or Equal To)" :
+                                        "Relational Operator (Less Than or Equal To)";
+        writeToken(symbolTable, type, currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '!' && line[j + 1] == '=') {
-        // Not equal to operator (!=)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Relational Operator (Not Equal To)", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
-    } else if (c == '>' && line[j + 1] == '=') {
-        // Greater than or equal to operator (>=)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Relational Operator (Greater Than or Equal To)", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
-    } else if (c == '<' && line[j + 1] == '=') {
-        // Less than or equal to operator (<=)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Relational Operator (Less Than or Equal To)", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
-    } else if (c == '>') {
-        // Greater than operator (>)
+    } else if (c == '>' || c == '<') {
+        // Relational operators (>, <)
         currentToken[i++] = c;
         currentToken[i] = '\0';
-        writeToken(symbolTable, "Relational Operator (Greater Than)", currentToken, lineNumber);
+        const char* type = (c == '>') ? "Relational Operator (Greater Than)" :
+                                        "Relational Operator (Less Than)";
+        writeToken(symbolTable, type, currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '<') {
-        // Less than operator (<)
-        currentToken[i++] = c;
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Relational Operator (Less Than)", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
     } else if (c == '!' && line[j + 1] != '=') {
         // Logical NOT operator (!)
         currentToken[i++] = c;
         currentToken[i] = '\0';
         writeToken(symbolTable, "Logical Operator (NOT)", currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '|' && line[j + 1] == '|') {
-        // Logical OR operator (||)
+    } else if ((c == '|' && line[j + 1] == '|') || (c == '&' && line[j + 1] == '&')) {
+        // Logical operators (||, &&)
         currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume the second '|'
+        currentToken[i++] = line[++j];
         currentToken[i] = '\0';
-        writeToken(symbolTable, "Logical Operator (OR)", currentToken, lineNumber);
+        const char* type = (c == '|') ? "Logical Operator (OR)" : "Logical Operator (AND)";
+        writeToken(symbolTable, type, currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '&' && line[j + 1] == '&') {
-        // Logical AND operator (&&)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume the second '&'
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Logical Operator (AND)", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
     } else if (c == '=' && line[j + 1] != '=') {
-        // Assignment operator
+        // Assignment operator (=)
         currentToken[i++] = c;
         currentToken[i] = '\0';
         writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '+' && line[j + 1] == '=') {
-        // Addition assignment operator (+=)
+    } else if ((c == '+' && line[j + 1] == '=') || (c == '-' && line[j + 1] == '=') ||
+               (c == '*' && line[j + 1] == '=') || (c == '/' && line[j + 1] == '=') || 
+               (c == '%' && line[j + 1] == '=')) {
+        // Assignment operators (+=, -=, *=, /=, %=)
         currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
+        currentToken[i++] = line[++j];
         currentToken[i] = '\0';
-        writeToken(symbolTable, "Addition Assignment Operator", currentToken, lineNumber);
+        const char* type = (c == '+') ? "Addition Assignment Operator" :
+                           (c == '-') ? "Subtraction Assignment Operator" :
+                           (c == '*') ? "Multiplication Assignment Operator" :
+                           (c == '/') ? "Division Assignment Operator" :
+                                        "Modulo Assignment Operator";
+        writeToken(symbolTable, type, currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '-' && line[j + 1] == '=') {
-        // Subtraction assignment operator (-=)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Subtraction Assignment Operator", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
-    } else if (c == '*' && line[j + 1] == '=') {
-        // Multiplication assignment operator (*=)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Multiplication Assignment Operator", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
-    } else if (c == '/' && line[j + 1] == '=') {
-        // Division assignment operator (/=)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Division Assignment Operator", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
     } else if (c == '/' && line[j + 1] == '/' && line[j + 2] == '=') {
         // Integer division assignment operator (//=)
         currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '/'
-        currentToken[i++] = line[++j]; // Consume '='
+        currentToken[i++] = line[++j];
+        currentToken[i++] = line[++j];
         currentToken[i] = '\0';
         writeToken(symbolTable, "Integer Division Assignment Operator", currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '%' && line[j + 1] == '=') {
-        // Modulo assignment operator (%=)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume '='
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Modulo Assignment Operator", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
     } else if (c == '/' && line[j + 1] == '/') {
         // Integer division operator (//)
         currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume the second '/'
+        currentToken[i++] = line[++j];
         currentToken[i] = '\0';
         writeToken(symbolTable, "Arithmetic Operator (Integer Division)", currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '/') {
-        // Division operator
+    } else if (c == '/' || c == '*' || c == '%') {
+        // Arithmetic operators (/, *, %)
         currentToken[i++] = c;
         currentToken[i] = '\0';
-        writeToken(symbolTable, "Arithmetic Operator (Division)", currentToken, lineNumber);
+        const char* type = (c == '/') ? "Arithmetic Operator (Division)" :
+                           (c == '*') ? "Arithmetic Operator (Multiplication)" :
+                                        "Arithmetic Operator (Modulo)";
+        writeToken(symbolTable, type, currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '+' && line[j + 1] == '+') {
-        // Increment operator (++)
+    } else if ((c == '+' && line[j + 1] == '+') || (c == '-' && line[j + 1] == '-')) {
+        // Unary operators (++, --)
         currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume second '+'
+        currentToken[i++] = line[++j];
         currentToken[i] = '\0';
-        writeToken(symbolTable, "Unary Operator (Increment)", currentToken, lineNumber);
+        const char* type = (c == '+') ? "Unary Operator (Increment)" : "Unary Operator (Decrement)";
+        writeToken(symbolTable, type, currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '-' && line[j + 1] == '-') {
-        // Decrement operator (--)
-        currentToken[i++] = c;
-        currentToken[i++] = line[++j]; // Consume second '-'
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Unary Operator (Decrement)", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
     } else if ((c == '+' || c == '-') && (isdigit(line[j + 1]) || isalpha(line[j + 1]) || line[j + 1] == '_')) {
         // Unary + or -
         state = UNARY_OPERATOR;
         currentToken[i++] = c;
     } else if (c == '+' || c == '-') {
-        // Standalone + or - treated as arithmetic operators
+        // Arithmetic operators (+, -)
         currentToken[i++] = c;
         currentToken[i] = '\0';
-        if (c == '+') {
-            writeToken(symbolTable, "Arithmetic Operator (Addition)", currentToken, lineNumber);
-        } else {
-            writeToken(symbolTable, "Arithmetic Operator (Subtraction)", currentToken, lineNumber);
-        }
+        const char* type = (c == '+') ? "Arithmetic Operator (Addition)" : "Arithmetic Operator (Subtraction)";
+        writeToken(symbolTable, type, currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
     } else if (isalpha(c) || c == '_') {
         // Identifier or reserved word
         state = IDENTIFIER;
@@ -303,46 +231,26 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
         // Integer literal
         state = INTEGER;
         currentToken[i++] = c;
-    } else if (c == '*' || c == '%' || c == '^') {
-        // Arithmetic operators (excluding / already handled)
+    } else if (c == '^') {
+        // Exponentiation operator (^)
         currentToken[i++] = c;
         currentToken[i] = '\0';
-        if (c == '*') {
-            writeToken(symbolTable, "Arithmetic Operator (Multiplication)", currentToken, lineNumber);
-        } else if (c == '%') {
-            writeToken(symbolTable, "Arithmetic Operator (Modulo)", currentToken, lineNumber);
-        } else if (c == '^') {
-            writeToken(symbolTable, "Arithmetic Operator (Exponentiation)", currentToken, lineNumber);
-        }
+        writeToken(symbolTable, "Arithmetic Operator (Exponentiation)", currentToken, lineNumber);
         i = 0;
-        state = START; // Reset state
-    } else if (c == '=' || c == '>' || c == '<' || c == '!') {
-        // Relational or assignment operators
-        state = RELATIONAL_OPERATOR;
-        currentToken[i++] = c;
-    } else if (c == '&') {
-        // Logical AND candidate
-        state = LOGICAL_OPERATOR;
-        currentToken[i++] = c;
-    } else if (c == '|') {
-        // Logical OR candidate
-        state = LOGICAL_OPERATOR;
-        currentToken[i++] = c;
-    } else if (c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']' || c == ',' || c == ';') {
+    } else if (c == '(' || c == ')' || c == '{' || c == '}' || c == '[' || c == ']' || c == ',' || c == ';' || c == '.') {
         // Delimiters
         currentToken[i++] = c;
         currentToken[i] = '\0';
         writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
         i = 0;
         state = START;
-    } else if (isspace(c)) {
-        // Ignore whitespace
-    } else {
+    } else if (!isspace(c)) {
         // Unknown character
         state = ERROR;
         currentToken[i++] = c;
     }
     break;
+
 
 
 
