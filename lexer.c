@@ -307,6 +307,8 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
+
+
                         case IDENTIFIER:
     if (isalnum(c) || c == '_') {
         // Continue building the identifier
@@ -355,6 +357,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
         j--; // Reprocess current character
     }
     break;
+
 
 
 
@@ -739,7 +742,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                             i = 0;
                             state = START;
                             break;
-                            }
+                            
 
     
 
@@ -757,7 +760,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
                     }
-                }
+                
 
                                 // Closing the leftover tokens
     if (i > 0) {
@@ -802,9 +805,13 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
             default:
                 writeToken(symbolTable, "Unknown", currentToken, lineNumber);
                 break;
+                    }
         }
-    }
-}
+} // processLine end
+
+
+
+
 
 void writeToken(FILE *symbolTable, const char *type, const char *value, int lineNumber) {
     if (symbolTable != NULL && type != NULL && value != NULL) {
