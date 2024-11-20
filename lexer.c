@@ -114,7 +114,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
     for (int j = 0; line[j] != '\0'; j++) {
         char c = line[j];
-
+    
         switch (state) {
 
             // START case for recursive use ----------------------------------------------------------------------------------------------------------------------------------------
@@ -313,33 +313,23 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
     if (isalnum(c) || c == '_') {
         // Continue building the identifier
         currentToken[i++] = c;
-    } else if (isdigit(currentToken[0]) || (!isalpha(currentToken[0]) && currentToken[0] != '_')) {
-        // Invalid identifier: started with a digit or invalid symbol
-        currentToken[i++] = c;
-        while (line[j + 1] != '\0' && !isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
-            currentToken[i++] = line[++j];
-        }
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
-        i = 0;
-        state = START;
     } else {
-        // Valid identifier complete
+        // Identifier complete
         currentToken[i] = '\0';
 
-        // Check against reserved words
+        // Check for reserved words first
         Token *reservedWordToken = reservedWords(currentToken, strlen(currentToken), lineNumber);
         if (reservedWordToken) {
             writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
             free(reservedWordToken);
         } else {
-            // Check against keywords
+            // Check for keywords next
             Token *keywordToken = keywords(currentToken, strlen(currentToken), lineNumber);
             if (keywordToken) {
                 writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
                 free(keywordToken);
             } else {
-                // Check against noise words
+                // Check for noise words last
                 Token *noiseWordToken = noiseWords(currentToken, strlen(currentToken), lineNumber);
                 if (noiseWordToken) {
                     writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
@@ -351,10 +341,10 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
             }
         }
 
-        // Reset for next token
+        // Reset state
         i = 0;
         state = START;
-        j--; // Reprocess current character
+        j--; // Reprocess the current character
     }
     break;
 
@@ -362,6 +352,8 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
+
+        
 
 
 
@@ -522,7 +514,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 currentToken[i] = '\0';
                                 writeToken(symbolTable, "Arithmetic Operator (Exponentiation)", currentToken, lineNumber);
                             }
-
+        
                             // Reset state for next token
                             i = 0;
                             state = START;
@@ -760,7 +752,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
                     }
-                
+    }
 
                                 // Closing the leftover tokens
     if (i > 0) {
