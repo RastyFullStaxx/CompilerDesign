@@ -303,57 +303,59 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                 }
                 break;
 
-
+        
 
 
 
                         case IDENTIFIER:
-                            if (isalnum(c) || c == '_') {
-                                // Continue building the identifier
-                                currentToken[i++] = c;
-                            } else if (isdigit(currentToken[0]) || (!isalpha(currentToken[0]) && currentToken[0] != '_')) {
-                                // Invalid identifier: started with a digit or invalid symbol
-                                currentToken[i++] = c;
-                                while (line[j + 1] != '\0' && !isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
-                                    currentToken[i++] = line[++j];
-                                }
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
-                                i = 0;
-                                state = START;
-                            } else {
-                                // Valid identifier complete
-currentToken[i] = '\0';
-
-// Check for reserved words
-Token *reservedWordToken = reservedWords(currentToken, tokenLength, lineNumber);
-if (reservedWordToken) {
-    writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
-    free(reservedWordToken);
-} else {
-    // Check for keywords if not a reserved word
-    Token *keywordToken = keywords(currentToken, tokenLength, lineNumber);
-    if (keywordToken) {
-        writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
-        free(keywordToken);
-    } else {
-        // Check for noise words if not a keyword or reserved word
-        Token *noiseWordToken = noiseWords(currentToken, tokenLength, lineNumber);
-        if (noiseWordToken) {
-            writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
-            free(noiseWordToken);
-        } else {
-            // Default to identifier if none of the above
-            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+    if (isalnum(c) || c == '_') {
+        // Continue building the identifier
+        currentToken[i++] = c;
+    } else if (isdigit(currentToken[0]) || (!isalpha(currentToken[0]) && currentToken[0] != '_')) {
+        // Invalid identifier: started with a digit or invalid symbol
+        currentToken[i++] = c;
+        while (line[j + 1] != '\0' && !isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
+            currentToken[i++] = line[++j];
         }
-    }
-}
+        currentToken[i] = '\0';
+        writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
+        i = 0;
+        state = START;
+    } else {
+        // Valid identifier complete
+        currentToken[i] = '\0';
 
-// Reset for next token
-i = 0;
-state = START;
-j--; // Reprocess the current character
-break;
+        // Check against reserved words
+        Token *reservedWordToken = reservedWords(currentToken, strlen(currentToken), lineNumber);
+        if (reservedWordToken) {
+            writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
+            free(reservedWordToken);
+        } else {
+            // Check against keywords
+            Token *keywordToken = keywords(currentToken, strlen(currentToken), lineNumber);
+            if (keywordToken) {
+                writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
+                free(keywordToken);
+            } else {
+                // Check against noise words
+                Token *noiseWordToken = noiseWords(currentToken, strlen(currentToken), lineNumber);
+                if (noiseWordToken) {
+                    writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
+                    free(noiseWordToken);
+                } else {
+                    // Default to identifier
+                    writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                }
+            }
+        }
+
+        // Reset for next token
+        i = 0;
+        state = START;
+        j--; // Reprocess current character
+    }
+    break;
+
 
 
 
@@ -699,7 +701,7 @@ break;
                             j--; // Reprocess the current character
                             break;
 
-
+        
 
 
                         case DELIMITER:
@@ -739,6 +741,7 @@ break;
                             break;
                             }
 
+    
 
 
                         case ERROR:
@@ -749,58 +752,59 @@ break;
                             j--;  // Reprocess the current character
                             break;
 
+                        default:
+                            break;
+
 
                     }
                 }
 
                                 // Closing the leftover tokens
-if (i > 0) {
-    currentToken[i] = '\0'; // Null-terminate the token
-    switch (state) {
-        case IDENTIFIER:
-            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-            break;
+    if (i > 0) {
+        currentToken[i] = '\0'; // Null-terminate the token
+        switch (state) {
+            case IDENTIFIER:
+                writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                break;
 
-        case INTEGER:
-            writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-            break;
+            case INTEGER:
+                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+                break;
 
-        case FLOAT:
-            writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
-            break;
+            case FLOAT:
+                writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
+                break;
 
-        case ARITHMETIC_OPERATOR:
-            writeToken(symbolTable, "Arithmetic Operator", currentToken, lineNumber);
-            break;
+            case ARITHMETIC_OPERATOR:
+                writeToken(symbolTable, "Arithmetic Operator", currentToken, lineNumber);
+                break;
 
-        case ASSIGNMENT_OPERATOR:
-            writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
-            break;
+            case ASSIGNMENT_OPERATOR:
+                writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
+                break;
 
-        case RELATIONAL_OPERATOR:
-            writeToken(symbolTable, "Relational Operator", currentToken, lineNumber);
-            break;
+            case RELATIONAL_OPERATOR:
+                writeToken(symbolTable, "Relational Operator", currentToken, lineNumber);
+                break;
 
-        case LOGICAL_OPERATOR:
-            writeToken(symbolTable, "Logical Operator", currentToken, lineNumber);
-            break;
+            case LOGICAL_OPERATOR:
+                writeToken(symbolTable, "Logical Operator", currentToken, lineNumber);
+                break;
 
-        case UNARY_OPERATOR:
-            writeToken(symbolTable, "Unary Operator", currentToken, lineNumber);
-            break;
+            case UNARY_OPERATOR:
+                writeToken(symbolTable, "Unary Operator", currentToken, lineNumber);
+                break;
 
-        case DELIMITER:
-            writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
-            break;
+            case DELIMITER:
+                writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+                break;
 
-        default:
-            writeToken(symbolTable, "Unknown", currentToken, lineNumber);
-            break;
+            default:
+                writeToken(symbolTable, "Unknown", currentToken, lineNumber);
+                break;
+        }
     }
 }
-           
-
-} // end of processLine function
 
 void writeToken(FILE *symbolTable, const char *type, const char *value, int lineNumber) {
     if (symbolTable != NULL && type != NULL && value != NULL) {
