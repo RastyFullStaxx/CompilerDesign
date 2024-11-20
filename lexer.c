@@ -33,6 +33,11 @@ void processLine(char *line, int lineNumber, FILE *symbolTable);
 void writeToken(FILE *symbolTable, const char *type, const char *value, int lineNumber);
 void writeHorizantalBar(FILE *symbolTable);
 void trimWhitespace(char *str);
+int isDelimiter(char c);
+Token* makeToken(const char* type, const char* value, int lineNumber);
+Token* keywords(char* lexeme, int len, int line_number);
+Token* reservedWords(char* lexeme, int len, int line_number);
+Token* noiseWords(char* lexeme, int len, int line_number);
 
 
 int main() {
@@ -50,7 +55,7 @@ int main() {
 
     // Write header
     writeHorizantalBar(symbolTable);
-    fprintf(symbolTable, "%-65s%-30s%-20s\n", "Type", "Value", "LineNumber");
+    fprintf(symbolTable, "%-65s%-30s%-20s\n", "Token Type", "Value", "LineNumber");
     writeHorizantalBar(symbolTable);
 
     char line[256];
@@ -104,11 +109,6 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
     State state = START;
     char currentToken[50] = "";
     int i = 0;
-
-    // Reserved words declaration
-    const char *reservedWords[] = {"true", "false", "null", "const"};
-    int reservedWordCount = sizeof(reservedWords) / sizeof(reservedWords[0]);
-
 
     for (int j = 0; line[j] != '\0'; j++) {
         char c = line[j];
@@ -304,33 +304,47 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
+
                         case IDENTIFIER:
                             if (isalnum(c) || c == '_') {
                                 // Continue building the identifier
                                 currentToken[i++] = c;
-                            } else if (isdigit(currentToken[0])) {
-                                // Invalid identifier starting with a digit
+                            } else if (isdigit(currentToken[0]) || (!isalpha(currentToken[0]) && currentToken[0] != '_')) {
+                                // Invalid identifier: started with a digit or invalid symbol
                                 currentToken[i++] = c;
+                                while (line[j + 1] != '\0' && !isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
+                                    currentToken[i++] = line[++j];
+                                }
                                 currentToken[i] = '\0';
                                 writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
                                 i = 0;
                                 state = START;
                             } else {
-                                // Identifier complete
-                                currentToken[i] = '\0';
-                                int isReserved = 0;
-                                for (int k = 0; k < reservedWordCount; k++) {
-                                    if (strcmp(currentToken, reservedWords[k]) == 0) {
-                                        isReserved = 1;
-                                        break;
-                                    }
-                                }
-
-                                if (isReserved) {
-                                    writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
+                                // Valid identifier complete
+                                            currentToken[i] = '\0';
+                                            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                                        } else // Check for reserved words
+                                Token *reservedWordToken = reservedWords(currentToken, tokenLength, lineNumber);
+                                if (reservedWordToken) {
+                                    writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
+                                    free(reservedWordToken);
                                 } else {
-                                    writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                                }
+                                    // Check for keywords if not a reserved word
+                                    Token *keywordToken = keywords(currentToken, tokenLength, lineNumber);
+                                    if (keywordToken) {
+                                        writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
+                                        free(keywordToken);
+                                    } else {
+                                        // Check for noise words if not a reserved word or keyword
+                                        Token *noiseWordToken = noiseWords(currentToken, tokenLength, lineNumber); // Added this line
+                                        if (noiseWordToken) {
+                                            writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
+                                            free(noiseWordToken);
+                                         } else {
+                                                writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                                             }
+                                        }
+
 
                                 i = 0;
                                 state = START;
@@ -343,17 +357,32 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
+
+
                         case INTEGER:
                             if (isdigit(c)) {
                                 // Continue building the integer literal
                                 currentToken[i++] = c;
-                            } else if (c == '.' && isdigit(line[j + 1])) {
+                            } else if (isalpha(c)) {
+                                // Alphanumeric combination (e.g., 12ten)
+                                currentToken[i++] = c;
+                                while (isalnum(line[j + 1])) {
+                                    currentToken[i++] = line[++j];
+                                }
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
+                                i = 0;
+                                state = START;
+                            } else if (c == '.') {
                                 // Transition to FLOAT state for a decimal point
                                 currentToken[i++] = c;
                                 state = FLOAT;
-                            } else if (isalpha(c)) {
-                                // Invalid sequence like 123a
+                            } else if (!isdigit(c) && !isspace(c) && !isDelimiter(c)) {
+                                // Invalid character sequence (e.g., 12@@)
                                 currentToken[i++] = c;
+                                while (!isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
+                                    currentToken[i++] = line[++j];
+                                }
                                 currentToken[i] = '\0';
                                 writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
                                 i = 0;
@@ -367,6 +396,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 j--; // Reprocess the current character
                             }
                             break;
+
 
 
 
@@ -391,6 +421,11 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 j--; // Reprocess current character
                             }
                             break;
+
+
+
+
+
 
 
 
@@ -423,6 +458,9 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
+
+
+
                         case STRING_LITERAL:
                             if (c == '"') {
                                 // End of string literal
@@ -436,6 +474,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 currentToken[i++] = c;
                             }
                             break;
+
 
 
 
@@ -744,6 +783,28 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
                                     }
 
+                                    Token *reservedWordToken = reservedWords(currentToken, tokenLength, lineNumber);
+                                        if (reservedWordToken) {
+                                            writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
+                                            free(reservedWordToken);
+                                        } else {
+                                            // Check for keywords if not a reserved word
+                                            Token *keywordToken = keywords(currentToken, tokenLength, lineNumber);
+                                            if (keywordToken) {
+                                                writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
+                                                free(keywordToken);
+                                            } else {
+                                                // Check for noise words if not a reserved word or keyword
+                                                Token *noiseWordToken = noiseWords(currentToken, tokenLength, lineNumber); 
+                                                if (noiseWordToken) {
+                                                    writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
+                                                    free(noiseWordToken);
+                                                } else {
+                                                    writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                                                }
+                                            }
+                                        }
+
                                     case INTEGER:
                                         writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
                                         break;
@@ -790,6 +851,8 @@ void writeToken(FILE *symbolTable, const char *type, const char *value, int line
     }
 }
 
+
+// Supporting functions
 void writeHorizantalBar(FILE *symbolTable) {
     if (symbolTable != NULL) {
         fprintf(symbolTable, "--------------------------------------------------------------------------------------------------------------------------------------------\n");
@@ -814,4 +877,532 @@ void trimWhitespace(char *str) {
     if (start != str) {
         memmove(str, start, strlen(start) + 1);
     }
+}
+
+int isDelimiter(char c) {
+    return (c == ',' || c == '.' || c == ';' || c == ':' || 
+            c == '(' || c == ')' || c == '{' || c == '}' || 
+            c == '[' || c == ']' || c == '"' || c == '\'');
+}
+
+// Recursive tokenization
+Token* makeToken(const char* type, const char* value, int lineNumber) {
+    // Allocate memory for a new token
+    Token* newToken = (Token*)malloc(sizeof(Token));
+    if (!newToken) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Copy the type string manually
+    int i = 0;
+    while (type[i] != '\0' && i < sizeof(newToken->type) - 1) {
+        newToken->type[i] = type[i];
+        i++;
+    }
+    newToken->type[i] = '\0'; // Null-terminate the string
+
+    // Copy the value string manually
+    i = 0;
+    while (value[i] != '\0' && i < sizeof(newToken->value) - 1) {
+        newToken->value[i] = value[i];
+        i++;
+    }
+    newToken->value[i] = '\0'; // Null-terminate the string
+
+    // Set the line number
+    newToken->lineNumber = lineNumber;
+
+    return newToken;
+}
+
+Token* keywords(char* lexeme, int len, int line_number) {
+    switch (lexeme[0]) {
+        case 'a': // array
+            if (len == 5) {
+                switch (lexeme[1]) {
+                    case 'r':
+                        switch (lexeme[2]) {
+                            case 'r':
+                                switch (lexeme[3]) {
+                                    case 'a':
+                                        switch (lexeme[4]) {
+                                            case 'y':
+                                                return makeToken("Keyword", "array", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'b': // bool, break
+            if (len == 4) { // bool
+                switch (lexeme[1]) {
+                    case 'o':
+                        switch (lexeme[2]) {
+                            case 'o':
+                                switch (lexeme[3]) {
+                                    case 'l':
+                                        return makeToken("Keyword", "bool", line_number);
+                                }
+                        }
+                }
+            }
+            else if (len == 5) { // break
+                switch (lexeme[1]) {
+                    case 'r':
+                        switch (lexeme[2]) {
+                            case 'e':
+                                switch (lexeme[3]) {
+                                    case 'a':
+                                        switch (lexeme[4]) {
+                                            case 'k':
+                                                return makeToken("Keyword", "break", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'c': // case, char, continue
+            if (len == 4) { // case, char
+                switch (lexeme[1]) {
+                    case 'a':
+                        switch (lexeme[2]) {
+                            case 's':
+                                switch (lexeme[3]) {
+                                    case 'e':
+                                        return makeToken("Keyword", "case", line_number);
+                                }
+                        }
+                        break;
+                    case 'h':
+                        switch (lexeme[2]) {
+                            case 'a':
+                                switch (lexeme[3]) {
+                                    case 'r':
+                                        return makeToken("Keyword", "char", line_number);
+                                }
+                        }
+                        break;
+                }
+            }
+            else if (len == 8) { // continue
+                switch (lexeme[1]) {
+                    case 'o':
+                        switch (lexeme[2]) {
+                            case 'n':
+                                switch (lexeme[3]) {
+                                    case 't':
+                                        switch (lexeme[4]) {
+                                            case 'i':
+                                                switch (lexeme[5]) {
+                                                    case 'n':
+                                                        switch (lexeme[6]) {
+                                                            case 'u':
+                                                                switch (lexeme[7]) {
+                                                                    case 'e':
+                                                                        return makeToken("Keyword", "continue", line_number);
+                                                                }
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'd': // default, do
+            if (len == 2) { // do
+                switch (lexeme[1]) {
+                    case 'o':
+                        return makeToken("Keyword", "do", line_number);
+                }
+            }
+            else if (len == 7) { // default
+                switch (lexeme[1]) {
+                    case 'e':
+                        switch (lexeme[2]) {
+                            case 'f':
+                                switch (lexeme[3]) {
+                                    case 'a':
+                                        switch (lexeme[4]) {
+                                            case 'u':
+                                                switch (lexeme[5]) {
+                                                    case 'l':
+                                                        switch (lexeme[6]) {
+                                                            case 't':
+                                                                return makeToken("Keyword", "default", line_number);
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'e': // else, else if
+            if (len == 4) { // else
+                switch (lexeme[1]) {
+                    case 'l':
+                        switch (lexeme[2]) {
+                            case 's':
+                                switch (lexeme[3]) {
+                                    case 'e':
+                                        return makeToken("Keyword", "else", line_number);
+                                }
+                        }
+                }
+            }
+            else if (len == 7) { // else if
+                switch (lexeme[1]) {
+                    case 'l':
+                        switch (lexeme[2]) {
+                            case 's':
+                                switch (lexeme[3]) {
+                                    case 'e':
+                                        switch (lexeme[4]) {
+                                            case ' ':
+                                                switch (lexeme[5]) {
+                                                    case 'i':
+                                                        switch (lexeme[6]) {
+                                                            case 'f':
+                                                                return makeToken("Keyword", "else if", line_number);
+                                                        }
+                                                }
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'f': // float, for
+            if (len == 3) { // for
+                switch (lexeme[1]) {
+                    case 'o':
+                        switch (lexeme[2]) {
+                            case 'r':
+                                return makeToken("Keyword", "for", line_number);
+                        }
+                }
+            }
+            else if (len == 5) { // float
+                switch (lexeme[1]) {
+                    case 'l':
+                        switch (lexeme[2]) {
+                            case 'o':
+                                switch (lexeme[3]) {
+                                    case 'a':
+                                        switch (lexeme[4]) {
+                                            case 't':
+                                                return makeToken("Keyword", "float", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'g': // goto
+            if (len == 4) {
+                switch (lexeme[1]) {
+                    case 'o':
+                        switch (lexeme[2]) {
+                            case 't':
+                                switch (lexeme[3]) {
+                                    case 'o':
+                                        return makeToken("Keyword", "goto", line_number);
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'i': // if, int, input
+            if (len == 2) { // if
+                switch (lexeme[1]) {
+                    case 'f':
+                        return makeToken("Keyword", "if", line_number);
+                }
+            }
+            else if (len == 3) { // int
+                switch (lexeme[1]) {
+                    case 'n':
+                        switch (lexeme[2]) {
+                            case 't':
+                                return makeToken("Keyword", "int", line_number);
+                        }
+                }
+            }
+            else if (len == 5) { // input
+                switch (lexeme[1]) {
+                    case 'n':
+                        switch (lexeme[2]) {
+                            case 'p':
+                                switch (lexeme[3]) {
+                                    case 'u':
+                                        switch (lexeme[4]) {
+                                            case 't':
+                                                return makeToken("Keyword", "input", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'm': // main
+            if (len == 4) {
+                switch (lexeme[1]) {
+                    case 'a':
+                        switch (lexeme[2]) {
+                            case 'i':
+                                switch (lexeme[3]) {
+                                    case 'n':
+                                        return makeToken("Keyword", "main", line_number);
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'p': // printf
+            if (len == 6) {
+                switch (lexeme[1]) {
+                    case 'r':
+                        switch (lexeme[2]) {
+                            case 'i':
+                                switch (lexeme[3]) {
+                                    case 'n':
+                                        switch (lexeme[4]) {
+                                            case 't':
+                                                switch (lexeme[5]) {
+                                                    case 'f':
+                                                        return makeToken("Keyword", "printf", line_number);
+                                                }
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'r': // return
+            if (len == 6) {
+                switch (lexeme[1]) {
+                    case 'e':
+                        switch (lexeme[2]) {
+                            case 't':
+                                switch (lexeme[3]) {
+                                    case 'u':
+                                        switch (lexeme[4]) {
+                                            case 'r':
+                                                switch (lexeme[5]) {
+                                                    case 'n':
+                                                        return makeToken("Keyword", "return", line_number);
+                                                }
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 's': // string, switch
+            if (len == 6) { // string
+                switch (lexeme[1]) {
+                    case 't':
+                        switch (lexeme[2]) {
+                            case 'r':
+                                switch (lexeme[3]) {
+                                    case 'i':
+                                        switch (lexeme[4]) {
+                                            case 'n':
+                                                switch (lexeme[5]) {
+                                                    case 'g':
+                                                        return makeToken("Keyword", "string", line_number);
+                                                }
+                                        }
+                                }
+                        }
+                }
+            }
+            else if (len == 6) { // switch
+                switch (lexeme[1]) {
+                    case 'w':
+                        switch (lexeme[2]) {
+                            case 'i':
+                                switch (lexeme[3]) {
+                                    case 't':
+                                        switch (lexeme[4]) {
+                                            case 'c':
+                                                switch (lexeme[5]) {
+                                                    case 'h':
+                                                        return makeToken("Keyword", "switch", line_number);
+                                                }
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'v': // void
+            if (len == 4) {
+                switch (lexeme[1]) {
+                    case 'o':
+                        switch (lexeme[2]) {
+                            case 'i':
+                                switch (lexeme[3]) {
+                                    case 'd':
+                                        return makeToken("Keyword", "void", line_number);
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'w': // while
+            if (len == 5) {
+                switch (lexeme[1]) {
+                    case 'h':
+                        switch (lexeme[2]) {
+                            case 'i':
+                                switch (lexeme[3]) {
+                                    case 'l':
+                                        switch (lexeme[4]) {
+                                            case 'e':
+                                                return makeToken("Keyword", "while", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+    }
+    return NULL;
+}
+
+
+Token* reservedWords(char* lexeme, int len, int line_number) {
+    switch (lexeme[0]) {
+        case 'c': // const
+            if (len == 5) {
+                switch (lexeme[1]) {
+                    case 'o':
+                        switch (lexeme[2]) {
+                            case 'n':
+                                switch (lexeme[3]) {
+                                    case 's':
+                                        switch (lexeme[4]) {
+                                            case 't':
+                                                return makeToken("Reserved", "const", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'f': // false
+            if (len == 5) {
+                switch (lexeme[1]) {
+                    case 'a':
+                        switch (lexeme[2]) {
+                            case 'l':
+                                switch (lexeme[3]) {
+                                    case 's':
+                                        switch (lexeme[4]) {
+                                            case 'e':
+                                                return makeToken("Reserved", "false", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'n': // null
+            if (len == 4) {
+                switch (lexeme[1]) {
+                    case 'u':
+                        switch (lexeme[2]) {
+                            case 'l':
+                                switch (lexeme[3]) {
+                                    case 'l':
+                                        return makeToken("Reserved", "null", line_number);
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 't': // true
+            if (len == 4) {
+                switch (lexeme[1]) {
+                    case 'r':
+                        switch (lexeme[2]) {
+                            case 'u':
+                                switch (lexeme[3]) {
+                                    case 'e':
+                                        return makeToken("Reserved", "true", line_number);
+                                }
+                        }
+                }
+            }
+            break;
+    }
+    return NULL;
+}
+
+Token* noiseWords(char* lexeme, int len, int line_number) {
+    switch (lexeme[0]) {
+        case 'b': // by
+            if (len == 2) {
+                switch (lexeme[1]) {
+                    case 'y':
+                        return makeToken("Noise", "by", line_number);                                       
+                }
+            }
+            break;
+
+        case 'f': // from
+            if (len == 4) {
+                switch (lexeme[1]) {
+                    case 'r':
+                        switch (lexeme[2]) {
+                            case 'o':
+                                switch (lexeme[3]) {
+                                    case 'm':
+                                       return makeToken("Noise", "from", line_number);
+                                }
+                        }
+                }
+            }
+            break;
+
+        case 'u': // until
+            if (len == 5) {
+                switch (lexeme[1]) {
+                    case 'n':
+                        switch (lexeme[2]) {
+                            case 't':
+                                switch (lexeme[3]) {
+                                    case 'i':
+                                        switch (lexeme[4]) {
+                                            case 'l':
+                                                return makeToken("Noise", "until", line_number);
+                                        }
+                                }
+                        }
+                }
+            }
+            break;
+    }
+    return NULL;
 }
