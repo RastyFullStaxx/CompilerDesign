@@ -1,5 +1,7 @@
 # Prismatic Programming Language
 
+![image](https://github.com/user-attachments/assets/7fb12404-c2fa-493d-8f67-d76213850e1a)
+
 *A lightweight, intuitive programming language inspired by Python and C++.*
 
 ---
