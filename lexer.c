@@ -109,6 +109,8 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
     State state = START;
     char currentToken[50] = "";
     int i = 0;
+    int tokenLength = strlen(currentToken);
+
 
     for (int j = 0; line[j] != '\0'; j++) {
         char c = line[j];
@@ -321,36 +323,38 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 state = START;
                             } else {
                                 // Valid identifier complete
-                                            currentToken[i] = '\0';
-                                            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                                        } else // Check for reserved words
-                                Token *reservedWordToken = reservedWords(currentToken, tokenLength, lineNumber);
-                                if (reservedWordToken) {
-                                    writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
-                                    free(reservedWordToken);
-                                } else {
-                                    // Check for keywords if not a reserved word
-                                    Token *keywordToken = keywords(currentToken, tokenLength, lineNumber);
-                                    if (keywordToken) {
-                                        writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
-                                        free(keywordToken);
-                                    } else {
-                                        // Check for noise words if not a reserved word or keyword
-                                        Token *noiseWordToken = noiseWords(currentToken, tokenLength, lineNumber); // Added this line
-                                        if (noiseWordToken) {
-                                            writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
-                                            free(noiseWordToken);
-                                         } else {
-                                                writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                                             }
-                                        }
+currentToken[i] = '\0';
 
+// Check for reserved words
+Token *reservedWordToken = reservedWords(currentToken, tokenLength, lineNumber);
+if (reservedWordToken) {
+    writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
+    free(reservedWordToken);
+} else {
+    // Check for keywords if not a reserved word
+    Token *keywordToken = keywords(currentToken, tokenLength, lineNumber);
+    if (keywordToken) {
+        writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
+        free(keywordToken);
+    } else {
+        // Check for noise words if not a keyword or reserved word
+        Token *noiseWordToken = noiseWords(currentToken, tokenLength, lineNumber);
+        if (noiseWordToken) {
+            writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
+            free(noiseWordToken);
+        } else {
+            // Default to identifier if none of the above
+            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+        }
+    }
+}
 
-                                i = 0;
-                                state = START;
-                                j--; // Reprocess current character
-                            }
-                            break;
+// Reset for next token
+i = 0;
+state = START;
+j--; // Reprocess the current character
+break;
+
 
 
 
@@ -733,7 +737,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                             i = 0;
                             state = START;
                             break;
-
+                            }
 
 
 
@@ -749,99 +753,52 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                     }
                 }
 
-                                // Handle leftover tokens
-                            if (i > 0) {
-                                currentToken[i] = '\0'; // Null-terminate the token
-                                switch (state) {
-                                    case IDENTIFIER: {
-                                            // Check if it's a reserved word
-                                            int isReserved = 0;
-                                            for (int k = 0; k < reservedWordCount; k++) {
-                                                const char *reserved = reservedWords[k];
-                                                int match = 1;
+                                // Closing the leftover tokens
+if (i > 0) {
+    currentToken[i] = '\0'; // Null-terminate the token
+    switch (state) {
+        case IDENTIFIER:
+            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+            break;
 
-                                                for (int r = 0; reserved[r] != '\0'; r++) {
-                                                    if (currentToken[r] != reserved[r] || currentToken[r] == '\0') {
-                                                        match = 0;
-                                                        break;
-                                                    }
-                                                }
+        case INTEGER:
+            writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+            break;
 
-                                                // Ensure the token length matches the reserved word length
-                                                if (match && currentToken[strlen(reserved)] == '\0') {
-                                                    isReserved = 1;
-                                                    break;
-                                                }
-                                            }
+        case FLOAT:
+            writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
+            break;
 
-                                        if (isReserved) {
-                                            writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
-                                        } else {
-                                            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                                        }
-                                        break;
+        case ARITHMETIC_OPERATOR:
+            writeToken(symbolTable, "Arithmetic Operator", currentToken, lineNumber);
+            break;
 
-                                    }
+        case ASSIGNMENT_OPERATOR:
+            writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
+            break;
 
-                                    Token *reservedWordToken = reservedWords(currentToken, tokenLength, lineNumber);
-                                        if (reservedWordToken) {
-                                            writeToken(symbolTable, reservedWordToken->type, reservedWordToken->value, reservedWordToken->lineNumber);
-                                            free(reservedWordToken);
-                                        } else {
-                                            // Check for keywords if not a reserved word
-                                            Token *keywordToken = keywords(currentToken, tokenLength, lineNumber);
-                                            if (keywordToken) {
-                                                writeToken(symbolTable, keywordToken->type, keywordToken->value, keywordToken->lineNumber);
-                                                free(keywordToken);
-                                            } else {
-                                                // Check for noise words if not a reserved word or keyword
-                                                Token *noiseWordToken = noiseWords(currentToken, tokenLength, lineNumber); 
-                                                if (noiseWordToken) {
-                                                    writeToken(symbolTable, noiseWordToken->type, noiseWordToken->value, noiseWordToken->lineNumber);
-                                                    free(noiseWordToken);
-                                                } else {
-                                                    writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                                                }
-                                            }
-                                        }
+        case RELATIONAL_OPERATOR:
+            writeToken(symbolTable, "Relational Operator", currentToken, lineNumber);
+            break;
 
-                                    case INTEGER:
-                                        writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-                                        break;
+        case LOGICAL_OPERATOR:
+            writeToken(symbolTable, "Logical Operator", currentToken, lineNumber);
+            break;
 
-                                    case FLOAT:
-                                        writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
-                                        break;
+        case UNARY_OPERATOR:
+            writeToken(symbolTable, "Unary Operator", currentToken, lineNumber);
+            break;
 
-                                    case ARITHMETIC_OPERATOR:
-                                        writeToken(symbolTable, "Arithmetic Operator", currentToken, lineNumber);
-                                        break;
+        case DELIMITER:
+            writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+            break;
 
-                                    case ASSIGNMENT_OPERATOR:
-                                        writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
-                                        break;
-
-                                    case RELATIONAL_OPERATOR:
-                                        writeToken(symbolTable, "Relational Operator", currentToken, lineNumber);
-                                        break;
-
-                                    case LOGICAL_OPERATOR:
-                                        writeToken(symbolTable, "Logical Operator", currentToken, lineNumber);
-                                        break;
-
-                                    case UNARY_OPERATOR:
-                                        writeToken(symbolTable, "Unary Operator", currentToken, lineNumber);
-                                        break;
-
-                                    case DELIMITER:
-                                        writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
-                                        break;
-
-                                    default:
-                                        writeToken(symbolTable, "Unknown", currentToken, lineNumber);
-                                        break;
-                                            }           
-                                        }           
+        default:
+            writeToken(symbolTable, "Unknown", currentToken, lineNumber);
+            break;
+    }
+}
+           
 
 } // end of processLine function
 
@@ -887,34 +844,19 @@ int isDelimiter(char c) {
 
 // Recursive tokenization
 Token* makeToken(const char* type, const char* value, int lineNumber) {
-    // Allocate memory for a new token
     Token* newToken = (Token*)malloc(sizeof(Token));
     if (!newToken) {
-        perror("Memory allocation failed");
+        fprintf(stderr, "Error: Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-
-    // Copy the type string manually
-    int i = 0;
-    while (type[i] != '\0' && i < sizeof(newToken->type) - 1) {
-        newToken->type[i] = type[i];
-        i++;
-    }
-    newToken->type[i] = '\0'; // Null-terminate the string
-
-    // Copy the value string manually
-    i = 0;
-    while (value[i] != '\0' && i < sizeof(newToken->value) - 1) {
-        newToken->value[i] = value[i];
-        i++;
-    }
-    newToken->value[i] = '\0'; // Null-terminate the string
-
-    // Set the line number
+    strncpy(newToken->type, type, sizeof(newToken->type) - 1);
+    newToken->type[sizeof(newToken->type) - 1] = '\0';
+    strncpy(newToken->value, value, sizeof(newToken->value) - 1);
+    newToken->value[sizeof(newToken->value) - 1] = '\0';
     newToken->lineNumber = lineNumber;
-
     return newToken;
 }
+
 
 Token* keywords(char* lexeme, int len, int line_number) {
     switch (lexeme[0]) {
