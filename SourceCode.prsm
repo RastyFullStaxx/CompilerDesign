@@ -1,0 +1,115 @@
+~~ Arithmetic Operators
++
+-
+*
+/
+%
+^
+//
+
+~~ Assignment Operators 
+=
++=
+-=
+*=
+/=
+%=
+//=
+
+~~ Unary Operators
++
+++
+-
+--
+
+~~ Logical Operators
+!
+||
+&&
+
+~~ Relational Operators
+==
+!=
+>
+<
+>=
+<=
+
+~~ Keywords
+bool
+break
+case
+char
+continue
+default
+do
+else
+float
+for
+goto
+if
+int
+main
+printf
+return
+input
+string
+switch
+void
+while
+array
+
+~~ Reserved Words
+true
+false
+null
+const
+
+~~ Noise Words
+by
+from
+until
+
+~~ Delimiters
+(
+)
+{
+}
+[
+]
+,
+.
+;
+: 
+'R'
+""
+
+~/ Array Declaration
+array int[]
+array float[]
+array boolean[]
+array char[]
+array string[]
+/~
+
+~~ Sample Errors
+12ten
+lei$Variable
+@@##%*
+@rast%yVa&riable
+#rast#yVariable
+$rast$yVari@able
+
+~~ No spaces (must still be validand separated)
+12 - 43
+32 - 2
+12 - 43
+x - y
+num - 21
+
+~~ Close spaces (must be valid)
+12-43
+32-2
+12-43
+x-y
+num-21
