@@ -405,10 +405,21 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
     }
     break;
 
+
+
+
+
+
+
+
                         case INTEGER:
                             if (isdigit(c)) {
                                 // Continue building the integer
                                 currentToken[i++] = c;
+                            } else if (c == '.' && isdigit(line[j + 1])) {
+                                // Transition to FLOAT state if '.' is followed by a digit
+                                currentToken[i++] = c;
+                                state = FLOAT;
                             } else if (isalpha(c) || c == '_') {
                                 // Invalid integer (e.g., "14anneVariable")
                                 while (isalnum(c) || c == '_') {
@@ -426,6 +437,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
                                 i = 0;
 
+                                // Handle next character
                                 if (isDelimiter(c)) {
                                     currentToken[i++] = c;
                                     currentToken[i] = '\0';
@@ -449,33 +461,36 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
                         case FLOAT:
                             if (isdigit(c)) {
                                 // Continue building the float literal
-                                currentToken[i++] = c;
-                            } else if (c == '.' && isdigit(line[j + 1])) {
-                                // Allow another decimal point only if followed by a digit
                                 currentToken[i++] = c;
                             } else {
                                 // Float literal complete
                                 currentToken[i] = '\0';
                                 writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
                                 i = 0;
-                                state = START;
-                                j--; // Reprocess current character
+                        
+                                // Handle next character
+                                if (isDelimiter(c)) {
+                                    currentToken[i++] = c;
+                                    currentToken[i] = '\0';
+                                    writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+                                    i = 0;
+                                    state = START;
+                                } else if (!isspace(c)) {
+                                    // Reprocess invalid character
+                                    currentToken[i++] = c;
+                                    currentToken[i] = '\0';
+                                    writeToken(symbolTable, "Lexical Error (Invalid Float)", currentToken, lineNumber);
+                                    i = 0;
+                                    state = START;
+                                } else {
+                                    state = START;
+                                }
                             }
                             break;
+
 
 
 
@@ -919,16 +934,32 @@ int isDelimiter(char c) {
 
 // Recursive tokenization
 Token* makeToken(const char* type, const char* value, int lineNumber) {
+    // Allocate memory for a new token
     Token* newToken = (Token*)malloc(sizeof(Token));
     if (!newToken) {
-        fprintf(stderr, "Error: Memory allocation failed\n");
+        perror("Memory allocation failed");
         exit(EXIT_FAILURE);
     }
-    strncpy(newToken->type, type, sizeof(newToken->type) - 1);
-    newToken->type[sizeof(newToken->type) - 1] = '\0';
-    strncpy(newToken->value, value, sizeof(newToken->value) - 1);
-    newToken->value[sizeof(newToken->value) - 1] = '\0';
+
+    // Copy the type string 
+    int i = 0;
+    while (type[i] != '\0' && i < sizeof(newToken->type) - 1) {
+        newToken->type[i] = type[i];
+        i++;
+    }
+    newToken->type[i] = '\0'; 
+
+    // Copy the value string 
+    i = 0;
+    while (value[i] != '\0' && i < sizeof(newToken->value) - 1) {
+        newToken->value[i] = value[i];
+        i++;
+    }
+    newToken->value[i] = '\0'; 
+
+    // Setting the line number
     newToken->lineNumber = lineNumber;
+
     return newToken;
 }
 
