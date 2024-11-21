@@ -351,116 +351,101 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
                         case IDENTIFIER:
-                            if (isalnum(c) || c == '_') {
-                                // Continue building the identifier
+    if (isalnum(c) || c == '_') {
+        // Continue building the identifier
+        currentToken[i++] = c;
+    } else if (!isalpha(currentToken[0]) && !isDelimiter(c) && !isspace(c)) {
+        // If identifier starts with an invalid character or contains invalid ones
+        while (isalnum(c) || c == '_' || (!isDelimiter(c) && !isspace(c))) {
+            currentToken[i++] = c;
+            c = line[++j]; // Consume the invalid characters
+        }
+        currentToken[i] = '\0';
+        writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
+        i = 0;
+        state = START;
+        j--; // Reprocess the last character
+    } else {
+        // Finalize identifier when encountering a valid delimiter or space
+        currentToken[i] = '\0';
+        Token *token = NULL;
+
+        // Check if identifier matches reserved words, keywords, or noise words
+        token = reservedWords(currentToken, strlen(currentToken), lineNumber);
+        if (!token) token = keywords(currentToken, strlen(currentToken), lineNumber);
+        if (!token) token = noiseWords(currentToken, strlen(currentToken), lineNumber);
+
+        if (token) {
+            writeToken(symbolTable, token->type, token->value, token->lineNumber);
+            free(token);
+        } else {
+            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+        }
+
+        i = 0;
+        memset(currentToken, 0, sizeof(currentToken));
+
+        // Handle next character
+        if (isDelimiter(c)) {
+            currentToken[i++] = c;
+            currentToken[i] = '\0';
+            writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+            i = 0;
+            state = START;
+        } else if (!isspace(c)) {
+            // Reprocess invalid character as a lexical error
+            currentToken[i++] = c;
+            currentToken[i] = '\0';
+            writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
+            i = 0;
+            state = START;
+        } else {
+            state = START;
+        }
+    }
+    break;
+
+                        case INTEGER:
+                            if (isdigit(c)) {
+                                // Continue building the integer
                                 currentToken[i++] = c;
-                            } else {
-                                // Finalize identifier when encountering a non-alphanumeric character
-                                currentToken[i] = '\0';
-                                Token *token = NULL;
-
-                                // Check if the identifier matches reserved words, keywords, or noise words
-                                token = reservedWords(currentToken, strlen(currentToken), lineNumber);
-                                if (!token) token = keywords(currentToken, strlen(currentToken), lineNumber);
-                                if (!token) token = noiseWords(currentToken, strlen(currentToken), lineNumber);
-
-                                if (token) {
-                                    writeToken(symbolTable, token->type, token->value, token->lineNumber);
-                                    free(token);
-                                } else {
-                                    writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                            } else if (isalpha(c) || c == '_') {
+                                // Invalid integer (e.g., "14anneVariable")
+                                while (isalnum(c) || c == '_') {
+                                    currentToken[i++] = c;
+                                    c = line[++j];
                                 }
-                                i = 0; 
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
+                                i = 0;
+                                state = START;
+                                j--; // Reprocess the last character
+                            } else {
+                                // Finalize integer when encountering a valid delimiter or space
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+                                i = 0;
 
-                                // For the next character
-                                if (c == '\'') {
-                                    currentToken[i++] = c;
-                                    state = CHAR_LITERAL;
-                                } else if (c == '"') {
-                                    currentToken[i++] = c;
-                                    state = STRING_LITERAL;
-                                } else if (isDelimiter(c)) {
+                                if (isDelimiter(c)) {
                                     currentToken[i++] = c;
                                     currentToken[i] = '\0';
                                     writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
                                     i = 0;
                                     state = START;
                                 } else if (!isspace(c)) {
-                                    // Unexpected character 
+                                    // Reprocess invalid character
                                     currentToken[i++] = c;
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Lexical Error", currentToken, lineNumber);
+                                    writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
                                     i = 0;
                                     state = START;
                                 } else {
-                                    // Ignore whitespace
                                     state = START;
                                 }
                             }
                             break;
 
 
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-                        case INTEGER:
-                            if (isdigit(c)) {
-                                // Continue building the integer
-                                currentToken[i++] = c;
-                            } else if (isspace(c)) {
-                                // Finalize integer if space is encountered
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-                                i = 0;
-                                state = START;
-                            } else if (c == '+' || c == '-' || c == '*' || c == '/') {
-                                // Finalize integer and handle operator
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-                                i = 0;
-                                currentToken[i++] = c;
-                                currentToken[i] = '\0';
-                                const char *type = (c == '+') ? "Arithmetic Operator (Addition)" :
-                                                   (c == '-') ? "Arithmetic Operator (Subtraction)" :
-                                                   (c == '*') ? "Arithmetic Operator (Multiplication)" :
-                                                                "Arithmetic Operator (Division)";
-                                writeToken(symbolTable, type, currentToken, lineNumber);
-                                i = 0;
-                                state = START;
-                            } else if (isDelimiter(c)) {
-                                // Finalize integer and handle delimiter
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-                                i = 0;
-                                state = START;
-                                j--; // Reprocess delimiter
-                            } else {
-                                // Handle unexpected characters
-                                currentToken[i++] = c;
-                                while (!isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
-                                    currentToken[i++] = line[++j];
-                                }
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
-                                i = 0;
-                                state = START;
-                            }
-                            break;
 
 
 
@@ -810,14 +795,19 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
                         case ERROR:
                             currentToken[i] = '\0'; // Null-terminate the token
-                            writeToken(symbolTable, "Unknown Token", currentToken, lineNumber);
+                            writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
                             i = 0; // Reset token index
+                            memset(currentToken, 0, sizeof(currentToken)); // Clear the currentToken
+                        
+                            // Reprocess current character if not whitespace or delimiter
+                            if (!isspace(c) && !isDelimiter(c)) {
+                                j--; // Reprocess the character in the START state
+                            }
+                        
                             state = START; // Return to START state
-                            j--;  // Reprocess the current character
                             break;
 
-                        default:
-                            break;
+
 
 
                     }
