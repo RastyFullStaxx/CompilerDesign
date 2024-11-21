@@ -1,3 +1,18 @@
+~~ Sample Errors
+12ten
+@@##%*
+@rast%yVa&riable
+#rast#yVariable
+$rast$yVari@able
+14anneVariable
+
+~~ const
+18
+rastyIdentifier
+18.18
+'R'
+"String Literal"
+
 ~~ Arithmetic Operators
 +
 -
@@ -81,35 +96,12 @@ until
 .
 ;
 : 
-'R'
-""
 
-~/ Array Declaration
-array int[]
-array float[]
-array boolean[]
-array char[]
-array string[]
-/~
-
-~~ Sample Errors
-12ten
-lei$Variable
-@@##%*
-@rast%yVa&riable
-#rast#yVariable
-$rast$yVari@able
 
 ~~ No spaces (must still be validand separated)
 12 - 43
-32 - 2
-12 - 43
-x - y
-num - 21
+
 
 ~~ Close spaces (must be valid)
 12-43
-32-2
-12-43
-x-y
-num-21
+
