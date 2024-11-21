@@ -38,26 +38,38 @@ Token* makeToken(const char* type, const char* value, int lineNumber);
 Token* keywords(char* lexeme, int len, int line_number);
 Token* reservedWords(char* lexeme, int len, int line_number);
 Token* noiseWords(char* lexeme, int len, int line_number);
+int validFiletype(const char *fileName);
 
 
-int main() {
-    FILE *sourceFile = fopen("SourceCode.prsm", "r");
-    if (!sourceFile) {
-        perror("Error opening SourceCode.prsm");
+int main() { // main function
+
+    // Source file selection and validation
+    const char *fileName = "SourceCode.prsm";
+
+    if(validFiletype(fileName)){
+        fprintf(stderr, "Error: Invalid file type. Only .prsm are accepted\n");
         return 1;
     }
 
-    FILE *symbolTable = fopen("symbol_table.txt", "w");
-    if (!symbolTable) {
-        perror("Error opening symbol_table.txt");
-        return 1;
-    }
+        // Validate if the source has the .prsm extension
+        FILE *sourceFile = fopen(fileName, "r");
+        if (!sourceFile) {
+            perror("Error opening file");
+            return 1;
+        }
+
+        FILE *symbolTable = fopen("symbol_table.prsm", "w");
+        if (!symbolTable) {
+            perror("Error opening symbol_table.prsm");
+            return 1;
+        }
 
     // Write header
     writeHorizantalBar(symbolTable);
     fprintf(symbolTable, "%-65s%-30s%-20s\n", "Token Type", "Value", "LineNumber");
     writeHorizantalBar(symbolTable);
 
+    // Writes the header ti the symbol table
     char line[256];
     int lineNumber = 1;
     int inComment = 0;  // Multi-line comment flag
@@ -76,35 +88,52 @@ int main() {
             continue;
         }
 
-        // Handle multi-line comments
-        if (inComment) {
-            if (strstr(line, "/~")) {
-                writeToken(symbolTable, "Multi-line Comment End", "/~", lineNumber);
-                inComment = 0;  // End comment
-            }
-            lineNumber++;
-            continue;  // Ignore content inside multi-line comments
-        }
+        // Handle multi-line comments by reading line by line and trims trailing whitespaces
+        // Process multi-line comments like an NFA
+int startCommentIndex, endCommentIndex;
+startCommentIndex = strstr(line, "~/") ? strstr(line, "~/") - line : -1;
+endCommentIndex = strstr(line, "/~") ? strstr(line, "/~") - line : -1;
 
-        if (strstr(line, "~/")) {
-            writeToken(symbolTable, "Multi-line Comment Start", "~/", lineNumber);
-            inComment = 1;  // Start comment
-            lineNumber++;
-            continue;
-        }
+// Process multi-line comments
+while (startCommentIndex != -1 || endCommentIndex != -1) {
+    if (startCommentIndex != -1 && (endCommentIndex == -1 || startCommentIndex < endCommentIndex)) {
+        // Found a "Multi-line Comment Start" before an "End" or no "End"
+        writeToken(symbolTable, "Multi-line Comment Start", "~/", lineNumber);
+        inComment = 1;
+        startCommentIndex = strstr(line + startCommentIndex + 2, "~/") 
+                            ? strstr(line + startCommentIndex + 2, "~/") - line 
+                            : -1;
+    } else if (endCommentIndex != -1) {
+        // Found a "Multi-line Comment End"
+        writeToken(symbolTable, "Multi-line Comment End", "/~", lineNumber);
+        inComment = 0;
+        endCommentIndex = strstr(line + endCommentIndex + 2, "/~") 
+                          ? strstr(line + endCommentIndex + 2, "/~") - line 
+                          : -1;
+    }
+}
+
+// If still in a multi-line comment after processing the line
+if (inComment) {
+    lineNumber++;
+    continue;  // Ignore content inside the ongoing multi-line comment
+}
+
 
         // Process regular lines
         processLine(line, lineNumber, symbolTable);
         lineNumber++;
     }
+        // Closees the file opened
+        fclose(sourceFile);
+        fclose(symbolTable);
 
-    fclose(sourceFile);
-    fclose(symbolTable);
+        // Console notice for successful reading
+        printf("Lexical analysis completed. Tokens saved in symbol_table.prsm\n");
+        return 0;
+    }
 
-    printf("Lexical analysis completed. Tokens saved in symbol_table.txt\n");
-    return 0;
-}
-
+// processLine function
 void processLine(char *line, int lineNumber, FILE *symbolTable) {
     State state = START;
     char currentToken[50] = "";
@@ -326,10 +355,13 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
     if (isalnum(c) || c == '_') {
         // Continue building the identifier
         currentToken[i++] = c;
-    } else if (isspace(c)) {
-        // Finalize identifier on whitespace
+    } else {
+        // Finalize identifier when encountering a non-alphanumeric character
         currentToken[i] = '\0';
-        Token *token = reservedWords(currentToken, strlen(currentToken), lineNumber);
+        Token *token = NULL;
+
+        // Check if the identifier matches reserved words, keywords, or noise words
+        token = reservedWords(currentToken, strlen(currentToken), lineNumber);
         if (!token) token = keywords(currentToken, strlen(currentToken), lineNumber);
         if (!token) token = noiseWords(currentToken, strlen(currentToken), lineNumber);
 
@@ -339,39 +371,32 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
         } else {
             writeToken(symbolTable, "Identifier", currentToken, lineNumber);
         }
-        i = 0;
-        state = START;
-    } else if (c == '+' || c == '-' || c == '*' || c == '/') {
-        // Finalize identifier and handle operator
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-        i = 0;
-        currentToken[i++] = c;
-        currentToken[i] = '\0';
-        const char *type = (c == '+') ? "Arithmetic Operator (Addition)" :
-                           (c == '-') ? "Arithmetic Operator (Subtraction)" :
-                           (c == '*') ? "Arithmetic Operator (Multiplication)" :
-                                        "Arithmetic Operator (Division)";
-        writeToken(symbolTable, type, currentToken, lineNumber);
-        i = 0;
-        state = START;
-    } else if (isDelimiter(c)) {
-        // Finalize identifier and handle delimiter
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-        i = 0;
-        state = START;
-        j--; // Reprocess delimiter
-    } else {
-        // Handle invalid identifiers
-        currentToken[i++] = c;
-        while (!isspace(line[j + 1]) && !isDelimiter(line[j + 1]) && line[j + 1] != '\0') {
-            currentToken[i++] = line[++j];
+        i = 0; 
+
+        // For the next character
+        if (c == '\'') {
+            currentToken[i++] = c;
+            state = CHAR_LITERAL;
+        } else if (c == '"') {
+            currentToken[i++] = c;
+            state = STRING_LITERAL;
+        } else if (isDelimiter(c)) {
+            currentToken[i++] = c;
+            currentToken[i] = '\0';
+            writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+            i = 0;
+            state = START;
+        } else if (!isspace(c)) {
+            // Unexpected character 
+            currentToken[i++] = c;
+            currentToken[i] = '\0';
+            writeToken(symbolTable, "Lexical Error", currentToken, lineNumber);
+            i = 0;
+            state = START;
+        } else {
+            // Ignore whitespace
+            state = START;
         }
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
-        i = 0;
-        state = START;
     }
     break;
 
@@ -1406,4 +1431,24 @@ Token* noiseWords(char* lexeme, int len, int line_number) {
             break;
     }
     return NULL;
+}
+int validFiletype(const char *fileName){
+    const char *extension = strrchr(fileName, '.');
+    if(!extension){
+        return 1;
+    }
+
+    const char *prisma = ".prsm";
+    while(*extension && *prisma){
+        if(*extension != *prisma){
+            return 1;
+        }
+        extension++;
+        prisma++;
+    }
+
+    if (*extension == '\0' && *prisma == '\0'){
+        return 0;
+    }
+    return 1;
 }
