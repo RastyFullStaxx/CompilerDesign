@@ -88,39 +88,38 @@ int main() { // main function
             continue;
         }
 
-        // Handle multi-line comments by reading line by line and trims trailing whitespaces
-        // Process multi-line comments like an NFA
-int startCommentIndex, endCommentIndex;
-startCommentIndex = strstr(line, "~/") ? strstr(line, "~/") - line : -1;
-endCommentIndex = strstr(line, "/~") ? strstr(line, "/~") - line : -1;
+        // Process multi-line comments like an NFA, comment symbols are read independently
+        int startCommentIndex, endCommentIndex;
+        startCommentIndex = strstr(line, "~/") ? strstr(line, "~/") - line : -1;
+        endCommentIndex = strstr(line, "/~") ? strstr(line, "/~") - line : -1;
 
-// Process multi-line comments
-while (startCommentIndex != -1 || endCommentIndex != -1) {
-    if (startCommentIndex != -1 && (endCommentIndex == -1 || startCommentIndex < endCommentIndex)) {
-        // Found a "Multi-line Comment Start" before an "End" or no "End"
-        writeToken(symbolTable, "Multi-line Comment Start", "~/", lineNumber);
-        inComment = 1;
-        startCommentIndex = strstr(line + startCommentIndex + 2, "~/") 
-                            ? strstr(line + startCommentIndex + 2, "~/") - line 
-                            : -1;
-    } else if (endCommentIndex != -1) {
-        // Found a "Multi-line Comment End"
-        writeToken(symbolTable, "Multi-line Comment End", "/~", lineNumber);
-        inComment = 0;
-        endCommentIndex = strstr(line + endCommentIndex + 2, "/~") 
-                          ? strstr(line + endCommentIndex + 2, "/~") - line 
-                          : -1;
-    }
-}
+        // Process multi-line comments
+        while (startCommentIndex != -1 || endCommentIndex != -1) {
+            if (startCommentIndex != -1 && (endCommentIndex == -1 || startCommentIndex < endCommentIndex)) {
+                // Found a "Multi-line Comment Start" before an "End" or no "End"
+                writeToken(symbolTable, "Multi-line Comment Start", "~/", lineNumber);
+                inComment = 1;
+                startCommentIndex = strstr(line + startCommentIndex + 2, "~/") 
+                                    ? strstr(line + startCommentIndex + 2, "~/") - line 
+                                    : -1;
+            } else if (endCommentIndex != -1) {
+                // Found a "Multi-line Comment End"
+                writeToken(symbolTable, "Multi-line Comment End", "/~", lineNumber);
+                inComment = 0;
+                endCommentIndex = strstr(line + endCommentIndex + 2, "/~") 
+                                  ? strstr(line + endCommentIndex + 2, "/~") - line 
+                                  : -1;
+            }
+        }
 
-// If still in a multi-line comment after processing the line
-if (inComment) {
-    lineNumber++;
-    continue;  // Ignore content inside the ongoing multi-line comment
-}
+            // If still in a multi-line comment after processing the line
+            if (inComment) {
+                lineNumber++;
+                continue;  // Ignore content inside the ongoing multi-line comment
+            }
 
 
-        // Process regular lines
+        // Handles multi-line comments, toggling the inComment flag
         processLine(line, lineNumber, symbolTable);
         lineNumber++;
     }
@@ -282,16 +281,16 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                     state = IDENTIFIER;
                     currentToken[i++] = c;
                 } else if (!isspace(c) && !isDelimiter(c) && !isalnum(c) && c != '_') {
-        // Invalid token starting with a special character
-        currentToken[i++] = c; // Capture the invalid starting character
-        while (line[j + 1] != '\0' && !isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
-            currentToken[i++] = line[++j]; // Append subsequent characters
-        }
-        currentToken[i] = '\0'; // Null-terminate
-        writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
-        i = 0;
-        state = START; // Reset state
-        break;
+                    // Invalid token starting with a special character
+                    currentToken[i++] = c; // Capture the invalid starting character
+                    while (line[j + 1] != '\0' && !isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
+                        currentToken[i++] = line[++j]; // Append subsequent characters
+                    }
+                    currentToken[i] = '\0'; // Null-terminate
+                    writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
+                    i = 0;
+                    state = START; // Reset state
+                    break;
                 } else if (isdigit(c)) {
                     // Start of integer
                     state = INTEGER;
@@ -352,53 +351,53 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
                         case IDENTIFIER:
-    if (isalnum(c) || c == '_') {
-        // Continue building the identifier
-        currentToken[i++] = c;
-    } else {
-        // Finalize identifier when encountering a non-alphanumeric character
-        currentToken[i] = '\0';
-        Token *token = NULL;
+                            if (isalnum(c) || c == '_') {
+                                // Continue building the identifier
+                                currentToken[i++] = c;
+                            } else {
+                                // Finalize identifier when encountering a non-alphanumeric character
+                                currentToken[i] = '\0';
+                                Token *token = NULL;
 
-        // Check if the identifier matches reserved words, keywords, or noise words
-        token = reservedWords(currentToken, strlen(currentToken), lineNumber);
-        if (!token) token = keywords(currentToken, strlen(currentToken), lineNumber);
-        if (!token) token = noiseWords(currentToken, strlen(currentToken), lineNumber);
+                                // Check if the identifier matches reserved words, keywords, or noise words
+                                token = reservedWords(currentToken, strlen(currentToken), lineNumber);
+                                if (!token) token = keywords(currentToken, strlen(currentToken), lineNumber);
+                                if (!token) token = noiseWords(currentToken, strlen(currentToken), lineNumber);
 
-        if (token) {
-            writeToken(symbolTable, token->type, token->value, token->lineNumber);
-            free(token);
-        } else {
-            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-        }
-        i = 0; 
+                                if (token) {
+                                    writeToken(symbolTable, token->type, token->value, token->lineNumber);
+                                    free(token);
+                                } else {
+                                    writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                                }
+                                i = 0; 
 
-        // For the next character
-        if (c == '\'') {
-            currentToken[i++] = c;
-            state = CHAR_LITERAL;
-        } else if (c == '"') {
-            currentToken[i++] = c;
-            state = STRING_LITERAL;
-        } else if (isDelimiter(c)) {
-            currentToken[i++] = c;
-            currentToken[i] = '\0';
-            writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
-            i = 0;
-            state = START;
-        } else if (!isspace(c)) {
-            // Unexpected character 
-            currentToken[i++] = c;
-            currentToken[i] = '\0';
-            writeToken(symbolTable, "Lexical Error", currentToken, lineNumber);
-            i = 0;
-            state = START;
-        } else {
-            // Ignore whitespace
-            state = START;
-        }
-    }
-    break;
+                                // For the next character
+                                if (c == '\'') {
+                                    currentToken[i++] = c;
+                                    state = CHAR_LITERAL;
+                                } else if (c == '"') {
+                                    currentToken[i++] = c;
+                                    state = STRING_LITERAL;
+                                } else if (isDelimiter(c)) {
+                                    currentToken[i++] = c;
+                                    currentToken[i] = '\0';
+                                    writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+                                    i = 0;
+                                    state = START;
+                                } else if (!isspace(c)) {
+                                    // Unexpected character 
+                                    currentToken[i++] = c;
+                                    currentToken[i] = '\0';
+                                    writeToken(symbolTable, "Lexical Error", currentToken, lineNumber);
+                                    i = 0;
+                                    state = START;
+                                } else {
+                                    // Ignore whitespace
+                                    state = START;
+                                }
+                            }
+                            break;
 
 
 
@@ -420,48 +419,48 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
                         case INTEGER:
-    if (isdigit(c)) {
-        // Continue building the integer
-        currentToken[i++] = c;
-    } else if (isspace(c)) {
-        // Finalize integer if space is encountered
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-        i = 0;
-        state = START;
-    } else if (c == '+' || c == '-' || c == '*' || c == '/') {
-        // Finalize integer and handle operator
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-        i = 0;
-        currentToken[i++] = c;
-        currentToken[i] = '\0';
-        const char *type = (c == '+') ? "Arithmetic Operator (Addition)" :
-                           (c == '-') ? "Arithmetic Operator (Subtraction)" :
-                           (c == '*') ? "Arithmetic Operator (Multiplication)" :
-                                        "Arithmetic Operator (Division)";
-        writeToken(symbolTable, type, currentToken, lineNumber);
-        i = 0;
-        state = START;
-    } else if (isDelimiter(c)) {
-        // Finalize integer and handle delimiter
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
-        i = 0;
-        state = START;
-        j--; // Reprocess delimiter
-    } else {
-        // Handle unexpected characters
-        currentToken[i++] = c;
-        while (!isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
-            currentToken[i++] = line[++j];
-        }
-        currentToken[i] = '\0';
-        writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
-        i = 0;
-        state = START;
-    }
-    break;
+                            if (isdigit(c)) {
+                                // Continue building the integer
+                                currentToken[i++] = c;
+                            } else if (isspace(c)) {
+                                // Finalize integer if space is encountered
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+                                i = 0;
+                                state = START;
+                            } else if (c == '+' || c == '-' || c == '*' || c == '/') {
+                                // Finalize integer and handle operator
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+                                i = 0;
+                                currentToken[i++] = c;
+                                currentToken[i] = '\0';
+                                const char *type = (c == '+') ? "Arithmetic Operator (Addition)" :
+                                                   (c == '-') ? "Arithmetic Operator (Subtraction)" :
+                                                   (c == '*') ? "Arithmetic Operator (Multiplication)" :
+                                                                "Arithmetic Operator (Division)";
+                                writeToken(symbolTable, type, currentToken, lineNumber);
+                                i = 0;
+                                state = START;
+                            } else if (isDelimiter(c)) {
+                                // Finalize integer and handle delimiter
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+                                i = 0;
+                                state = START;
+                                j--; // Reprocess delimiter
+                            } else {
+                                // Handle unexpected characters
+                                currentToken[i++] = c;
+                                while (!isspace(line[j + 1]) && !isDelimiter(line[j + 1])) {
+                                    currentToken[i++] = line[++j];
+                                }
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
+                                i = 0;
+                                state = START;
+                            }
+                            break;
 
 
 
@@ -901,6 +900,7 @@ void writeHorizantalBar(FILE *symbolTable) {
     }
 }
 
+// Whitespace removal function
 void trimWhitespace(char *str) {
     if (str == NULL) {
         return;
