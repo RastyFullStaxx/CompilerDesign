@@ -1,0 +1,107 @@
+--------------------------------------------------------------------------------------------------------------------------------------------
+Token Type                                                       Value                         LineNumber          
+--------------------------------------------------------------------------------------------------------------------------------------------
+Single-line Comment                                              ~~                            1                   
+Identifier                                                       _rastyvar1                    2                   
+Identifier                                                       Rastyvar1                     3                   
+Identifier                                                       rastyvar1                     4                   
+Single-line Comment                                              ~~                            6                   
+Lexical Error (Invalid Identifier)                               @@##%*                        7                   
+Lexical Error (Invalid Identifier)                               @rast%yVa&riable              8                   
+Lexical Error (Invalid Identifier)                               #rast#yVariable               9                   
+Lexical Error (Invalid Identifier)                               $rast$yVari@able              10                  
+Lexical Error (Invalid Integer)                                  14anneVariable                11                  
+Lexical Error (Invalid Identifier)                               $invalid                      12                  
+Single-line Comment                                              ~~                            14                  
+Integer Literal                                                  18                            15                  
+Identifier                                                       rastyIdentifier               16                  
+Float Literal                                                    18.18                         17                  
+Character Literal                                                'R'                           18                  
+String Literal                                                   "String Literal"              19                  
+Single-line Comment                                              ~~                            21                  
+Arithmetic Operator (Addition)                                   +                             22                  
+Arithmetic Operator (Subtraction)                                -                             23                  
+Arithmetic Operator (Multiplication)                             *                             24                  
+Arithmetic Operator (Division)                                   /                             25                  
+Arithmetic Operator (Modulo)                                     %                             26                  
+Arithmetic Operator (Exponentiation)                             ^                             27                  
+Arithmetic Operator (Integer Division)                           //                            28                  
+Single-line Comment                                              ~~                            30                  
+Assignment Operator                                              =                             31                  
+Addition Assignment Operator                                     +=                            32                  
+Subtraction Assignment Operator                                  -=                            33                  
+Multiplication Assignment Operator                               *=                            34                  
+Division Assignment Operator                                     /=                            35                  
+Modulo Assignment Operator                                       %=                            36                  
+Integer Division Assignment Operator                             //=                           37                  
+Single-line Comment                                              ~~                            39                  
+Arithmetic Operator (Addition)                                   +                             40                  
+Unary Operator (Increment)                                       ++                            41                  
+Arithmetic Operator (Subtraction)                                -                             42                  
+Unary Operator (Decrement)                                       --                            43                  
+Single-line Comment                                              ~~                            45                  
+Logical Operator (NOT)                                           !                             46                  
+Logical Operator (OR)                                            ||                            47                  
+Logical Operator (AND)                                           &&                            48                  
+Single-line Comment                                              ~~                            50                  
+Relational Operator (Equal To)                                   ==                            51                  
+Relational Operator (Not Equal To)                               !=                            52                  
+Relational Operator (Greater Than)                               >                             53                  
+Relational Operator (Less Than)                                  <                             54                  
+Relational Operator (Greater Than or Equal To)                   >=                            55                  
+Relational Operator (Less Than or Equal To)                      <=                            56                  
+Single-line Comment                                              ~~                            58                  
+Keyword                                                          bool                          59                  
+Keyword                                                          break                         60                  
+Keyword                                                          case                          61                  
+Keyword                                                          char                          62                  
+Keyword                                                          continue                      63                  
+Keyword                                                          default                       64                  
+Keyword                                                          do                            65                  
+Keyword                                                          else                          66                  
+Keyword                                                          float                         67                  
+Keyword                                                          for                           68                  
+Keyword                                                          goto                          69                  
+Keyword                                                          if                            70                  
+Keyword                                                          int                           71                  
+Keyword                                                          main                          72                  
+Keyword                                                          printf                        73                  
+Identifier                                                       return                        74                  
+Keyword                                                          input                         75                  
+Keyword                                                          string                        76                  
+Keyword                                                          switch                        77                  
+Keyword                                                          void                          78                  
+Keyword                                                          while                         79                  
+Identifier                                                       array                         80                  
+Single-line Comment                                              ~~                            82                  
+Reserved Word                                                    true                          83                  
+Keyword                                                          false                         84                  
+Reserved Word                                                    null                          85                  
+Reserved Word                                                    const                         86                  
+Single-line Comment                                              ~~                            88                  
+Noise Word                                                       by                            89                  
+Noise Word                                                       from                          90                  
+Noise Word                                                       until                         91                  
+Single-line Comment                                              ~~                            93                  
+Left Parenthesis                                                 (                             94                  
+Right Parenthesis                                                )                             95                  
+Left Curly Brace                                                 {                             96                  
+Right Curly Brace                                                }                             97                  
+Left Bracket                                                     [                             98                  
+Right Bracket                                                    ]                             99                  
+Comma                                                            ,                             100                 
+Dot                                                              .                             101                 
+Semicolon                                                        ;                             102                 
+Colon                                                            :                             103                 
+Single-line Comment                                              ~~                            106                 
+Integer Literal                                                  12                            107                 
+Arithmetic Operator (Subtraction)                                -                             107                 
+Integer Literal                                                  43                            107                 
+Single-line Comment                                              ~~                            110                 
+Integer Literal                                                  12                            111                 
+Lexical Error (Invalid Integer)                                  -                             111                 
+Integer Literal                                                  43                            111                 
+Multi-line Comment Start                                         ~/                            113                 
+Multi-line Comment End                                           /~                            117                 
+Arithmetic Operator (Division)                                   /                             117                 
+Lexical Error (Invalid Identifier)                               ~                             117                 

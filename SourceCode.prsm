@@ -1,0 +1,113 @@
+~~ Sample accepted
+_rastyvar1
+Rastyvar1
+rastyvar1
+
+~~ Sample Errors
+@@##%*
+@rast%yVa&riable
+#rast#yVariable
+$rast$yVari@able
+14anneVariable
+$invalid
+
+~~ const
+18
+rastyIdentifier
+18.18
+'R'
+"String Literal"
+
+~~ Arithmetic Operators
++
+-
+*
+/
+%
+^
+//
+
+~~ Assignment Operators 
+=
++=
+-=
+*=
+/=
+%=
+//=
+
+~~ Unary Operators
++
+++
+-
+--
+
+~~ Logical Operators
+!
+||
+&&
+
+~~ Relational Operators
+==
+!=
+>
+<
+>=
+<=
+
+~~ Keywords
+bool
+break
+case
+char
+continue
+default
+do
+else
+float
+for
+goto
+if
+int
+main
+printf
+return
+input
+string
+switch
+void
+while
+array
+
+~~ Reserved Words
+true
+false
+null
+const
+
+~~ Noise Words
+by
+from
+until
+
+~~ Delimiters
+(
+)
+{
+}
+[
+]
+,
+.
+;
+: 
+
+
+~~ No spaces (must still be validand separated)
+12 - 43
+
+
+~~ Close spaces (must be valid)
+12-43
+
+myArray
