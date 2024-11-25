@@ -16,9 +16,7 @@ Single-line Comment                                              ~~             
 Integer Literal                                                  18                            15                  
 Identifier                                                       rastyIdentifier               16                  
 Float Literal                                                    18.18                         17                  
-Lexical Error (Invalid Character Literal)                        'Ra                           18                  
-Identifier                                                       sty                           18                  
-Delimiter                                                        '                             18                  
+Character Literal                                                'R'                           18                 
 String Literal                                                   "String Literal"              19                  
 Single-line Comment                                              ~~                            21                  
 Arithmetic Operator (Addition)                                   +                             22                  
