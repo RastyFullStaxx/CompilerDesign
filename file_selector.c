@@ -66,16 +66,42 @@ FileHandles* initializeFiles() {
         return NULL;
     }
 
-    return handles;
-}
+    if (!handles->fileName) {
+    fprintf(stderr, "Error: No .prsm file found.\n");
+    return NULL;
+    } else {
+        printf("\n\n\nSource file detected: %s\n", handles->fileName);
+    }
+
+    if (!handles->sourceFile) {
+        fprintf(stderr, "Error: Could not open source file: %s\n", handles->fileName);
+        return NULL;
+    }
+
+    if (!handles->symbolTable) {
+        fprintf(stderr, "Error: Could not create symbol table file.\n");
+        return NULL;
+    }
+
+
+        return handles;
+    }
 
 // Function to close opened files and free resources
 void closeFiles(FileHandles *handles) {
 
     if (handles) {
-        if (handles->sourceFile) fclose(handles->sourceFile);
-        if (handles->symbolTable) fclose(handles->symbolTable);
-        if (handles->fileName) free(handles->fileName);
+        if (handles->sourceFile) {
+            fclose(handles->sourceFile);
+            printf("[Debug] Source file closed.\n");
+        }
+        if (handles->symbolTable) {
+            fclose(handles->symbolTable);
+            printf("[Debug] Symbol table closed.\n");
+        }
+        if (handles->fileName) {
+            free(handles->fileName);
+        }
         free(handles);
     }
 

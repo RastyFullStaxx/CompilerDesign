@@ -27,6 +27,7 @@ typedef enum {
 typedef enum {
     S,        // Start
     B, C, D, E, F, G, I, M, P, S1, V, W, // Initial letters for keywords
+    R,        // Add this for the initial 'return' keyword state
     A, R1, R2, A1, // States for 'array'
     O1, O2, R3, R4, R5, // States for 'bool', 'break'
     CA, CAS, CH, CHA, CO, CON, CONT, CONTI, CONTIN, CONTINU, // States for 'case', 'char', 'continue'
@@ -43,6 +44,7 @@ typedef enum {
     RE, RET, RETU, RETUR, RETURN, // States for 'return'
     ACCEPT // Final accepting state
 } KeywordState;
+
 
 
 // Function to process a single line using the FSM

@@ -1,13 +1,10 @@
+#include "state_machine.h" // For KeywordState
+#include "keywords.h"
+#include "token.h"          // For Token and makeToken
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "file_selector.h"
-#include "token.h"
-#include "state_machine.h"
-#include "keywords.h"
-#include "utils.h"
-#include "comment_handler.h"
-#include "config.h"
+
 
 
 // Keywords finite state machine (FSM)
@@ -32,6 +29,8 @@ Token* keywords(char *lexeme, int lineNumber) {
                     case 's': state = S1; break; // For 'string', 'switch'
                     case 'v': state = V; break; // For 'void'
                     case 'w': state = W; break; // For 'while'
+                    case 'r': state = R; break; // For 'return'
+                    case 'a': state = A; break; // For 'array'
                     default: return NULL; // Not a keyword
                 }
                 break;
@@ -92,20 +91,15 @@ Token* keywords(char *lexeme, int lineNumber) {
             case EL: if (*current == 's') state = ELS; else return NULL; break;
             case ELS: if (*current == 'e') state = ACCEPT; else return NULL; break;
 
-            // States for 'false', 'float', 'for'
-            case F:
-                if (*current == 'a') state = FA;
-                else if (*current == 'l') state = FL;
-                else if (*current == 'o') state = FO;
-                else return NULL;
-                break;
-            case FA: if (*current == 'l') state = FAL; else return NULL; break;
-            case FAL: if (*current == 's') state = FALS; else return NULL; break;
-            case FALS: if (*current == 'e') state = ACCEPT; else return NULL; break;
+            // States for 'float', 'for'
+            case F: if (*current == 'l') state = FL; // For 'float'
+                    else if (*current == 'o') state = FO; // For 'for'
+                    else return NULL; break;
             case FL: if (*current == 'o') state = FLO; else return NULL; break;
             case FLO: if (*current == 'a') state = FLT; else return NULL; break;
             case FLT: if (*current == 't') state = ACCEPT; else return NULL; break;
             case FO: if (*current == 'r') state = ACCEPT; else return NULL; break;
+
 
             // States for 'goto'
             case G: if (*current == 'o') state = GO1; else return NULL; break;
@@ -164,14 +158,12 @@ Token* keywords(char *lexeme, int lineNumber) {
             case WHIL: if (*current == 'e') state = ACCEPT; else return NULL; break;
 
             // State for 'return'
-            case R:
-                if (*current == 'e') state = RE;
-                else return NULL;
-                break;
+            case R: if (*current == 'e') state = RE; else return NULL; break;
             case RE: if (*current == 't') state = RET; else return NULL; break;
             case RET: if (*current == 'u') state = RETU; else return NULL; break;
             case RETU: if (*current == 'r') state = RETUR; else return NULL; break;
-            case RETUR: if (*current == 'n') state = RETURN; else return NULL; break;
+            case RETUR: if (*current == 'n') state = ACCEPT; else return NULL; break;
+
 
 
             // Accepting state

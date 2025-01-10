@@ -1,9 +1,9 @@
+#include "state_machine.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "file_selector.h"
 #include "token.h"
-#include "state_machine.h"
 #include "keywords.h"
 #include "utils.h"
 #include "comment_handler.h"
@@ -51,7 +51,7 @@ int main() {
     // Close files
     closeFiles(handles);
 
-    printf("Lexical analysis completed. Tokens saved in symbol_table.prsm\n");
+    printf("Lexical analysis completed. \nTokens saved in symbol_table.prsm\n\n\n");
     return 0;
 
 } // end of main function

@@ -1,8 +1,8 @@
+#include "token.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "file_selector.h"
-#include "token.h"
 #include "state_machine.h"
 #include "keywords.h"
 #include "utils.h"
@@ -37,9 +37,11 @@ Token* makeToken(const char *type, const char *value, int lineNumber) {
 
 // Function to write a token to the symbol table
 void writeToken(FILE *symbolTable, const char *type, const char *value, int lineNumber) {
-    
     if (symbolTable != NULL && type != NULL && value != NULL) {
-        fprintf(symbolTable, "%-65s%-30s%-20d\n", type, value, lineNumber);
+        fprintf(symbolTable, "%-65s%-30s\n", type, value);
+        //printf("[Debug] Written Token: Type = %s, Value = %s\n", type, value);
+    } else {
+        //fprintf(stderr, "[Error] Failed to write token: Type = %s, Value = %s\n", type, value);
     }
 
 } // end of writeToken function

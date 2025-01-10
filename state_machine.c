@@ -1,42 +1,33 @@
+#include "state_machine.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
 #include "file_selector.h"
 #include "token.h"
-#include "state_machine.h"
 #include "keywords.h"
 #include "utils.h"
 #include "comment_handler.h"
 #include "config.h"
 
-void processLine(char *line, int lineNumber, FILE *symbolTable) {
-
-    // processLine function
+// processLine function
 void processLine(char *line, int lineNumber, FILE *symbolTable) {
     State state = START;
     char currentToken[50] = "";
     int i = 0;
-    int tokenLength = strlen(currentToken);
+    static int inComment = 0; // Track multi-line comment state
 
+    // Delegate comment handling
+    if (handleComments(line, &inComment, lineNumber, symbolTable)) {
+        return; // Skip processing the rest of the line if inside a comment
+    }
 
     for (int j = 0; line[j] != '\0'; j++) {
         char c = line[j];
-    
-        switch (state) {
 
-            // START case for recursive use ----------------------------------------------------------------------------------------------------------------------------------------
+        switch (state) {
             case START:
-                if (c == '~' && line[j + 1] == '~') {
-                    /// Single-line comment indicator (~~)
-                    currentToken[i++] = c;
-                    currentToken[i++] = line[++j]; // Consume the second '~'
-                    currentToken[i] = '\0';
-                    writeToken(symbolTable, "Single-line Comment", currentToken, lineNumber);
-                    i = 0;
-                    state = START; // Reset state
-                    return; // Skip the rest of the line
-                } else if ((c == '=' && line[j + 1] == '=') || 
+                if ((c == '=' && line[j + 1] == '=') || 
                            (c == '!' && line[j + 1] == '=') || 
                            (c == '>' && line[j + 1] == '=') || 
                            (c == '<' && line[j + 1] == '=')) {
@@ -175,12 +166,6 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                     // Start of integer
                     state = INTEGER;
                     currentToken[i++] = c;
-                } else if (c == '~' && line[j + 1] == '~') {
-                    currentToken[i++] = c;
-                    currentToken[i++] = line[++j]; // Consume the second '~'
-                    currentToken[i] = '\0';
-                    writeToken(symbolTable, "Single-line Comment", currentToken, lineNumber);
-                    i = 0;
                 } else if (isalpha(c) || c == '_') {
                     // Start of identifier
                     state = IDENTIFIER;
@@ -229,70 +214,67 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
-                        // FSM for IDENTIFIER (keywords, noise and reserved would be identified here since they are indetifier in a sense, just special) 
                         case IDENTIFIER:
-                            if (isalnum(c) || c == '_') {
-                                // Continue building the identifier
+                        if (isalnum(c) || c == '_') {
+                            // Continue building the identifier
+                            currentToken[i++] = c;
+                        } else if (!isalpha(currentToken[0]) && !isDelimiter(c) && !isspace(c)) {
+                            // Invalid identifier
+                            while (isalnum(c) || c == '_' || (!isDelimiter(c) && !isspace(c))) {
                                 currentToken[i++] = c;
-                            } else if (!isalpha(currentToken[0]) && !isDelimiter(c) && !isspace(c)) {
-                                // If identifier starts with an invalid character or contains invalid ones
-                                while (isalnum(c) || c == '_' || (!isDelimiter(c) && !isspace(c))) {
-                                    currentToken[i++] = c;
-                                    c = line[++j]; // Consume the invalid characters
-                                }
+                                c = line[++j];
+                            }
+                            currentToken[i] = '\0';
+                            printf("Lexical Error: %s\n", currentToken);
+                            writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
+                            i = 0;
+                            state = START;
+                            j--;
+                        } else {
+                            // Finalize identifier
+                            currentToken[i] = '\0'; // Null-terminate the token
+                            printf("Finalizing token: %s\n", currentToken); // Debug
+
+                            Token *token = keywords(currentToken, lineNumber); // Check keywords
+                            if (token) {
+                                printf("Keyword detected: %s\n", token->value); // Debug
+                                writeToken(symbolTable, token->type, token->value, lineNumber);
+                                free(token);
+                            } else if (isReservedWord(currentToken)) {
+                                printf("Reserved Word detected: %s\n", currentToken); // Debug
+                                writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
+                            } else if (isNoiseWord(currentToken)) {
+                                printf("Noise Word detected: %s\n", currentToken); // Debug
+                                writeToken(symbolTable, "Noise Word", currentToken, lineNumber);
+                            } else {
+                                printf("Identifier detected: %s\n", currentToken); // Debug
+                                writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                            }
+
+                            // Reset token index
+                            i = 0;
+                            memset(currentToken, '\0', sizeof(currentToken));
+
+                            // Handle next character
+                            if (isDelimiter(c)) {
+                                currentToken[i++] = c;
+                                currentToken[i] = '\0';
+                                writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+                                i = 0;
+                                state = START;
+                            } else if (!isspace(c)) {
+                                currentToken[i++] = c;
                                 currentToken[i] = '\0';
                                 writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
                                 i = 0;
                                 state = START;
-                                j--; // Reprocess the last character
                             } else {
-                                // Finalize identifier when encountering a valid delimiter or space
-                                currentToken[i] = '\0';
-                                Token *token = NULL;
-
-                                // Check if the identifier is a keyword
-                                token = keywords(currentToken, lineNumber);
-                                if (token) {
-                                    writeToken(symbolTable, token->type, token->value, lineNumber);
-                                    free(token);
-                                } else if (isReservedWord(currentToken)) {
-                                    // Check if the identifier is a reserved word
-                                    writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
-                                } else if (isNoiseWord(currentToken)) {
-                                    // Check if the identifier is a noise word
-                                    writeToken(symbolTable, "Noise Word", currentToken, lineNumber);
-                                } else {
-                                    // Default to identifier if no matches
-                                    writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                                }
-
-                                // Reset token index and current token buffer
-                                i = 0;
-                                for (int k = 0; k < 50; k++) {
-                                    currentToken[k] = '\0';
-                                }
-
-                                // Handle next character
-                                if (isDelimiter(c)) {
-                                    // If the next character is a delimiter, process it
-                                    currentToken[i++] = c;
-                                    currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
-                                    i = 0;
-                                    state = START;
-                                } else if (!isspace(c)) {
-                                    // Reprocess invalid character as a lexical error
-                                    currentToken[i++] = c;
-                                    currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
-                                    i = 0;
-                                    state = START;
-                                } else {
-                                    // Default case: reset to START state
-                                    state = START;
-                                }
+                                state = START;
                             }
-                            break;
+                        }
+                        break;
+
+
 
 
 
@@ -763,64 +745,53 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                 if (i > 0) {
                     currentToken[i] = '\0'; // Null-terminate the token
                     Token *token = NULL;
-
+                
+                    // Ensure the leftover token is valid and not part of a comment
+                    if (inComment) {
+                        // Skip leftover tokens inside comments
+                        i = 0; // Reset token index
+                        memset(currentToken, 0, sizeof(currentToken)); // Clear currentToken
+                        return; // Exit processing for this line
+                    }
+                
+                    // Process the leftover token based on its state
                     switch (state) {
                         case IDENTIFIER:
-                        token = keywords(currentToken, lineNumber); // Check for keywords
-                        if (token) {
-                            // If it's a keyword
-                            writeToken(symbolTable, token->type, token->value, lineNumber);
-                            free(token);
-                        } else if (isReservedWord(currentToken)) {
-                            // If it's a reserved word
-                            writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
-                        } else if (isNoiseWord(currentToken)) {
-                            // If it's a noise word
-                            writeToken(symbolTable, "Noise Word", currentToken, lineNumber);
-                        } else {
-                            // Otherwise, it's an identifier
-                            writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                        }
-                        break;
-
+                            token = keywords(currentToken, lineNumber); // Check for keywords
+                            if (token) {
+                                writeToken(symbolTable, token->type, token->value, lineNumber);
+                                free(token);
+                            } else if (isReservedWord(currentToken)) {
+                                writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
+                            } else if (isNoiseWord(currentToken)) {
+                                writeToken(symbolTable, "Noise Word", currentToken, lineNumber);
+                            } else {
+                                writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                            }
+                            break;
+                
                         case INTEGER:
                             writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
                             break;
-
+                
                         case FLOAT:
                             writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
                             break;
-
-                        case ARITHMETIC_OPERATOR:
-                            writeToken(symbolTable, "Arithmetic Operator", currentToken, lineNumber);
-                            break;
-
-                        case ASSIGNMENT_OPERATOR:
-                            writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
-                            break;
-
-                        case RELATIONAL_OPERATOR:
-                            writeToken(symbolTable, "Relational Operator", currentToken, lineNumber);
-                            break;
-
-                        case LOGICAL_OPERATOR:
-                            writeToken(symbolTable, "Logical Operator", currentToken, lineNumber);
-                            break;
-
-                        case UNARY_OPERATOR:
-                            writeToken(symbolTable, "Unary Operator", currentToken, lineNumber);
-                            break;
-
-                        case DELIMITER:
-                            writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
-                            break;
-
+                
+                        // Add more cases if needed for other states...
+                
                         default:
                             writeToken(symbolTable, "Unknown", currentToken, lineNumber);
                             break;
-            }
-        }
+                    }
+                
+                    // Reset token index and currentToken
+                    i = 0;
+                    memset(currentToken, 0, sizeof(currentToken));
+                }
+
+
+        
 
     } // processLine end
 
-}
