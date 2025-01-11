@@ -14,4 +14,8 @@ typedef struct {
 Token* makeToken(const char *type, const char *value, int lineNumber);
 void writeToken(FILE *symbolTable, const char *type, const char *value, int lineNumber);
 
+// For debugging purposes
+void printToken(const Token *token); // Debug: Print token details
+int validateToken(const Token *token); // Validate token properties (optional)
+
 #endif // TOKEN_H
