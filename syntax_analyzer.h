@@ -1,81 +1,75 @@
 #ifndef SYNTAX_ANALYZER_H
 #define SYNTAX_ANALYZER_H
 
-#include "parse_tree.h"
 #include "token.h"
+#include "parse_tree.h"
 
-// Enum for parsing status (optional, if used)
-typedef enum {
-    PARSE_SUCCESS,
-    PARSE_FAILURE
-} ParseStatus;
+// Parse Tree Handling
+ParseTreeNode* createParseTreeNode(const char* type, const char* value);
+void addChild(ParseTreeNode* parent, ParseTreeNode* child);
+void writeParseTreeToFile(ParseTreeNode* node, FILE* file); // Write parse tree to a file
+void freeParseTree(ParseTreeNode* node); // Free parse tree memory
 
-// Top-level grammar rules
-void parseProgram();
-void parseMainFunction();
-void parseBlock();
-void parseStatementList();
+// Function declarations for the top-level grammar rules
+ParseTreeNode* parseProgram();
+ParseTreeNode* parseMainFunction();
+ParseTreeNode* parseBlock();
+ParseTreeNode* parseStatementList();
 
-// Statement parsing
-void parseDeclarationStatement();
-void parseVariableDeclaration();
-void parseTypeSpecifier();
-void parseStatement();
-void parseAssignmentStatement();
-void parseInputStatement();
-void parseOutputStatement();
-void parseConditionalStatement();
-void parseIterativeStatement();
-void parseArrayStatement();
-void parseFunctionStatement();
-void parseExpressionStatement();
-void parseJumpStatement();
+// Function declarations for specific statement types
+ParseTreeNode* parseDeclarationStatement();
+ParseTreeNode* parseVariableDeclaration();
+ParseTreeNode* parseTypeSpecifier();
+ParseTreeNode* parseStatement();
+ParseTreeNode* parseAssignmentStatement();
+ParseTreeNode* parseInputStatement();
+ParseTreeNode* parseOutputStatement();
+ParseTreeNode* parseConditionalStatement();
+ParseTreeNode* parseIterativeStatement();
+ParseTreeNode* parseArrayStatement();
+ParseTreeNode* parseFunctionStatement();
+ParseTreeNode* parseExpressionStatement();
+ParseTreeNode* parseJumpStatement();
 
-// Expressions and operators
-void parseExpression();
-void parseLogicalOrExpr();
-void parseLogicalAndExpr();
-void parseEqualityExpr();
-void parseRelationalExpr();
-void parseAdditiveExpr();
-void parseMultiplicativeExpr();
-void parseExponentialExpr();
-void parseUnaryExpr();
-void parsePostfixExpr();
+// Function declarations for expressions and operators
+ParseTreeNode* parseExpression();
+ParseTreeNode* parseLogicalOrExpr();
+ParseTreeNode* parseLogicalAndExpr();
+ParseTreeNode* parseEqualityExpr();
+ParseTreeNode* parseRelationalExpr();
+ParseTreeNode* parseAdditiveExpr();
+ParseTreeNode* parseMultiplicativeExpr();
+ParseTreeNode* parseExponentialExpr();
+ParseTreeNode* parseUnaryExpr();
+ParseTreeNode* parsePostfixExpr();
 
-// Literals and identifiers
-void parseLiteral();
-void parseBoolLiteral();
-void parsePrimaryExpr();
+// Function declarations for literals and identifiers
+ParseTreeNode* parseLiteral();
+ParseTreeNode* parseBoolLiteral();
+ParseTreeNode* parsePrimaryExpr();
 
-// Control flow
-void parseIfStatement();
-void parseSwitchStatement();
-void parseForLoop();
-void parseWhileLoop();
-void parseDoWhileLoop();
+// Function declarations for control flow
+ParseTreeNode* parseIfStatement();
+ParseTreeNode* parseSwitchStatement();
+ParseTreeNode* parseForLoop();
+ParseTreeNode* parseWhileLoop();
+ParseTreeNode* parseDoWhileLoop();
 
-// Arrays
-void parseArrayDeclaration();
-void parseArrayOperations();
-void parseArrayAccess();
-void parseArrayInitializer(); // Missing definition added
-void parseArrayDimensions();  // Missing definition added
+// Function declarations for array handling
+ParseTreeNode* parseArrayDeclaration();
+ParseTreeNode* parseArrayOperations();
+ParseTreeNode* parseArrayAccess();
+ParseTreeNode* parseArrayAssignment();
 
-// Functions
-void parseFunctionDeclaration();
-void parseFunctionCall();
-void parseParameterList();
-void parseArgumentList();
-
-// Utility functions
-void matchToken(const char* expectedType);
-Token* peekToken();
-Token* getNextToken();
-void syntaxError(const char* message);
+// Function declarations for functions
+ParseTreeNode* parseForUpdate();
+ParseTreeNode* parseFunctionDeclaration();
+ParseTreeNode* parseFunctionCall();
+ParseTreeNode* parseParameterList();
+ParseTreeNode* parseArgumentList();
 
 // Error handling
-void reportSyntaxError(const char* message);
-void recoverFromError();
+void reportSyntaxError(const char *message);
+void recoverFromError(); // Error recovery mechanism
 
 #endif // SYNTAX_ANALYZER_H

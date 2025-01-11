@@ -1,16 +1,31 @@
 #include "parse_tree.h"
 
 // Function to create a new parse tree node
-ParseTreeNode* createParseTreeNode(const char* label) {
+ParseTreeNode* createParseTreeNode(const char* type, const char* value) {
     ParseTreeNode* node = (ParseTreeNode*)malloc(sizeof(ParseTreeNode));
     if (!node) {
-        printf("Error: Memory allocation failed for ParseTreeNode\n");
+        fprintf(stderr, "Memory allocation failed for ParseTreeNode\n");
         exit(EXIT_FAILURE);
     }
-    strcpy(node->label, label);
+    if (type) {
+        strncpy(node->label, type, sizeof(node->label) - 1);
+        node->label[sizeof(node->label) - 1] = '\0'; // Null-terminate
+    } else {
+        node->label[0] = '\0'; // Initialize as empty
+    }
+
+    if (value) {
+        strncpy(node->value, value, sizeof(node->value) - 1);
+        node->value[sizeof(node->value) - 1] = '\0'; // Null-terminate
+    } else {
+        node->value[0] = '\0'; // Initialize as empty
+    }
+
     node->childCount = 0;
     return node;
 }
+
+
 
 // Function to add a child to a parse tree node
 void addChild(ParseTreeNode* parent, ParseTreeNode* child) {
@@ -39,20 +54,35 @@ void printParseTree(ParseTreeNode* node, int depth) {
 void writeParseTreeToFile(ParseTreeNode* node, FILE* file) {
     if (!node) return;
 
-    fprintf(file, "(%s", node->label);
+    fprintf(file, "(%s", node->label); // Print the node's label
 
     for (int i = 0; i < node->childCount; i++) {
-        writeParseTreeToFile(node->children[i], file);
+        writeParseTreeToFile(node->children[i], file); // Recursive call for each child
     }
 
-    fprintf(file, ")");
+    fprintf(file, ")"); // Close parentheses for this node
 }
+
 
 // Function to free the parse tree
 void freeParseTree(ParseTreeNode* node) {
     if (!node) return;
+
     for (int i = 0; i < node->childCount; i++) {
-        freeParseTree(node->children[i]);
+        freeParseTree(node->children[i]); // Recursively free children
     }
-    free(node);
+
+    free(node); // Free the current node
+}
+
+void setNodeValue(ParseTreeNode* node, const char* value) {
+    if (!node) {
+        fprintf(stderr, "Cannot set value on a NULL node\n");
+        return;
+    }
+    if (value) {
+        strcpy(node->value, value);
+    } else {
+        node->value[0] = '\0'; // Initialize as empty string
+    }
 }
