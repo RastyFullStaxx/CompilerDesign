@@ -12,10 +12,11 @@ gcc -c keywords.c
 gcc -c config.c
 gcc -c utils.c
 gcc -c comment_handler.c
+gcc -c syntax_analyzer.c
 
 
 // Link objects
-gcc lexer.o file_selector.o token.o state_machine.o keywords.o config.o utils.o comment_handler.o -o lexer -mconsole
+gcc lexer.o file_selector.o token.o state_machine.o keywords.o config.o utils.o comment_handler.o syntax_analyzer.o -o lexer -mconsole
 
 
 // Run main lexer program
