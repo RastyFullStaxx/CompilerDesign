@@ -12,7 +12,7 @@ gcc -c keywords.c
 gcc -c config.c
 gcc -c utils.c
 gcc -c comment_handler.c
-gcc -c syntax_analyzer.c
+
 
 
 // Link objects - LEXER
