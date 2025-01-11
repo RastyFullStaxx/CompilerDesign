@@ -1,21 +1,22 @@
 #ifndef SYNTAX_ANALYZER_H
 #define SYNTAX_ANALYZER_H
 
-#include "token.h" // Assuming token.h provides the Token structure and necessary utilities
+#include "parse_tree.h"
+#include "token.h"
 
-// Enum to represent parsing states or grammar-related errors
+// Enum for parsing status (optional, if used)
 typedef enum {
     PARSE_SUCCESS,
     PARSE_FAILURE
 } ParseStatus;
 
-// Function declarations for the top-level grammar rules
+// Top-level grammar rules
 void parseProgram();
 void parseMainFunction();
 void parseBlock();
 void parseStatementList();
 
-// Function declarations for specific statement types
+// Statement parsing
 void parseDeclarationStatement();
 void parseVariableDeclaration();
 void parseTypeSpecifier();
@@ -30,7 +31,7 @@ void parseFunctionStatement();
 void parseExpressionStatement();
 void parseJumpStatement();
 
-// Function declarations for expressions and operators
+// Expressions and operators
 void parseExpression();
 void parseLogicalOrExpr();
 void parseLogicalAndExpr();
@@ -42,37 +43,39 @@ void parseExponentialExpr();
 void parseUnaryExpr();
 void parsePostfixExpr();
 
-// Function declarations for literals and identifiers
+// Literals and identifiers
 void parseLiteral();
 void parseBoolLiteral();
 void parsePrimaryExpr();
 
-// Function declarations for control flow
+// Control flow
 void parseIfStatement();
 void parseSwitchStatement();
 void parseForLoop();
 void parseWhileLoop();
 void parseDoWhileLoop();
 
-// Function declarations for array handling
+// Arrays
 void parseArrayDeclaration();
 void parseArrayOperations();
 void parseArrayAccess();
-void parseArrayAssignment();
+void parseArrayInitializer(); // Missing definition added
+void parseArrayDimensions();  // Missing definition added
 
-// Function declarations for functions
+// Functions
 void parseFunctionDeclaration();
 void parseFunctionCall();
 void parseParameterList();
 void parseArgumentList();
 
 // Utility functions
-void matchToken(TokenType expectedType); // Match and consume a token, throw an error if mismatched
-Token peekToken(); // Peek at the next token without consuming it
-Token getNextToken(); // Consume and return the next token
+void matchToken(const char* expectedType);
+Token* peekToken();
+Token* getNextToken();
+void syntaxError(const char* message);
 
 // Error handling
-void reportSyntaxError(const char *message);
-void recoverFromError(); // Error recovery mechanism
+void reportSyntaxError(const char* message);
+void recoverFromError();
 
 #endif // SYNTAX_ANALYZER_H

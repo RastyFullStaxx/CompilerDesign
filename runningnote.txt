@@ -21,3 +21,4 @@ gcc lexer.o file_selector.o token.o state_machine.o keywords.o config.o utils.o 
 
 // Run main lexer program
 ./lexer
+./syntax_analyzer
