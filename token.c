@@ -11,7 +11,6 @@
 
 // Function to create a new token
 Token* makeToken(const char *type, const char *value, int lineNumber) {
-
     Token *token = (Token *)malloc(sizeof(Token));
     if (!token) {
         fprintf(stderr, "Error: Memory allocation failed for token.\n");
@@ -28,21 +27,17 @@ Token* makeToken(const char *type, const char *value, int lineNumber) {
     token->lineNumber = lineNumber;
 
     return token;
-    
 } // end of makeToken function
-
-
-
-
 
 // Function to write a token to the symbol table
 void writeToken(FILE *symbolTable, const char *type, const char *value, int lineNumber) {
     if (symbolTable != NULL && type != NULL && value != NULL) {
-        // Write token in a simple format: type value lineNumber
-        fprintf(symbolTable, "%s\t%s\t%d\n", type, value, lineNumber);
+        // Write token with fixed-width columns
+        // Column width: Type = 25, Value = 20, Line = 6
+        fprintf(symbolTable, "%-25s %-20s %-6d\n", type, value, lineNumber);
 
         // Debugging log
-        printf("[Debug] Written Token: Type = %s, Value = %s, Line = %d\n", type, value, lineNumber);
+        printf("[Debug] Written Token: Type = %-25s, Value = %-20s, Line = %-6d\n", type, value, lineNumber);
     } else {
         fprintf(stderr, "[Error] Failed to write token: Type = %s, Value = %s, Line = %d\n", 
                 type ? type : "(null)", value ? value : "(null)", lineNumber);

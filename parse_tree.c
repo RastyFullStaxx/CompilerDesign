@@ -40,15 +40,18 @@ void addChild(ParseTreeNode* parent, ParseTreeNode* child) {
 void printParseTree(ParseTreeNode* node, int depth) {
     if (!node) return;
 
-    // Indent based on depth
     for (int i = 0; i < depth; i++) printf("  ");
-    printf("%s\n", node->label);
+    if (node->value[0] != '\0') {
+        printf("%s: %s\n", node->label, node->value);
+    } else {
+        printf("%s\n", node->label);
+    }
 
-    // Recursively print children
     for (int i = 0; i < node->childCount; i++) {
         printParseTree(node->children[i], depth + 1);
     }
 }
+
 
 // Function to write the parse tree in parenthesized format to a file
 void writeParseTreeToFile(ParseTreeNode* node, FILE* file) {
