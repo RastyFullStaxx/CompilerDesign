@@ -25,26 +25,30 @@ void syntaxError(const char* message);
 Token* getNextToken() {
     if (currentTokenIndex < totalTokens) {
         Token* token = &tokens[currentTokenIndex++];
-        printf("DEBUG: getNextToken: Type='%s', Value='%s', Line=%d\n",
+        printf("DEBUG: getNextToken: Retrieved Token[%d]: Type='%s', Value='%s', Line=%d\n",
+               currentTokenIndex - 1, // Index before increment
                token->type, token->value, token->lineNumber);
         return token;
     }
-    printf("DEBUG: getNextToken: No more tokens.\n");
+    printf("DEBUG: getNextToken: No more tokens. Current Index=%d, Total Tokens=%d\n",
+           currentTokenIndex, totalTokens);
     return NULL;
 }
 
-
 Token* peekToken() {
     if (currentTokenIndex < totalTokens) {
-        printf("DEBUG: peekToken: Type='%s', Value='%s', Line=%d\n",
+        printf("DEBUG: peekToken: Current Token[%d]: Type='%s', Value='%s', Line=%d\n",
+               currentTokenIndex, // Current index
                tokens[currentTokenIndex].type,
                tokens[currentTokenIndex].value,
                tokens[currentTokenIndex].lineNumber);
         return &tokens[currentTokenIndex];
     }
-    printf("DEBUG: peekToken: No more tokens.\n");
+    printf("DEBUG: peekToken: No more tokens. Current Index=%d, Total Tokens=%d\n",
+           currentTokenIndex, totalTokens);
     return NULL;
 }
+
 
 
 
@@ -175,7 +179,6 @@ void mapToken(Token* token) {
 
 
 
-
 // Function to load tokens from a file
 int loadTokensFromFile(const char *filename) {
     FILE *file = fopen(filename, "r");
@@ -186,60 +189,78 @@ int loadTokensFromFile(const char *filename) {
 
     char line[256];
     int tokenCount = 0;
-    int failedCount = 0;
 
     printf("\nLoading tokens from %s...\n", filename);
 
     while (fgets(line, sizeof(line), file)) {
+        // Debug: Print each line read
         printf("Processing line: %s", line);
 
+        // Trim whitespace from the line
         trimWhitespace(line);
 
-        if (strlen(line) == 0) continue;
+        // Skip empty lines
+        if (strlen(line) == 0) {
+            continue;
+        }
 
+        // Parse the line into token fields (comma-separated)
         Token token;
         char type[50] = {0}, value[50] = {0};
         int lineNumber = 0;
-        int matched = sscanf(line, "%49s%49s%d", type, value, &lineNumber);
 
-        if (matched == 3) {
-            strncpy(token.type, type, sizeof(token.type) - 1);
-            token.type[sizeof(token.type) - 1] = '\0';
+        // Extract the fields using sscanf for type and line number and custom logic for the value
+        char *firstComma = strchr(line, ',');
+        char *lastComma = strrchr(line, ',');
 
-            strncpy(token.value, value, sizeof(token.value) - 1);
-            token.value[sizeof(token.value) - 1] = '\0';
-
-            token.lineNumber = lineNumber;
-
-            // Normalize the token
-            mapToken(&token);
-
-            if (tokenCount < MAX_TOKENS) {
-                tokens[tokenCount++] = token;
-                printf("DEBUG: Normalized token: Type='%s', Value='%s', Line=%d\n",
-                       token.type, token.value, token.lineNumber);
-            } else {
-                printf("Error: Token limit exceeded. Increase MAX_TOKENS.\n");
-                break;
-            }
-        } else {
-            failedCount++;
+        if (!firstComma || !lastComma || firstComma == lastComma) {
             printf("DEBUG: Invalid or unparsed line: %s\n", line);
-            printf("DEBUG: Failed Token Details: RawType='%s', RawValue='%s', RawLine=%d\n",
-                   type, value, lineNumber);
+            continue; // Skip invalid lines
+        }
+
+        // Extract token type
+        *firstComma = '\0';
+        strncpy(type, line, sizeof(type) - 1);
+        type[sizeof(type) - 1] = '\0';
+
+        // Extract value
+        *lastComma = '\0';
+        strncpy(value, firstComma + 1, sizeof(value) - 1);
+        value[sizeof(value) - 1] = '\0';
+
+        // Extract line number
+        lineNumber = atoi(lastComma + 1);
+
+        // Populate the token
+        strncpy(token.type, type, sizeof(token.type) - 1);
+        token.type[sizeof(token.type) - 1] = '\0';
+        strncpy(token.value, value, sizeof(token.value) - 1);
+        token.value[sizeof(token.value) - 1] = '\0';
+        token.lineNumber = lineNumber;
+
+        // Normalize the token type and value
+        mapToken(&token);
+
+        // Add the token to the list
+        if (tokenCount < MAX_TOKENS) {
+            tokens[tokenCount++] = token;
+            printf("DEBUG: Loaded token: Type='%s', Value='%s', Line=%d\n", token.type, token.value, token.lineNumber);
+        } else {
+            printf("Error: Token limit exceeded. Increase MAX_TOKENS.\n");
+            break;
         }
     }
 
     fclose(file);
 
-    printf("DEBUG: Completed loading tokens. Total loaded: %d, Failed: %d from %s.\n",
-           tokenCount, failedCount, filename);
-
-    // Log failed tokens for further debugging
-    if (failedCount > 0) {
-        printf("DEBUG: Failed tokens occurred during parsing. Review raw input lines.\n");
+    // Debug: Print all loaded tokens
+    printf("DEBUG: Loaded Tokens:\n");
+    for (int i = 0; i < tokenCount; i++) {
+        printf("  Token %d: Type='%s', Value='%s', Line=%d\n",
+               i + 1, tokens[i].type, tokens[i].value, tokens[i].lineNumber);
     }
 
+    printf("DEBUG: Completed loading tokens. Total loaded: %d from %s.\n", tokenCount, filename);
     return tokenCount;
 }
 
@@ -273,14 +294,19 @@ void syntaxError(const char* message) {
 
 // Recursive Descent Parsing Functions
 ParseTreeNode* parseProgram() {
-    printf("Parsing Program...\n");
+    printf("DEBUG: Starting parseProgram...\n");
 
     // Create the root node for the program
     ParseTreeNode* programNode = createParseTreeNode("Program", "");
 
+    Token* token = peekToken();
+    printf("DEBUG: First token in program: Type='%s', Value='%s', Line=%d\n",
+           token ? token->type : "NULL",
+           token ? token->value : "NULL",
+           token ? token->lineNumber : -1);
+
     // Parse any declaration statements at the beginning of the program
-    while (peekToken() && strcmp(peekToken()->type, "Keyword") == 0) {
-        Token* token = peekToken();
+    while (token && strcmp(token->type, "Keyword") == 0) {
         printf("DEBUG: Parsing declaration. Current Token: Type='%s', Value='%s', Line=%d\n",
                token->type, token->value, token->lineNumber);
 
@@ -289,18 +315,50 @@ ParseTreeNode* parseProgram() {
             strcmp(token->value, "char") == 0 || strcmp(token->value, "bool") == 0 ||
             strcmp(token->value, "string") == 0 || strcmp(token->value, "void") == 0 ||
             strcmp(token->value, "array") == 0) {
+            printf("DEBUG: Valid declaration keyword found: '%s'\n", token->value);
             addChild(programNode, parseDeclarationStatement());
         } else {
+            printf("DEBUG: Invalid declaration keyword: '%s'. Breaking out of loop.\n", token->value);
             break; // Stop if it's not a valid declaration keyword
         }
+
+        token = peekToken(); // Update the token after parsing
     }
 
     // Parse the main function
     printf("DEBUG: Parsing main function...\n");
-    addChild(programNode, parseMainFunction());
+    token = peekToken();
+    if (token) {
+        printf("DEBUG: Token before parsing main function: Type='%s', Value='%s', Line=%d\n",
+               token->type, token->value, token->lineNumber);
+    } else {
+        printf("DEBUG: No tokens available before parsing main function.\n");
+    }
 
+    ParseTreeNode* mainFunctionNode = parseMainFunction();
+    if (mainFunctionNode) {
+        addChild(programNode, mainFunctionNode);
+        printf("DEBUG: Main function successfully parsed.\n");
+    } else {
+        printf("DEBUG: Error parsing main function.\n");
+    }
+
+    // Debug remaining tokens
+    token = peekToken();
+    if (token) {
+        printf("DEBUG: Remaining tokens after parsing main function:\n");
+        for (int i = currentTokenIndex; i < totalTokens; i++) {
+            printf("  Token %d: Type='%s', Value='%s', Line=%d\n",
+                   i + 1, tokens[i].type, tokens[i].value, tokens[i].lineNumber);
+        }
+    } else {
+        printf("DEBUG: No remaining tokens after parsing main function.\n");
+    }
+
+    printf("DEBUG: Completed parseProgram.\n");
     return programNode;
 }
+
 
 
 
