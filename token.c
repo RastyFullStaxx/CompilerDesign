@@ -38,10 +38,13 @@ Token* makeToken(const char *type, const char *value, int lineNumber) {
 // Function to write a token to the symbol table
 void writeToken(FILE *symbolTable, const char *type, const char *value, int lineNumber) {
     if (symbolTable != NULL && type != NULL && value != NULL) {
-        fprintf(symbolTable, "%-65s%-30s\n", type, value);
-        //printf("[Debug] Written Token: Type = %s, Value = %s\n", type, value);
-    } else {
-        //fprintf(stderr, "[Error] Failed to write token: Type = %s, Value = %s\n", type, value);
-    }
+        // Write token in a simple format: type value lineNumber
+        fprintf(symbolTable, "%s\t%s\t%d\n", type, value, lineNumber);
 
+        // Debugging log
+        printf("[Debug] Written Token: Type = %s, Value = %s, Line = %d\n", type, value, lineNumber);
+    } else {
+        fprintf(stderr, "[Error] Failed to write token: Type = %s, Value = %s, Line = %d\n", 
+                type ? type : "(null)", value ? value : "(null)", lineNumber);
+    }
 } // end of writeToken function

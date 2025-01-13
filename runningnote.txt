@@ -3,7 +3,7 @@ cls             // for clearing
 rm *.o          // wild card for clearing of objects
 
 
-// Create/Update Objects
+// LEXICAL ANAYZER
 gcc -c lexer.c
 gcc -c file_selector.c
 gcc -c token.c
@@ -13,15 +13,17 @@ gcc -c config.c
 gcc -c utils.c
 gcc -c comment_handler.c
 
-
-
-// Link objects - LEXER
 gcc lexer.o file_selector.o token.o state_machine.o keywords.o config.o utils.o comment_handler.o -o lexer -mconsole
 
-// Link objects - SYNTAX ANALYZER
-gcc syntax_analyzer.c parse_tree.c -o syntax_analyzer
-
-
-// Run main lexer program
 ./lexer
+
+
+// SYNTAX ANALYZER
+gcc -c syntax_analyzer.c parse_tree.c
+
+gcc syntax_analyzer.o parse_tree.o -o syntax_analyzer -mconsole
+
 ./syntax_analyzer
+
+
+

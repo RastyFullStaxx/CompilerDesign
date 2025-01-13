@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#define MAX_TOKENS 1000 // Adjust size based on expected token count
 
 
 // Global Variables - Store tokens and tracking variables
@@ -22,26 +24,55 @@ void syntaxError(const char* message);
 // Utility Functions - Token management
 Token* getNextToken() {
     if (currentTokenIndex < totalTokens) {
-        return &tokens[currentTokenIndex++];
+        Token* token = &tokens[currentTokenIndex++];
+        printf("DEBUG: getNextToken: Type='%s', Value='%s', Line=%d\n",
+               token->type, token->value, token->lineNumber);
+        return token;
     }
-    return NULL; // End of tokens
+    printf("DEBUG: getNextToken: No more tokens.\n");
+    return NULL;
 }
+
 
 Token* peekToken() {
     if (currentTokenIndex < totalTokens) {
+        printf("DEBUG: peekToken: Type='%s', Value='%s', Line=%d\n",
+               tokens[currentTokenIndex].type,
+               tokens[currentTokenIndex].value,
+               tokens[currentTokenIndex].lineNumber);
         return &tokens[currentTokenIndex];
     }
-    return NULL; // End of tokens
+    printf("DEBUG: peekToken: No more tokens.\n");
+    return NULL;
 }
 
 
 
 
+// Function to trim leading and trailing whitespace from a string
+void trimWhitespace(char *str) {
+    if (!str || !*str) return;
+
+    // Trim leading whitespace
+    char *start = str;
+    while (isspace((unsigned char)*start)) {
+        start++;
+    }
+
+    // Move trimmed string to the beginning
+    if (start != str) {
+        memmove(str, start, strlen(start) + 1);
+    }
+
+    // Trim trailing whitespace
+    char *end = str + strlen(str) - 1;
+    while (end > str && isspace((unsigned char)*end)) {
+        *end = '\0';
+        end--;
+    }
+}
 
 
-
-// Function to load tokens from a file
-#include <string.h> // Add this for strstr
 
 // Function to load tokens from a file
 int loadTokensFromFile(const char *filename) {
@@ -60,29 +91,160 @@ int loadTokensFromFile(const char *filename) {
         // Debug: Print each line read
         printf("Processing line: %s", line);
 
-        // Skip header and separator lines
-        if (strstr(line, "Token Type") || strstr(line, "Value") || strstr(line, "Line Number") || strstr(line, "-")) {
-            printf("Skipping header/separator line.\n");
+        // Trim whitespace from the line
+        trimWhitespace(line);
+
+        // Skip empty lines
+        if (strlen(line) == 0) {
             continue;
         }
 
-        // Parse valid token lines
+        // Parse the line into token fields
         Token token;
-        int matched = sscanf(line, "%49s %49s %d", token.type, token.value, &token.lineNumber);
+        char type[50] = {0}, value[50] = {0};
+        int lineNumber = 0;
+        int matched = sscanf(line, "%49s%49s%d", type, value, &lineNumber);
 
         if (matched == 3) {
-            tokens[tokenCount++] = token;
-            printf("Loaded token: Type=%s, Value=%s, Line=%d\n", token.type, token.value, token.lineNumber);
+            // Copy parsed values into the token
+            strncpy(token.type, type, sizeof(token.type) - 1);
+            token.type[sizeof(token.type) - 1] = '\0'; // Null-terminate explicitly
+
+            strncpy(token.value, value, sizeof(token.value) - 1);
+            token.value[sizeof(token.value) - 1] = '\0'; // Null-terminate explicitly
+
+            token.lineNumber = lineNumber;
+
+            // Normalize token type and value for consistency
+            if (strcmp(token.type, "Right Parenthesis") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, ")");
+            } else if (strcmp(token.type, "Left Parenthesis") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, "(");
+            } else if (strcmp(token.type, "Left Curly Brace") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, "{");
+            } else if (strcmp(token.type, "Right Curly Brace") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, "}");
+            } else if (strcmp(token.type, "Left Bracket") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, "[");
+            } else if (strcmp(token.type, "Right Bracket") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, "]");
+            } else if (strcmp(token.type, "Semicolon") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, ";");
+            } else if (strcmp(token.type, "Colon") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, ":");
+            } else if (strcmp(token.type, "Comma") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, ",");
+            } else if (strstr(token.type, "Arithmetic Operator") != NULL) {
+                strcpy(token.type, "Operator");
+                // Ensure specific operators retain their value
+            } else if (strstr(token.type, "Relational Operator") != NULL) {
+                strcpy(token.type, "RelationalOperator");
+            } else if (strstr(token.type, "Logical Operator") != NULL) {
+                strcpy(token.type, "LogicalOperator");
+            } else if (strcmp(token.type, "Assignment Operator") == 0) {
+                strcpy(token.type, "AssignmentOperator");
+            } else if (strcmp(token.type, "Addition Assignment Operator") == 0) {
+                strcpy(token.type, "AssignmentOperator");
+                strcpy(token.value, "+=");
+            } else if (strcmp(token.type, "Subtraction Assignment Operator") == 0) {
+                strcpy(token.type, "AssignmentOperator");
+                strcpy(token.value, "-=");
+            } else if (strcmp(token.type, "Multiplication Assignment Operator") == 0) {
+                strcpy(token.type, "AssignmentOperator");
+                strcpy(token.value, "*=");
+            } else if (strcmp(token.type, "Division Assignment Operator") == 0) {
+                strcpy(token.type, "AssignmentOperator");
+                strcpy(token.value, "/=");
+            } else if (strcmp(token.type, "Modulo Assignment Operator") == 0) {
+                strcpy(token.type, "AssignmentOperator");
+                strcpy(token.value, "%=");
+            } else if (strcmp(token.type, "Integer Division Assignment Operator") == 0) {
+                strcpy(token.type, "AssignmentOperator");
+                strcpy(token.value, "//=");
+            } else if (strcmp(token.type, "Unary Operator (Increment)") == 0) {
+                strcpy(token.type, "UnaryOperator");
+                strcpy(token.value, "++");
+            } else if (strcmp(token.type, "Unary Operator (Decrement)") == 0) {
+                strcpy(token.type, "UnaryOperator");
+                strcpy(token.value, "--");
+            } else if (strcmp(token.type, "Character Literal") == 0) {
+                strcpy(token.type, "CHAR_LITERAL");
+            } else if (strcmp(token.type, "String Literal") == 0) {
+                strcpy(token.type, "STRING_LITERAL");
+            } else if (strcmp(token.type, "Integer Literal") == 0) {
+                strcpy(token.type, "INT_LITERAL");
+            } else if (strcmp(token.type, "Float Literal") == 0) {
+                strcpy(token.type, "FLOAT_LITERAL");
+            } else if (strcmp(token.type, "Keyword") == 0 && strcmp(token.value, "true") == 0) {
+                strcpy(token.type, "BOOLEAN_LITERAL");
+                strcpy(token.value, "true");
+            } else if (strcmp(token.type, "Keyword") == 0 && strcmp(token.value, "false") == 0) {
+                strcpy(token.type, "BOOLEAN_LITERAL");
+                strcpy(token.value, "false");
+            } else if (strcmp(token.type, "Keyword") == 0 && strcmp(token.value, "null") == 0) {
+                strcpy(token.type, "NULL_LITERAL");
+                strcpy(token.value, "null");
+            } else if (strcmp(token.type, "Keyword") == 0) {
+                strcpy(token.type, "Keyword"); // Retain as is for generic keywords
+            } else if (strcmp(token.type, "Noise Word") == 0) {
+                strcpy(token.type, "NoiseWord");
+            } else if (strcmp(token.type, "Single-line Comment") == 0) {
+                strcpy(token.type, "Comment");
+                // Optionally skip comments if not required for parsing
+            } else if (strcmp(token.type, "Reserved Word") == 0) {
+                strcpy(token.type, "ReservedWord");
+            } else if (strcmp(token.type, "Dot") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, ".");
+            } else if (strcmp(token.type, "Left Parenthesis") == 0) {
+                strcpy(token.type, "Delimiter");
+                strcpy(token.value, "(");
+            }
+
+
+            // Add the token to the list
+            if (tokenCount < MAX_TOKENS) {
+                tokens[tokenCount++] = token;
+                printf("DEBUG: Loaded token: Type='%s', Value='%s', Line=%d\n", token.type, token.value, token.lineNumber);
+            } else {
+                printf("Error: Token limit exceeded. Increase MAX_TOKENS.\n");
+                break;
+            }
         } else {
-            printf("Skipping invalid line: %s", line);
+            printf("DEBUG: Invalid or unparsed line: %s\n", line);
         }
     }
 
     fclose(file);
 
-    printf("Loaded %d tokens from %s.\n", tokenCount, filename);
+    // Debug: Print all loaded tokens
+    printf("DEBUG: Loaded Tokens:\n");
+    for (int i = 0; i < tokenCount; i++) {
+        printf("  Token %d: Type='%s', Value='%s', Line=%d\n", 
+               i + 1, tokens[i].type, tokens[i].value, tokens[i].lineNumber);
+    }
+
+    printf("DEBUG: Completed loading tokens. Total loaded: %d from %s.\n", tokenCount, filename);
     return tokenCount;
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -113,19 +275,61 @@ ParseTreeNode* parseProgram() {
 }
 
 
-ParseTreeNode* matchToken(const char* expectedType) {
+ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue) {
+    // Debug: Check the token before fetching
+    printf("DEBUG: Checking token before fetching: Type='%s', Value='%s', Line=%d\n",
+           peekToken() ? peekToken()->type : "NULL",
+           peekToken() ? peekToken()->value : "NULL",
+           peekToken() ? peekToken()->lineNumber : -1);
+
+    // Fetch the next token
     Token* token = getNextToken();
-    if (!token || strcmp(token->type, expectedType) != 0) {
-        char errorMessage[100];
-        snprintf(errorMessage, sizeof(errorMessage), 
-                 "Expected token of type '%s', but got '%s' at line %d.", 
-                 expectedType, token ? token->type : "EOF", 
-                 token ? token->lineNumber : -1);
-        syntaxError(errorMessage);
+    if (!token) {
+        printf("DEBUG: No more tokens available when trying to match. Expected Type='%s', Value='%s'.\n",
+               expectedType, expectedValue);
+    } else {
+        printf("DEBUG: Fetching token for match. Got Type='%s', Value='%s', Line=%d. Expected Type='%s', Value='%s'.\n",
+               token->type, token->value, token->lineNumber, expectedType, expectedValue);
     }
 
-    return createParseTreeNode(token->type, token->value); // Create and return the node
+    // Check if the token matches the expected type and value
+    if (!token || strcmp(token->type, expectedType) != 0 || strcmp(token->value, expectedValue) != 0) {
+        char errorMessage[200];
+        snprintf(errorMessage, sizeof(errorMessage),
+                 "Syntax Error: Expected token Type='%s', Value='%s', but got Type='%s', Value='%s' at line %d.",
+                 expectedType, expectedValue,
+                 token ? token->type : "EOF",
+                 token ? token->value : "EOF",
+                 token ? token->lineNumber : -1);
+        printf("DEBUG: Token mismatch error: %s\n", errorMessage);
+        syntaxError(errorMessage);
+        return NULL; // Return NULL on mismatch
+    }
+
+    // Debug: Successful match
+    printf("DEBUG: Matched token successfully: Type='%s', Value='%s', Line=%d\n",
+           token->type, token->value, token->lineNumber);
+
+    // Create a parse tree node for the matched token
+    ParseTreeNode* node = createParseTreeNode(token->type, token->value);
+
+    // Debug: ParseTreeNode creation
+    printf("DEBUG: Created ParseTreeNode: Type='%s', Value='%s'\n", token->type, token->value);
+
+    // Debug: Verify remaining tokens
+    printf("DEBUG: Remaining Tokens:\n");
+    for (int i = currentTokenIndex; i < totalTokens; i++) {
+        printf("  Token %d: Type='%s', Value='%s', Line=%d\n",
+               i + 1, tokens[i].type, tokens[i].value, tokens[i].lineNumber);
+    }
+
+    return node;
 }
+
+
+
+
+
 
 
 
@@ -135,14 +339,14 @@ ParseTreeNode* parseBlock() {
 
     ParseTreeNode* blockNode = createParseTreeNode("Block", "");
 
-    matchToken("L_CURLY"); // Match '{'
+    matchToken("Delimiter", "{"); // Match '{'
     addChild(blockNode, createParseTreeNode("Symbol", "{"));
 
     while (peekToken() && strcmp(peekToken()->type, "R_CURLY") != 0) {
         addChild(blockNode, parseStatement());
     }
 
-    matchToken("R_CURLY"); // Match '}'
+    matchToken("Delimiter", "}"); // Match '}'
     addChild(blockNode, createParseTreeNode("Symbol", "}"));
 
     return blockNode;
@@ -531,9 +735,12 @@ ParseTreeNode* parsePostfixExpr() {
     // Parse the primary expression and add it as a child
     addChild(postfixNode, parsePrimaryExpr());
 
-    // Handle optional postfix operators (e.g., function calls or array accesses)
+    // Handle optional postfix operations: function calls, array accesses, or unary operators
     Token* token = peekToken();
-    while (token && (strcmp(token->type, "L_PAREN") == 0 || strcmp(token->type, "L_BRACKET") == 0)) {
+    while (token && 
+           (strcmp(token->type, "L_PAREN") == 0 || 
+            strcmp(token->type, "L_BRACKET") == 0 || 
+            strcmp(token->type, "UnaryOperator") == 0)) {
         if (strcmp(token->type, "L_PAREN") == 0) {
             printf("Parsing Function Call...\n");
 
@@ -571,6 +778,17 @@ ParseTreeNode* parsePostfixExpr() {
 
             // Add the array access node as a child of the postfix node
             addChild(postfixNode, arrayAccessNode);
+
+        } else if (strcmp(token->type, "UnaryOperator") == 0) {
+            printf("Parsing Unary Operator...\n");
+
+            // Create a node for the unary operator
+            ParseTreeNode* unaryOpNode = createParseTreeNode("UnaryOperator", token->value);
+
+            getNextToken(); // Consume the unary operator
+
+            // Add the unary operator node as a child of the postfix node
+            addChild(postfixNode, unaryOpNode);
         }
 
         token = peekToken(); // Check for more postfix operations
@@ -578,6 +796,7 @@ ParseTreeNode* parsePostfixExpr() {
 
     return postfixNode;
 }
+
 
 
 
@@ -1590,117 +1809,185 @@ ParseTreeNode* parseAssignmentStatement() {
 
 
 ParseTreeNode* parseInputStatement() {
-    printf("Parsing Input Statement...\n");
-
-    // Create a parse tree node for the input statement
     ParseTreeNode* inputNode = createParseTreeNode("InputStatement", "");
 
-    // Parse the "input" keyword
-    Token* token = getNextToken();
-    if (!token || strcmp(token->value, "input") != 0) {
-        syntaxError("Expected 'input' keyword at the start of an input statement.");
-    }
+    matchToken("Keyword", "input"); // Match "input"
     addChild(inputNode, createParseTreeNode("Keyword", "input"));
 
-    // Parse the opening parenthesis
-    token = getNextToken();
-    if (!token || strcmp(token->type, "L_PAREN") != 0) {
-        syntaxError("Expected '(' after 'input'.");
-    }
-    addChild(inputNode, createParseTreeNode("LeftParenthesis", "("));
+    matchToken("Delimiter", "("); // Match "("
+    addChild(inputNode, createParseTreeNode("Delimiter", "("));
 
-    // Parse the variable list
-    addChild(inputNode, parseVariableList());
-
-    // Parse the closing parenthesis
-    token = getNextToken();
-    if (!token || strcmp(token->type, "R_PAREN") != 0) {
-        syntaxError("Expected ')' to close the input statement.");
+    if (peekToken() && strcmp(peekToken()->type, "FormatString") == 0) {
+        addChild(inputNode, parseInputList());
     }
-    addChild(inputNode, createParseTreeNode("RightParenthesis", ")"));
 
-    // Parse the semicolon to terminate the input statement
-    token = getNextToken();
-    if (!token || strcmp(token->type, "SEMICOLON") != 0) {
-        syntaxError("Expected ';' at the end of input statement.");
-    }
-    addChild(inputNode, createParseTreeNode("Semicolon", ";"));
+    matchToken("Delimiter", ")"); // Match ")"
+    addChild(inputNode, createParseTreeNode("Delimiter", ")"));
+
+    matchToken("Delimiter", ";"); // Match ";"
+    addChild(inputNode, createParseTreeNode("Delimiter", ";"));
 
     return inputNode;
 }
 
 
+ParseTreeNode* parseInputList() {
+    printf("Parsing Input List...\n");
 
-ParseTreeNode* parseOutputList() {
-    printf("Parsing Output List...\n");
+    ParseTreeNode* inputListNode = createParseTreeNode("InputList", "");
 
-    // Create a parse tree node for the output list
-    ParseTreeNode* outputListNode = createParseTreeNode("OutputList", "");
+    // Parse at least one format-variable pair
+    addChild(inputListNode, parseFormatVariablePair());
+
+    // Parse additional format-variable pairs (if any)
+    Token* token = peekToken();
+    while (token && strcmp(token->type, "COMMA") == 0) {
+        getNextToken(); // Consume ','
+        addChild(inputListNode, parseFormatVariablePair());
+        token = peekToken();
+    }
+
+    return inputListNode;
+}
+
+
+ParseTreeNode* parseFormatVariablePair() {
+    printf("Parsing Format-Variable Pair...\n");
+
+    ParseTreeNode* pairNode = createParseTreeNode("FormatVariablePair", "");
+
+    // Expect a format string
+    Token* token = getNextToken();
+    if (!token || strcmp(token->type, "FormatString") != 0) {
+        syntaxError("Expected a format string");
+    }
+    addChild(pairNode, createParseTreeNode("FormatString", token->value));
+
+    // Expect a comma
+    token = getNextToken();
+    if (!token || strcmp(token->type, "COMMA") != 0) {
+        syntaxError("Expected a comma after format string");
+    }
+    addChild(pairNode, createParseTreeNode("Comma", ","));
+
+    // Expect an address variable
+    token = getNextToken();
+    if (!token || strcmp(token->type, "AddressVariable") != 0) {
+        syntaxError("Expected an address variable");
+    }
+    addChild(pairNode, createParseTreeNode("AddressVariable", token->value));
+
+    return pairNode;
+}
+
+
+
+ParseTreeNode* parseExpressionList() {
+    printf("Parsing Expression List...\n");
+
+    // Create a parse tree node for the expression list
+    ParseTreeNode* exprListNode = createParseTreeNode("ExpressionList", "");
 
     // Parse the first expression
-    addChild(outputListNode, parseExpression());
+    addChild(exprListNode, parseExpression());
 
     // Parse subsequent expressions separated by commas
     while (peekToken() && strcmp(peekToken()->type, "COMMA") == 0) {
-        getNextToken(); // Consume ','
-        addChild(outputListNode, createParseTreeNode("Comma", ","));
-        addChild(outputListNode, parseExpression());
+        getNextToken(); // Consume the comma
+        addChild(exprListNode, createParseTreeNode("Comma", ","));
+        addChild(exprListNode, parseExpression());
+    }
+
+    return exprListNode;
+}
+
+
+
+
+ParseTreeNode* parseOutputStatement() {
+    ParseTreeNode* outputNode = createParseTreeNode("OutputStatement", "");
+
+    matchToken("Keyword", "printf"); // Match "printf"
+    addChild(outputNode, createParseTreeNode("Keyword", "printf"));
+
+    matchToken("Delimiter", "("); // Match "("
+    addChild(outputNode, createParseTreeNode("Delimiter", "("));
+
+    if (peekToken() && strcmp(peekToken()->type, "FormatString") == 0) {
+        addChild(outputNode, parseOutputList());
+    }
+
+    matchToken("Delimiter", ")"); // Match ")"
+    addChild(outputNode, createParseTreeNode("Delimiter", ")"));
+
+    matchToken("Delimiter", ";"); // Match ";"
+    addChild(outputNode, createParseTreeNode("Delimiter", ";"));
+
+    return outputNode;
+}
+
+ParseTreeNode* parseOutputList() {
+    ParseTreeNode* outputListNode = createParseTreeNode("OutputList", "");
+
+    if (peekToken() && strcmp(peekToken()->type, "FormatString") == 0) {
+        addChild(outputListNode, parseStringConcat());
+    } else {
+        addChild(outputListNode, parseExpressionList());
     }
 
     return outputListNode;
 }
 
+ParseTreeNode* parseStringConcat() {
+    printf("Parsing String Concatenation...\n");
 
+    ParseTreeNode* stringConcatNode = createParseTreeNode("StringConcat", "");
 
-ParseTreeNode* parseOutputStatement() {
-    printf("Parsing Output Statement...\n");
-
-    // Expect the "printf" keyword
+    // Parse at least one format string
     Token* token = getNextToken();
-    if (!token || strcmp(token->value, "printf") != 0) {
-        syntaxError("Expected 'printf' keyword at the start of an output statement.");
+    if (!token || strcmp(token->type, "FormatString") != 0) {
+        syntaxError("Expected a format string for concatenation");
+    }
+    addChild(stringConcatNode, createParseTreeNode("FormatString", token->value));
+
+    // Parse additional format strings separated by ADD_OP (if any)
+    token = peekToken();
+    while (token && strcmp(token->type, "ADD_OP") == 0) {
+        getNextToken(); // Consume '+'
+        addChild(stringConcatNode, createParseTreeNode("AddOp", "+"));
+
+        token = getNextToken();
+        if (!token || strcmp(token->type, "FormatString") != 0) {
+            syntaxError("Expected a format string after '+'");
+        }
+        addChild(stringConcatNode, createParseTreeNode("FormatString", token->value));
+
+        token = peekToken();
     }
 
-    // Expect an opening parenthesis
-    token = getNextToken();
-    if (!token || strcmp(token->type, "L_PAREN") != 0) {
-        syntaxError("Expected '(' after 'printf'.");
-    }
-
-    // Parse the output list
-    parseOutputList();
-
-    // Expect a closing parenthesis
-    token = getNextToken();
-    if (!token || strcmp(token->type, "R_PAREN") != 0) {
-        syntaxError("Expected ')' to close the output statement.");
-    }
-
-    // Expect a semicolon to terminate the output statement
-    token = getNextToken();
-    if (!token || strcmp(token->type, "SEMICOLON") != 0) {
-        syntaxError("Expected ';' at the end of output statement.");
-    }
+    return stringConcatNode;
 }
+
+
 
 
 ParseTreeNode* parseSwitchStatement() {
     printf("Parsing Switch Statement...\n");
 
     // Match the 'switch' keyword
-    matchToken("switch");
+    matchToken("Keyword", "switch");
 
     // Match the opening parenthesis '('
-    matchToken("L_PAREN");
+    matchToken("Delimiter", "(");
 
     // Parse the controlling expression
     parseExpression();
 
     // Match the closing parenthesis ')'
-    matchToken("R_PAREN");
+    matchToken("Delimiter", ")");
 
     // Match the opening curly brace '{'
-    matchToken("L_CURLY");
+    matchToken("Delimiter", "{");
 
     // Parse case statements
     while (peekToken() && strcmp(peekToken()->type, "case") == 0) {
@@ -1713,7 +2000,7 @@ ParseTreeNode* parseSwitchStatement() {
     }
 
     // Match the closing curly brace '}'
-    matchToken("R_CURLY");
+    matchToken("Delimiter", "}");
 }
 
 
@@ -1823,71 +2110,123 @@ ParseTreeNode* parseJumpStatement() {
 
 // Placeholder implementations
 ParseTreeNode* parseMainFunction() {
-    printf("Parsing Main Function...\n");
+    printf("DEBUG: Parsing Main Function...\n");
 
     // Create the main function node
     ParseTreeNode* mainNode = createParseTreeNode("MainFunction", "");
 
     // Match "void" keyword
-    if (strcmp(peekToken()->type, "Keyword") == 0 && strcmp(peekToken()->value, "void") == 0) {
-        addChild(mainNode, createParseTreeNode("Keyword", "void"));
-        matchToken("Keyword");
+    Token* token = peekToken();
+    printf("DEBUG: Checking for 'void' keyword. Current Token: Type='%s', Value='%s', Line=%d\n",
+           token ? token->type : "NULL",
+           token ? token->value : "NULL",
+           token ? token->lineNumber : -1);
+
+    if (token && strcmp(token->type, "Keyword") == 0 && strcmp(token->value, "void") == 0) {
+        printf("DEBUG: Matched 'void' keyword.\n");
+        addChild(mainNode, matchToken("Keyword", "void"));
     } else {
-        printf("Syntax Error: Expected 'void'.\n");
-        return mainNode; // Return with whatever is parsed so far
+        syntaxError("Expected 'void' keyword.");
+        return mainNode; // Return with partial parse tree
     }
 
     // Match "main" keyword
-    if (strcmp(peekToken()->type, "Keyword") == 0 && strcmp(peekToken()->value, "main") == 0) {
-        addChild(mainNode, createParseTreeNode("Keyword", "main"));
-        matchToken("Keyword");
+    token = peekToken();
+    printf("DEBUG: Checking for 'main' keyword. Current Token: Type='%s', Value='%s', Line=%d\n",
+           token ? token->type : "NULL",
+           token ? token->value : "NULL",
+           token ? token->lineNumber : -1);
+
+    if (token && strcmp(token->type, "Keyword") == 0 && strcmp(token->value, "main") == 0) {
+        printf("DEBUG: Matched 'main' keyword.\n");
+        addChild(mainNode, matchToken("Keyword", "main"));
     } else {
-        printf("Syntax Error: Expected 'main'.\n");
-        return mainNode; // Return with whatever is parsed so far
+        syntaxError("Expected 'main' keyword.");
+        return mainNode; // Return with partial parse tree
     }
 
     // Match "("
-    if (strcmp(peekToken()->type, "Delimiter") == 0 && strcmp(peekToken()->value, "(") == 0) {
-        addChild(mainNode, createParseTreeNode("Delimiter", "("));
-        matchToken("Delimiter");
+    token = peekToken();
+    printf("DEBUG: Checking for '('. Current Token: Type='%s', Value='%s', Line=%d\n",
+           token ? token->type : "NULL",
+           token ? token->value : "NULL",
+           token ? token->lineNumber : -1);
+
+    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "(") == 0) {
+        printf("DEBUG: Matched '('.\n");
+        addChild(mainNode, matchToken("Delimiter", "("));
     } else {
-        printf("Syntax Error: Expected '('.\n");
-        return mainNode; // Return with whatever is parsed so far
+        syntaxError("Expected '(' after 'main'.");
+        return mainNode; // Return with partial parse tree
     }
 
     // Match ")"
-    if (strcmp(peekToken()->type, "Delimiter") == 0 && strcmp(peekToken()->value, ")") == 0) {
-        addChild(mainNode, createParseTreeNode("Delimiter", ")"));
-        matchToken("Delimiter");
+    token = peekToken();
+    printf("DEBUG: Checking for ')'. Current Token: Type='%s', Value='%s', Line=%d\n",
+           token ? token->type : "NULL",
+           token ? token->value : "NULL",
+           token ? token->lineNumber : -1);
+
+    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, ")") == 0) {
+        printf("DEBUG: Matched ')'.\n");
+        addChild(mainNode, matchToken("Delimiter", ")"));
     } else {
-        printf("Syntax Error: Expected ')'.\n");
-        return mainNode; // Return with whatever is parsed so far
+        syntaxError("Expected ')' after '('.");
+        return mainNode; // Return with partial parse tree
     }
 
     // Match "{"
-    if (strcmp(peekToken()->type, "Delimiter") == 0 && strcmp(peekToken()->value, "{") == 0) {
-        addChild(mainNode, createParseTreeNode("Delimiter", "{"));
-        matchToken("Delimiter");
+    token = peekToken();
+    printf("DEBUG: Checking for '{'. Current Token: Type='%s', Value='%s', Line=%d\n",
+           token ? token->type : "NULL",
+           token ? token->value : "NULL",
+           token ? token->lineNumber : -1);
+
+    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "{") == 0) {
+        printf("DEBUG: Matched '{'.\n");
+        addChild(mainNode, matchToken("Delimiter", "{"));
     } else {
-        printf("Syntax Error: Expected '{'.\n");
-        return mainNode; // Return with whatever is parsed so far
+        syntaxError("Expected '{' after ')'.");
+        return mainNode; // Return with partial parse tree
     }
 
     // Parse statements inside the block
-    while (peekToken() && strcmp(peekToken()->type, "Delimiter") != 0 && strcmp(peekToken()->value, "}") != 0) {
-        addChild(mainNode, parseStatement());
+    printf("DEBUG: Parsing statements inside main block...\n");
+    while ((token = peekToken()) &&
+           !(strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "}") == 0)) {
+        printf("DEBUG: Parsing statement. Current Token: Type='%s', Value='%s', Line=%d\n",
+               token->type, token->value, token->lineNumber);
+
+        ParseTreeNode* statementNode = parseStatement();
+        if (statementNode) {
+            addChild(mainNode, statementNode);
+        } else {
+            syntaxError("Error parsing statement inside main function.");
+            break; // Exit the loop on error
+        }
     }
 
     // Match "}"
-    if (strcmp(peekToken()->type, "Delimiter") == 0 && strcmp(peekToken()->value, "}") == 0) {
-        addChild(mainNode, createParseTreeNode("Delimiter", "}"));
-        matchToken("Delimiter");
+    token = peekToken();
+    printf("DEBUG: Checking for '}'. Current Token: Type='%s', Value='%s', Line=%d\n",
+           token ? token->type : "NULL",
+           token ? token->value : "NULL",
+           token ? token->lineNumber : -1);
+
+    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "}") == 0) {
+        printf("DEBUG: Matched '}'.\n");
+        addChild(mainNode, matchToken("Delimiter", "}"));
     } else {
-        printf("Syntax Error: Expected '}'.\n");
+        syntaxError("Expected '}' at the end of main function block.");
     }
 
+    // Final debug statement
+    printf("DEBUG: Completed parsing Main Function.\n");
     return mainNode;
 }
+
+
+
 
 
 ParseTreeNode* parseConditionalStatement() {
@@ -1899,7 +2238,7 @@ ParseTreeNode* parseConditionalStatement() {
     // Match "if"
     if (strcmp(peekToken()->type, "Keyword") == 0 && strcmp(peekToken()->value, "if") == 0) {
         addChild(conditionalNode, createParseTreeNode("Keyword", "if"));
-        matchToken("Keyword");
+        matchToken("Keyword", "if");
     } else {
         printf("Syntax Error: Expected 'if'.\n");
         return conditionalNode;
@@ -1908,7 +2247,7 @@ ParseTreeNode* parseConditionalStatement() {
     // Match "("
     if (strcmp(peekToken()->type, "Delimiter") == 0 && strcmp(peekToken()->value, "(") == 0) {
         addChild(conditionalNode, createParseTreeNode("Delimiter", "("));
-        matchToken("Delimiter");
+        matchToken("Delimiter", "(");
     } else {
         printf("Syntax Error: Expected '('.\n");
         return conditionalNode;
@@ -1920,7 +2259,7 @@ ParseTreeNode* parseConditionalStatement() {
     // Match ")"
     if (strcmp(peekToken()->type, "Delimiter") == 0 && strcmp(peekToken()->value, ")") == 0) {
         addChild(conditionalNode, createParseTreeNode("Delimiter", ")"));
-        matchToken("Delimiter");
+        matchToken("Delimiter", ")");
     } else {
         printf("Syntax Error: Expected ')'.\n");
         return conditionalNode;
@@ -1933,7 +2272,7 @@ ParseTreeNode* parseConditionalStatement() {
     if (peekToken() && strcmp(peekToken()->type, "Keyword") == 0 && strcmp(peekToken()->value, "else") == 0) {
         ParseTreeNode* elseNode = createParseTreeNode("ElseClause", "");
         addChild(conditionalNode, elseNode);
-        matchToken("Keyword");
+        matchToken("Keyword", "else");
 
         // Check if it's an "else if" block
         if (peekToken() && strcmp(peekToken()->type, "Keyword") == 0 && strcmp(peekToken()->value, "if") == 0) {

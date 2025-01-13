@@ -1,9 +1,82 @@
---------------------------------------------------------------------------------------------------------------------------------------------
-Token Type                                                       Value                         Line Number         
---------------------------------------------------------------------------------------------------------------------------------------------
-Keyword                                                          void                          
-Keyword                                                          main                          
-Delimiter                                                        (                             
-Right Parenthesis                                                )                             
-Left Curly Brace                                                 {                             
-Right Curly Brace                                                }                             
+Keyword	void	1
+Keyword	main	1
+Delimiter	(	1
+Right Parenthesis	)	1
+Left Curly Brace	{	1
+Single-line Comment	~~	3
+Multi-line Comment Start	~/	5
+Multi-line Comment End	/~	6
+Identifier	Rastyvar1	8
+Identifier	rastyvar1	9
+Integer Literal	18	12
+Identifier	rastyIdentifier	13
+Float Literal	18.18	14
+Character Literal	'R'	15
+String Literal	"String Literal"	16
+Arithmetic Operator (Addition)	+	19
+Arithmetic Operator (Subtraction)	-	20
+Arithmetic Operator (Multiplication)	*	21
+Arithmetic Operator (Division)	/	22
+Arithmetic Operator (Modulo)	%	23
+Arithmetic Operator (Exponentiation)	^	24
+Arithmetic Operator (Integer Division)	//	25
+Assignment Operator	=	28
+Addition Assignment Operator	+=	29
+Subtraction Assignment Operator	-=	30
+Multiplication Assignment Operator	*=	31
+Division Assignment Operator	/=	32
+Modulo Assignment Operator	%=	33
+Integer Division Assignment Operator	//=	34
+Arithmetic Operator (Addition)	+	37
+Unary Operator (Increment)	++	38
+Arithmetic Operator (Subtraction)	-	39
+Unary Operator (Decrement)	--	40
+Logical Operator (NOT)	!	43
+Logical Operator (OR)	||	44
+Logical Operator (AND)	&&	45
+Relational Operator (Equal To)	==	48
+Relational Operator (Not Equal To)	!=	49
+Relational Operator (Greater Than)	>	50
+Relational Operator (Less Than)	<	51
+Relational Operator (Greater Than or Equal To)	>=	52
+Relational Operator (Less Than or Equal To)	<=	53
+Keyword	bool	56
+Keyword	break	57
+Keyword	case	58
+Keyword	char	59
+Keyword	continue	60
+Keyword	default	61
+Keyword	do	62
+Keyword	else	63
+Keyword	float	64
+Keyword	for	65
+Keyword	goto	66
+Keyword	if	67
+Keyword	int	68
+Keyword	main	69
+Keyword	printf	70
+Keyword	return	71
+Keyword	input	72
+Keyword	string	73
+Keyword	switch	74
+Keyword	void	75
+Keyword	while	76
+Keyword	array	77
+Reserved Word	true	80
+Reserved Word	false	81
+Reserved Word	null	82
+Reserved Word	const	83
+Noise Word	by	86
+Noise Word	from	87
+Noise Word	until	88
+Left Parenthesis	(	91
+Right Parenthesis	)	92
+Left Curly Brace	{	93
+Right Curly Brace	}	94
+Left Bracket	[	95
+Right Bracket	]	96
+Comma	,	97
+Dot	.	98
+Semicolon	;	99
+Colon	:	100
+Right Curly Brace	}	102

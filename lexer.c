@@ -10,17 +10,11 @@
 #include "config.h"
 
 int main() {
-
     // Initialize files
     FileHandles *handles = initializeFiles();
     if (!handles) {
         return 1; // Error already handled in `initializeFiles`
     }
-
-    // Write header to the symbol table
-    writeHorizontalBar(handles->symbolTable);
-    fprintf(handles->symbolTable, "%-65s%-30s%-20s\n", "Token Type", "Value", "Line Number");
-    writeHorizontalBar(handles->symbolTable);
 
     // Process the source file line by line
     char line[256];
@@ -51,8 +45,6 @@ int main() {
     // Close files
     closeFiles(handles);
 
-    printf("Lexical analysis completed. \nTokens saved in symbol_table.prsm\n\n\n");
+    printf("Lexical analysis completed. Tokens saved in symbol_table.prsm\n");
     return 0;
-
-} // end of main function
-
+}
