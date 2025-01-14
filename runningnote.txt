@@ -1,9 +1,9 @@
 // Quick Helper Syntax Commands
 cls             // for clearing
-rm *.o          // wild card for clearing of objects
+rm *.o          // wild card for clearing of terminal
 
 
-// LEXICAL ANAYZER
+// LEXICAL ANAYZER (run line by line)
 gcc -c lexer.c
 gcc -c file_selector.c
 gcc -c token.c
@@ -18,7 +18,11 @@ gcc lexer.o file_selector.o token.o state_machine.o keywords.o config.o utils.o 
 ./lexer
 
 
-// SYNTAX ANALYZER
+
+
+
+
+// SYNTAX ANALYZER (run line by line)
 gcc -c syntax_analyzer.c parse_tree.c
 
 gcc syntax_analyzer.o parse_tree.o -o syntax_analyzer -mconsole

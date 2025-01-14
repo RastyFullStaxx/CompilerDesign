@@ -35,117 +35,128 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                     currentToken[i++] = c;
                     currentToken[i++] = line[++j];
                     currentToken[i] = '\0';
-                    const char* type = (c == '=') ? "Relational Operator (Equal To)" :
-                                       (c == '!') ? "Relational Operator (Not Equal To)" :
-                                       (c == '>') ? "Relational Operator (Greater Than or Equal To)" :
-                                                    "Relational Operator (Less Than or Equal To)";
+                    const char* type = (c == '=') ? "RelationalOperator" :
+                                       (c == '!') ? "RelationalOperator" :
+                                       (c == '>') ? "RelationalOperator" :
+                                                    "RelationalOperator";
                     writeToken(symbolTable, type, currentToken, lineNumber);
                     i = 0;
                 } else if (c == '>' || c == '<') {
                     // Relational operators (>, <)
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    const char* type = (c == '>') ? "Relational Operator (Greater Than)" :
-                                                    "Relational Operator (Less Than)";
+                    const char* type = (c == '>') ? "RelationalOperator" :
+                                                    "RelationalOperator";
                     writeToken(symbolTable, type, currentToken, lineNumber);
                     i = 0;
                 } else if (c == '!' && line[j + 1] != '=') {
                     // Logical NOT operator (!)
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, "Logical Operator (NOT)", currentToken, lineNumber);
+                    writeToken(symbolTable, "LogicalOperator", currentToken, lineNumber);
                     i = 0;
                 } else if ((c == '|' && line[j + 1] == '|') || (c == '&' && line[j + 1] == '&')) {
                     // Logical operators (||, &&)
                     currentToken[i++] = c;
                     currentToken[i++] = line[++j];
                     currentToken[i] = '\0';
-                    const char* type = (c == '|') ? "Logical Operator (OR)" : "Logical Operator (AND)";
+                    const char* type = (c == '|') ? "LogicalOperator" : "LogicalOperator";
                     writeToken(symbolTable, type, currentToken, lineNumber);
                     i = 0;
                 } else if (c == '=' && line[j + 1] != '=') {
-                    // Assignment operator (=)
+                    // AssignmentOperator (=)
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
+                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                     i = 0;
                 } else if ((c == '+' && line[j + 1] == '=') || (c == '-' && line[j + 1] == '=') ||
                            (c == '*' && line[j + 1] == '=') || (c == '/' && line[j + 1] == '=') || 
                            (c == '%' && line[j + 1] == '=')) {
-                    // Assignment operators (+=, -=, *=, /=, %=)
+                    // AssignmentOperators (+=, -=, *=, /=, %=)
                     currentToken[i++] = c;
                     currentToken[i++] = line[++j];
                     currentToken[i] = '\0';
-                    const char* type = (c == '+') ? "Addition Assignment Operator" :
-                                       (c == '-') ? "Subtraction Assignment Operator" :
-                                       (c == '*') ? "Multiplication Assignment Operator" :
-                                       (c == '/') ? "Division Assignment Operator" :
-                                                    "Modulo Assignment Operator";
+                    const char* type = (c == '+') ? "AssignmentOperator" :
+                                       (c == '-') ? "AssignmentOperator" :
+                                       (c == '*') ? "AssignmentOperator" :
+                                       (c == '/') ? "AssignmentOperator" :
+                                                    "AssignmentOperator";
                     writeToken(symbolTable, type, currentToken, lineNumber);
                     i = 0;
                 } else if (c == '/' && line[j + 1] == '/' && line[j + 2] == '=') {
-                    // Integer division assignment operator (//=)
+                    // Integer AssignmentOperator (//=)
                     currentToken[i++] = c;
                     currentToken[i++] = line[++j];
                     currentToken[i++] = line[++j];
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, "Integer Division Assignment Operator", currentToken, lineNumber);
+                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                     i = 0;
                 } else if (c == '/' && line[j + 1] == '/') {
                     // Integer division operator (//)
                     currentToken[i++] = c;
                     currentToken[i++] = line[++j];
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, "Arithmetic Operator (Integer Division)", currentToken, lineNumber);
+                    writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                     i = 0;
                 } else if (c == '/' || c == '*' || c == '%') {
                     // Arithmetic operators (/, *, %)
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    const char* type = (c == '/') ? "Arithmetic Operator (Division)" :
-                                       (c == '*') ? "Arithmetic Operator (Multiplication)" :
-                                                    "Arithmetic Operator (Modulo)";
+                    const char* type = (c == '/') ? "ArithmeticOperator" :
+                                       (c == '*') ? "ArithmeticOperator" :
+                                                    "ArithmeticOperator";
                     writeToken(symbolTable, type, currentToken, lineNumber);
                     i = 0;
                 } else if ((c == '+' && line[j + 1] == '+') || (c == '-' && line[j + 1] == '-')) {
-                    // Unary operators (++, --)
-                    currentToken[i++] = c;
-                    currentToken[i++] = line[++j];
-                    currentToken[i] = '\0';
-                    const char* type = (c == '+') ? "Unary Operator (Increment)" : "Unary Operator (Decrement)";
-                    writeToken(symbolTable, type, currentToken, lineNumber);
-                    i = 0;
-                } else if ((c == '+' || c == '-') && (isdigit(line[j + 1]) || isalpha(line[j + 1]) || line[j + 1] == '_')) {
-                    // Unary + or -
-                    state = UNARY_OPERATOR;
-                    currentToken[i++] = c;
+    // Unary operators (++, --)
+    currentToken[i++] = c;
+    currentToken[i++] = line[++j];
+    currentToken[i] = '\0';
+    writeToken(symbolTable, "UnaryOperator", currentToken, lineNumber);
+    i = 0;
+    state = START; // Stay in START to process the next character
                 } else if (c == '+' || c == '-') {
                     // Arithmetic operators (+, -)
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    const char* type = (c == '+') ? "Arithmetic Operator (Addition)" : "Arithmetic Operator (Subtraction)";
+                    const char* type = (c == '+') ? "ArithmeticOperator" : "ArithmeticOperator";
                     writeToken(symbolTable, type, currentToken, lineNumber);
                     i = 0;
+                } else if (c == '&') {
+                    // Handle specifier identifier (&identifier)
+                    if (isalnum(line[j + 1]) || line[j + 1] == '_') {
+                        currentToken[i++] = c; // Append '&'
+                        c = line[++j];         // Move to the next character
+                        state = IDENTIFIER;    // Transition to IDENTIFIER state
+                        currentToken[i++] = c; // Start building the identifier
+                    } else {
+                        // Invalid token starting with '&'
+                        currentToken[i++] = c;
+                        currentToken[i] = '\0';
+                        writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
+                        i = 0;
+                        state = START; // Reset state
+                    }
                 } else if (isalpha(c) || c == '_') {
-                    // Identifier or reserved word
+                    // IDENTIFIER or ReservedWord
                     state = IDENTIFIER;
                     currentToken[i++] = c;
                 } else if (isdigit(c)) {
-                    // Integer literal
+                    // INT_LITERAL
                     state = INTEGER;
                     currentToken[i++] = c;
                 } else if (c == '^') {
                     // Exponentiation operator (^)
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, "Arithmetic Operator (Exponentiation)", currentToken, lineNumber);
+                    writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                     i = 0;
                 } else if (c == '\'') {
-                    // Start of character literal
+                    // Start of CHAR_LITERAL
                     currentToken[i++] = c;
                     state = CHAR_LITERAL;
                 } else if (c == '"') {
-                    // Start of string literal
+                    // Start of STRING_LITERAL
                     currentToken[i++] = c;
                     state = STRING_LITERAL;
                 } else if (isalpha(c) || c == '_') {
@@ -158,7 +169,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                         currentToken[i++] = line[++j]; // Append subsequent characters
                     }
                     currentToken[i] = '\0'; // Null-terminate
-                    writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
+                    writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
                     i = 0;
                     state = START; // Reset state
                     break;
@@ -178,26 +189,26 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                     // Left delimiters
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, (c == '(') ? "Left Parenthesis" :
-                                                   (c == '{') ? "Left Curly Brace" :
-                                                                "Left Bracket", currentToken, lineNumber);
+                    writeToken(symbolTable, (c == '(') ? "Delimiter" :
+                                                   (c == '{') ? "Delimiter" :
+                                                                "Delimiter", currentToken, lineNumber);
                     i = 0; // Reset token index
                 } else if (c == ')' || c == '}' || c == ']') {
                     // Right delimiters
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, (c == ')') ? "Right Parenthesis" :
-                                                   (c == '}') ? "Right Curly Brace" :
-                                                                "Right Bracket", currentToken, lineNumber);
+                    writeToken(symbolTable, (c == ')') ? "Delimiter" :
+                                                   (c == '}') ? "Delimiter" :
+                                                                "Delimiter", currentToken, lineNumber);
                     i = 0; // Reset token index
                 } else if (c == ',' || c == '.' || c == ';' || c == ':') {
                     // Independent delimiters
                     currentToken[i++] = c;
                     currentToken[i] = '\0';
-                    writeToken(symbolTable, (c == ',') ? "Comma" :
-                                                   (c == '.') ? "Dot" :
-                                                   (c == ';') ? "Semicolon" :
-                                                                "Colon", currentToken, lineNumber);
+                    writeToken(symbolTable, (c == ',') ? "Delimiter" :
+                                                   (c == '.') ? "Delimiter" :
+                                                   (c == ';') ? "Delimiter" :
+                                                                "Delimiter", currentToken, lineNumber);
                     i = 0; // Reset token index
                 } else if (!isspace(c)) {
                     // Other characters (unknown token)
@@ -215,81 +226,101 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
                         case IDENTIFIER:
-                        if (isalnum(c) || c == '_') {
-                            // Continue building the identifier
-                            currentToken[i++] = c;
-                        } else if (!isalpha(currentToken[0]) && !isDelimiter(c) && !isspace(c)) {
-                            // Invalid identifier
-                            while (isalnum(c) || c == '_' || (!isDelimiter(c) && !isspace(c))) {
-                                currentToken[i++] = c;
-                                c = line[++j];
-                            }
-                            currentToken[i] = '\0';
-                            printf("Lexical Error: %s\n", currentToken);
-                            writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
-                            i = 0;
-                            state = START;
-                            j--;
-                        } else {
-                            // Finalize identifier
-                            currentToken[i] = '\0'; // Null-terminate the token
-                            printf("Finalizing token: %s\n", currentToken); // Debug
+    if (isalnum(c) || c == '_') {
+        // Continue building the identifier
+        currentToken[i++] = c;
+    } else if (currentToken[0] == '&' && isalpha(c)) {
+        // Continue building identifier prefixed with '&'
+        currentToken[i++] = c;
+    } else if (!isalpha(currentToken[0]) && !isDelimiter(c) && !isspace(c)) {
+        // Invalid identifier
+        while (isalnum(c) || c == '_' || (!isDelimiter(c) && !isspace(c))) {
+            currentToken[i++] = c;
+            c = line[++j];
+        }
+        currentToken[i] = '\0';
+        printf("Lexical Error: %s\n", currentToken);
+        writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
+        i = 0;
+        state = START;
+        j--;
+    } else {
+        // Finalize identifier
+        currentToken[i] = '\0'; // Null-terminate the token
+        printf("Finalizing token: %s\n", currentToken); // Debug
 
-                            Token *token = keywords(currentToken, lineNumber); // Check keywords
-                            if (token) {
-                                printf("Keyword detected: %s\n", token->value); // Debug
-                                writeToken(symbolTable, token->type, token->value, lineNumber);
-                                free(token);
-                            } else if (isReservedWord(currentToken)) {
-                                printf("Reserved Word detected: %s\n", currentToken); // Debug
-                                writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
-                            } else if (isNoiseWord(currentToken)) {
-                                printf("Noise Word detected: %s\n", currentToken); // Debug
-                                writeToken(symbolTable, "Noise Word", currentToken, lineNumber);
-                            } else {
-                                printf("Identifier detected: %s\n", currentToken); // Debug
-                                writeToken(symbolTable, "Identifier", currentToken, lineNumber);
-                            }
+        // Check if the identifier is prefixed with '&'
+        if (currentToken[0] == '&') {
+            // Handle specifier identifier
+            writeToken(symbolTable, "SpecifierIdentifier", currentToken, lineNumber);
+        } else {
+            Token *token = keywords(currentToken, lineNumber); // Check keywords
+            if (token) {
+                printf("Keyword detected: %s\n", token->value); // Debug
+                writeToken(symbolTable, token->type, token->value, lineNumber);
+                free(token);
+            } else if (isReservedWord(currentToken)) {
+                printf("ReservedWord detected: %s\n", currentToken); // Debug
+                writeToken(symbolTable, "ReservedWord", currentToken, lineNumber);
+            } else if (isNoiseWord(currentToken)) {
+                printf("NoiseWord detected: %s\n", currentToken); // Debug
+                writeToken(symbolTable, "NoiseWord", currentToken, lineNumber);
+            } else {
+                printf("IDENTIFIER detected: %s\n", currentToken); // Debug
+                writeToken(symbolTable, "IDENTIFIER", currentToken, lineNumber);
+            }
+        }
 
-                            // Reset token index
-                            i = 0;
-                            memset(currentToken, '\0', sizeof(currentToken));
+        // Reset token index
+        i = 0;
+        memset(currentToken, '\0', sizeof(currentToken));
 
-                            // Handle next character
-                            if (isDelimiter(c)) {
-                                currentToken[i++] = c;
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
-                                i = 0;
-                                state = START;
-                            } else if (!isspace(c)) {
-                                currentToken[i++] = c;
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
-                                i = 0;
-                                state = START;
-                            } else {
-                                state = START;
-                            }
-                        }
-                        break;
-
-
-
-
-
-
-
-
-
-
+        // Handle next character
+        if ((c == '+' && line[j + 1] == '+') || (c == '-' && line[j + 1] == '-')) {
+            // Handle unary operators (++, --) following an identifier
+            currentToken[i++] = c;
+            currentToken[i++] = line[++j];
+            currentToken[i] = '\0';
+            writeToken(symbolTable, "UnaryOperator", currentToken, lineNumber);
+            i = 0;
+            state = START;
+        } else if (isDelimiter(c)) {
+            currentToken[i++] = c;
+            currentToken[i] = '\0';
+            writeToken(symbolTable, "Delimiter", currentToken, lineNumber);
+            i = 0;
+            state = START;
+        } else if (!isspace(c)) {
+            currentToken[i++] = c;
+            currentToken[i] = '\0';
+            writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
+            i = 0;
+            state = START;
+        } else {
+            state = START;
+        }
+    }
+    break;
 
 
 
 
 
 
-                        // FSM for integer literals
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        // FSM for INT_LITERALs
                         case INTEGER:
                             if (isdigit(c)) {
                                 // Continue building the integer
@@ -307,7 +338,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     c = line[++j];
                                 }
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
+                                writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
                                 i = 0;
                                 state = START;
                                 j--; // Reprocess the last character
@@ -315,7 +346,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                             } else {
                                 // Finalize integer when encountering a valid delimiter or space
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+                                writeToken(symbolTable, "INT_LITERAL", currentToken, lineNumber);
                                 i = 0;
 
                                 // Handle next character
@@ -330,7 +361,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     // Reprocess invalid character
                                     currentToken[i++] = c;
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Lexical Error (Invalid Integer)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
                                     i = 0;
                                     state = START;
                                 } else {
@@ -344,16 +375,16 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
-                        // FSM for float literals
+                        // FSM for FLOAT_LITERALs
                         case FLOAT:
                             if (isdigit(c)) {
-                                // Continue building the float literal
+                                // Continue building the FLOAT_LITERAL
                                 currentToken[i++] = c;
 
                             } else {
-                                // Float literal complete
+                                // FLOAT_LITERAL complete
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
+                                writeToken(symbolTable, "FLOAT_LITERAL", currentToken, lineNumber);
                                 i = 0;
 
                                 // Handle next character
@@ -368,7 +399,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     // Reprocess invalid character
                                     currentToken[i++] = c;
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Lexical Error (Invalid Float)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
                                     i = 0;
                                     state = START;
                                 } else {
@@ -387,13 +418,13 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                         // FSM for char literal
                         case CHAR_LITERAL:
                             if (c == '\'') {
-                                // End of character literal
+                                // End of CHAR_LITERAL
                                 currentToken[i++] = c;
                                 currentToken[i] = '\0';
                                 if (i == 3 || (i == 4 && currentToken[1] == '\\')) { // Valid if one character or escape sequence
-                                    writeToken(symbolTable, "Character Literal", currentToken, lineNumber);
+                                    writeToken(symbolTable, "CHAR_LITERAL", currentToken, lineNumber);
                                 } else {
-                                    writeToken(symbolTable, "Lexical Error (Invalid Character Literal)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
                                 }
                                 i = 0;
                                 state = START;
@@ -402,7 +433,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 // Error for more than one character (e.g., 'ab')
                                 currentToken[i++] = c;
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Lexical Error (Invalid Character Literal)", currentToken, lineNumber);
+                                writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
                                 i = 0;
                                 state = START;
                             } else {
@@ -418,13 +449,13 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
 
 
-                        // FSM for string literals
+                        // FSM for STRING_LITERALs
                         case STRING_LITERAL:
                             if (c == '"') {
-                                // End of string literal
+                                // End of STRING_LITERAL
                                 currentToken[i++] = c;
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "String Literal", currentToken, lineNumber);
+                                writeToken(symbolTable, "STRING_LITERAL", currentToken, lineNumber);
                                 i = 0;
                                 state = START;
 
@@ -443,39 +474,39 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                             if (currentToken[0] == '+') {
                                 // Addition operator
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Arithmetic Operator (Addition)", currentToken, lineNumber);
+                                writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                             
                             } else if (currentToken[0] == '-') {
                                 // Subtraction operator
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Arithmetic Operator (Subtraction)", currentToken, lineNumber);
+                                writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                             
                             } else if (currentToken[0] == '*') {
                                 // Multiplication operator
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Arithmetic Operator (Multiplication)", currentToken, lineNumber);
+                                writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                             
                             } else if (currentToken[0] == '/') {
                                 if (line[j] == '/') {
                                     // Integer division operator (//)
                                     currentToken[i++] = line[j++]; // Append the second '/'
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Arithmetic Operator (Integer Division)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                                 } else {
                                     // Division operator
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Arithmetic Operator (Division)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                                 }
                             
                             } else if (currentToken[0] == '%') {
                                 // Modulo operator
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Arithmetic Operator (Modulo)", currentToken, lineNumber);
+                                writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                             
                             } else if (currentToken[0] == '^') {
                                 // Exponentiation operator
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Arithmetic Operator (Exponentiation)", currentToken, lineNumber);
+                                writeToken(symbolTable, "ArithmeticOperator", currentToken, lineNumber);
                             }
         
                             // Reset state for next token
@@ -494,52 +525,52 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     // Relational Operator (==)
                                     currentToken[i++] = line[j++]; // Append second '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Relational Operator (Equal To)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                                 
                                 } else {
-                                    // Assignment Operator (=)
+                                    // AssignmentOperator (=)
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Assignment Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                                 
                                 }
                             } else if (currentToken[0] == '+') {
                                 if (line[j] == '=') {
-                                    // Addition Assignment Operator (+=)
+                                    // AssignmentOperator (+=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Addition Assignment Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                                 
                                 }
                             } else if (currentToken[0] == '-') {
                                 if (line[j] == '=') {
-                                    // Subtraction Assignment Operator (-=)
+                                    // AssignmentOperator (-=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Subtraction Assignment Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                                 
                                 }
                             } else if (currentToken[0] == '*') {
                                 if (line[j] == '=') {
-                                    // Multiplication Assignment Operator (*=)
+                                    // AssignmentOperator (*=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Multiplication Assignment Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                                 
                                 }
                             } else if (currentToken[0] == '/') {
                                 if (line[j] == '=') {
-                                    // Division Assignment Operator (/=)
+                                    // AssignmentOperator (/=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Division Assignment Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                                 
                                 }
                             } else if (currentToken[0] == '%') {
                                 if (line[j] == '=') {
-                                    // Modulo Assignment Operator (%=)
+                                    // AssignmentOperator (%=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Modulo Assignment Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "AssignmentOperator", currentToken, lineNumber);
                                 }
                             }
                             i = 0;
@@ -561,24 +592,24 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 // Equal to operator (==)
                                 currentToken[i++] = line[j++]; // Append second '='
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Relational Operator (Equal To)", currentToken, lineNumber);
+                                writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                             
                             } else if (currentToken[0] == '!' && line[j] == '=') {
                                 // Not equal to operator (!=)
                                 currentToken[i++] = line[j++]; // Append second '='
                                 currentToken[i] = '\0';
-                                writeToken(symbolTable, "Relational Operator (Not Equal To)", currentToken, lineNumber);
+                                writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                             
                             } else if (currentToken[0] == '<') {
                                 if (line[j] == '=') {
                                     // Less than or equal to operator (<=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Relational Operator (Less Than or Equal To)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                                 } else {
                                     // Less than operator (<)
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Relational Operator (Less Than)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                                 }
                             
                             } else if (currentToken[0] == '>') {
@@ -586,11 +617,11 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     // Greater than or equal to operator (>=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Relational Operator (Greater Than or Equal To)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                                 } else {
                                     // Greater than operator (>)
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Relational Operator (Greater Than)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                                 }
                             }
                             i = 0;
@@ -608,12 +639,12 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     // Relational Operator (!=)
                                     currentToken[i++] = line[j++]; // Append '='
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Relational Operator (Not Equal To)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "RelationalOperator", currentToken, lineNumber);
                                 
                                 } else {
                                     // Logical Operator (!)
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Logical Operator (NOT)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "LogicalOperator", currentToken, lineNumber);
                                 }
                             
                             } else if (currentToken[0] == '&') {
@@ -621,11 +652,11 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     // Logical AND Operator (&&)
                                     currentToken[i++] = line[j++]; // Append second '&'
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Logical Operator (AND)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "LogicalOperator", currentToken, lineNumber);
                                 } else {
                                     // Single & (fallback to unknown or further usage)
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Unknown Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "UnknownOperator", currentToken, lineNumber);
                                 }
                             
                             } else if (currentToken[0] == '|') {
@@ -633,11 +664,11 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                     // Logical OR Operator (||)
                                     currentToken[i++] = line[j++]; // Append second '|'
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Logical Operator (OR)", currentToken, lineNumber);
+                                    writeToken(symbolTable, "LogicalOperator", currentToken, lineNumber);
                                 } else {
                                     // Single | (fallback to unknown or further usage)
                                     currentToken[i] = '\0';
-                                    writeToken(symbolTable, "Unknown Operator", currentToken, lineNumber);
+                                    writeToken(symbolTable, "UnknownOperator", currentToken, lineNumber);
                                 }
                             }
                             i = 0;
@@ -649,34 +680,24 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
 
                         // FSM for unary operators
                         case UNARY_OPERATOR:
-                            if (currentToken[0] == '+' && line[j] == '+') {
-                                // Increment Operator (++)
-                                currentToken[i++] = line[j++]; // Append second '+'
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Unary Operator (Increment)", currentToken, lineNumber);
-                            
-                            } else if (currentToken[0] == '-' && line[j] == '-') {
-                                // Decrement Operator (--)
-                                currentToken[i++] = line[j++]; // Append second '-'
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Unary Operator (Decrement)", currentToken, lineNumber);
-                            
-                            } else if (currentToken[0] == '+') {
-                                // Unary Plus (+i)
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Unary Operator (Positive)", currentToken, lineNumber);
-                            
-                            } else if (currentToken[0] == '-') {
-                                // Unary Minus (-x)
-                                currentToken[i] = '\0';
-                                writeToken(symbolTable, "Unary Operator (Negative)", currentToken, lineNumber);
-                            }
+    if (currentToken[0] == '+' && line[j] == '+') {
+        // Increment Operator (++)
+        currentToken[i++] = line[j++]; // Append second '+'
+        currentToken[i] = '\0';        // Null-terminate
+        writeToken(symbolTable, "UnaryOperator", currentToken, lineNumber);
+    } else if (currentToken[0] == '-' && line[j] == '-') {
+        // Decrement Operator (--)
+        currentToken[i++] = line[j++]; // Append second '-'
+        currentToken[i] = '\0';        // Null-terminate
+        writeToken(symbolTable, "UnaryOperator", currentToken, lineNumber);
+    }
 
-                            // Reprocess the next character after the operator
-                            i = 0;
-                            state = START;
-                            j--; // Reprocess the current character
-                            break;
+    // Reset state for next token
+    i = 0;
+    state = START;
+    j--; // Reprocess the current character if not consumed
+    break;
+
 
         
 
@@ -685,31 +706,31 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                             currentToken[i] = '\0'; // Null-terminate the token
 
                             if (currentToken[0] == '(') {
-                                writeToken(symbolTable, "Delimiter (Left Parenthesis)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == ')') {
-                                writeToken(symbolTable, "Delimiter (Right Parenthesis)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == '{') {
-                                writeToken(symbolTable, "Delimiter (Left Curly Brace)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == '}') {
-                                writeToken(symbolTable, "Delimiter (Right Curly Brace)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == '[') {
-                                writeToken(symbolTable, "Delimiter (Left Bracket)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == ']') {
-                                writeToken(symbolTable, "Delimiter (Right Bracket)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == ',') {
-                                writeToken(symbolTable, "Delimiter (Comma)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == '.') {
-                                writeToken(symbolTable, "Delimiter (Dot)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == ';') {
-                                writeToken(symbolTable, "Delimiter (Semicolon)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == ':') {
-                                writeToken(symbolTable, "Delimiter (Colon)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == '\'') {
-                                writeToken(symbolTable, "Delimiter (Single Quotation)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else if (currentToken[0] == '"') {
-                                writeToken(symbolTable, "Delimiter (Double Quotation)", currentToken, lineNumber);
+                                writeToken(symbolTable, "Delimiter (Delimiter)", currentToken, lineNumber);
                             } else {
-                                writeToken(symbolTable, "Unknown Delimiter", currentToken, lineNumber);
+                                writeToken(symbolTable, "UnknownDelimiter", currentToken, lineNumber);
                             }
 
                             // Reset token index and state for the next character
@@ -723,7 +744,7 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                         // FSM for unknown tokens
                         case ERROR:
                             currentToken[i] = '\0'; // Null-terminate the token
-                            writeToken(symbolTable, "Lexical Error (Invalid Identifier)", currentToken, lineNumber);
+                            writeToken(symbolTable, "LexicalError", currentToken, lineNumber);
                             i = 0; // Reset token index
                             memset(currentToken, 0, sizeof(currentToken)); // Clear the currentToken
                         
@@ -762,20 +783,20 @@ void processLine(char *line, int lineNumber, FILE *symbolTable) {
                                 writeToken(symbolTable, token->type, token->value, lineNumber);
                                 free(token);
                             } else if (isReservedWord(currentToken)) {
-                                writeToken(symbolTable, "Reserved Word", currentToken, lineNumber);
+                                writeToken(symbolTable, "ReservedWord", currentToken, lineNumber);
                             } else if (isNoiseWord(currentToken)) {
-                                writeToken(symbolTable, "Noise Word", currentToken, lineNumber);
+                                writeToken(symbolTable, "NoiseWord", currentToken, lineNumber);
                             } else {
-                                writeToken(symbolTable, "Identifier", currentToken, lineNumber);
+                                writeToken(symbolTable, "IDENTIFIER", currentToken, lineNumber);
                             }
                             break;
                 
                         case INTEGER:
-                            writeToken(symbolTable, "Integer Literal", currentToken, lineNumber);
+                            writeToken(symbolTable, "INT_LITERAL", currentToken, lineNumber);
                             break;
                 
                         case FLOAT:
-                            writeToken(symbolTable, "Float Literal", currentToken, lineNumber);
+                            writeToken(symbolTable, "FLOAT_LITERAL", currentToken, lineNumber);
                             break;
                 
                         // Add more cases if needed for other states...

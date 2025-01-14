@@ -1,0 +1,202 @@
+<program> ::= (<declaration-statement>)* <main-function>
+
+<comment> ::= <single-line-comment> | <multi-line-comment>
+
+<single-line-comment> ::= "~~" <comment-text>
+<multi-line-comment> ::= "~/" <comment-text> "/~"
+
+<comment-text> ::= <character>* (* Zero or more characters *)
+
+<declaration-statement> ::= (<variable-declaration>)*
+
+<variable-declaration> ::= <type-specifier> <dec-list> SEMICOLON
+
+<type-specifier> ::= "int" | "float" | "char" | "bool" | "string"
+
+<dec-list> ::= <dec> (COMMA <dec>)*n
+
+<dec> ::= IDENTIFIER (ASSIGNMENT_OP <initializer>)?
+
+<initializer> ::= <expression> | L_CURLY <initializer-list> R_CURLY
+
+<initializer-list> ::= <initializer> (COMMA <initializer>)*
+
+<main-function> ::= "void" "main" L_PAREN R_PAREN <block>
+
+<block> ::= L_CURLY <statement-list>? R_CURLY
+
+<statement-list> ::= (<declaration-statement>)* (<statement>)*
+
+<statement> ::= <assignment-statement>
+              | <input-statement>
+              | <output-statement>
+              | <conditional-statement>
+              | <iterative-statement>
+              | <array-statement>
+              | <function-statement>
+              | <expression-statement>
+              | <jump-statement>
+
+<assignment-statement> ::= IDENTIFIER <assignment-operator> <expression> SEMICOLON
+
+<assignment-operator> ::= ASSIGNMENT_OP
+                        | ADD_ASSIGNOP
+                        | SUB_ASSIGNOP
+                        | MULTI_ASSIGNOP
+                        | DIV_ASSIGNOP
+                        | MOD_ASSIGNOP
+                        | INTDIV_ASSIGNOP
+
+<expression> ::= <logical-or-expr>
+
+<logical-or-expr> ::= <logical-and-expr> (LOGICAL_OR <logical-and-expr>)*
+
+<logical-and-expr> ::= <equality-expr> (LOGICAL_AND <equality-expr>)*
+
+<equality-expr> ::= <relational-expr> ((REL_EQ | REL_NEQ) <relational-expr>)*
+	
+<relational-expr> ::= <additive-expr> ((REL_LT | REL_GT | REL_LTE | REL_GTE) <additive-expr>)*
+
+<additive-expr> ::= <multiplicative-expr> ((ADD_OP | SUB_OP) <multiplicative-expr>)*
+
+<multiplicative-expr> ::= <exponential-expr> ((MULT_OP | DIV_OP | MOD_OP | INTDIV_OP) <exponential-expr>)*
+
+<exponential-expr> ::= <unary-expr> (EXP_OP <unary-expr>)*
+
+<unary-expr> ::= <postfix-expr>
+               | (LOGICAL_NOT | SUB_OP) <unary-expr>
+               | <unary-operator> <unary-expr>
+
+<postfix-expr> ::= <primary-expr> <unary-operator>
+                 | <array-access>
+                 | <function-call>
+                 | <primary-expr>
+
+<primary-expr> ::= <literal>
+                 | IDENTIFIER
+                 | L_PAREN <expression> R_PAREN
+
+<literal> ::= INT_LITERAL
+            | FLOAT_LITERAL
+            | CHAR_LITERAL
+            | STRING_LITERAL
+            | <bool-literal>
+
+<bool-literal> ::= "true" | "false"
+
+<unary-operator> ::= UNARY_INC | UNARY_DEC
+
+<input-statement> ::= "input" L_PAREN <input-list>? R_PAREN SEMICOLON
+
+<input-list> ::= <format-variable-pair> (COMMA <format-variable-pair>)*
+
+<format-variable-pair> ::= <format-string> COMMA <address-variable>
+
+<format-string> ::= "%" <format-specifier>
+
+<format-specifier> ::= "d" 
+                     | "f" 
+                     | "c" 
+                     | "s" 
+                     | "i" 
+                     | "lf" 
+                     | "Lf" 
+                     | "p"
+
+<address-variable> ::= "&" IDENTIFIER
+
+<output-statement> ::= "printf" L_PAREN <output-list> R_PAREN SEMICOLON
+
+<output-list> ::= <format-string> (COMMA <expression-list>)?
+                | <string-concat>
+
+<string-concat> ::= <format-string> ADD_OP <format-string>*
+<expression-list> ::= <expression> (COMMA <expression>)*
+
+<conditional-statement> ::= <if-statement>
+                          | <switch-statement>
+
+<if-statement> ::= "if" L_PAREN <expression> R_PAREN <statement-block>
+                 | <if-else-statement>
+                 | <else-if-statement>
+
+<statement-block> ::= <statement>
+                    | <compound-statement>
+
+<compound-statement> ::= L_CURLY <statement-list>? R_CURLY
+
+<if-else-statement> ::= "if" L_PAREN <expression> R_PAREN <statement-block>
+                        "else" <statement-block>
+
+<else-if-statement> ::= "if" L_PAREN <expression> R_PAREN <statement-block>
+                        ("else" "if" L_PAREN <expression> R_PAREN 
+<statement-block>)*  ("else" <statement-block>)?
+
+<switch-statement> ::= "switch" L_PAREN <expression> R_PAREN L_CURLY <case-list> R_CURLY
+
+<case-list> ::= <case-statement>* <default-case>?
+
+<case-statement> ::= "case" (INT_LITERAL | CHAR_LITERAL) COLON <statement-list> "break" SEMICOLON
+
+<default-case> ::= "default" COLON <statement-list>
+
+<iterative-statement> ::= <for-loop>
+                        | <while-loop>
+                        | <do-while-loop>
+                        | <nested-iterative>
+
+<for-loop> ::= "for" L_PAREN <for-init>? SEMICOLON <expression>? SEMICOLON <for-update>? R_PAREN <statement-block>
+
+<for-init> ::= <variable-declaration> | <assignment-statement>
+
+<for-update> ::= <assignment-statement> | <inc-dec>
+ 
+<inc-dec> ::= IDENTIFIER <unary-operator>
+            | IDENTIFIER (ADD_OP | SUB_OP) <expression>
+
+<while-loop> ::= "while" L_PAREN <expression> R_PAREN <statement-block>
+
+<do-while-loop> ::= "do" <statement-block> "while" L_PAREN <expression> R_PAREN SEMICOLON
+
+<nested-iterative> ::= <iterative-statement> <iterative-statement>
+                     | <iterative-statement> <nested-iterative>
+
+<array-statement> ::= <array-declaration>
+                    | <array-operations>
+
+<array-declaration> ::= "array" <array-type> IDENTIFIER <array-dimensions> (ASSIGNMENT_OP <initializer>)? SEMICOLON
+
+<array-type> ::= "int" | "float" | "char" | "bool"
+
+<array-dimensions> ::= L_BRACKET <expression> R_BRACKET
+                     | L_BRACKET <expression> R_BRACKET L_BRACKET <expression> R_BRACKET
+
+<array-operations> ::= <array-assignment>
+                     | <array-access>
+
+<array-assignment> ::= IDENTIFIER <array-index> ASSIGNMENT_OP <expression> SEMICOLON
+
+<array-index> ::= L_BRACKET <expression> R_BRACKET
+                | L_BRACKET <expression> R_BRACKET L_BRACKET <expression> R_BRACKET
+
+<array-access> ::= IDENTIFIER <array-index>
+
+
+<function-statement> ::= <function-declaration>
+                       | <function-call> SEMICOLON
+
+<function-declaration> ::= <return-type> IDENTIFIER L_PAREN <parameter-list>? R_PAREN (SEMICOLON | <compound-statement>)
+
+<return-type> ::= <type-specifier> | "void"
+
+<parameter-list> ::= <parameter> (COMMA <parameter>)*
+
+<parameter> ::= <type-specifier> IDENTIFIER
+
+<function-call> ::= IDENTIFIER L_PAREN <expression-list>? R_PAREN 
+
+	<expression-statement> ::= <expression> SEMICOLON
+
+<jump-statement> ::= "return" <expression> SEMICOLON
+                   | "break" SEMICOLON
+                   | "continue" SEMICOLON

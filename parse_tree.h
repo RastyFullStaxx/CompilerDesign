@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_CHILDREN 50 // Example: Increase the max children allowed
+
 // Parse Tree Node structure
 typedef struct ParseTreeNode {
     char label[50];  // Label for the node (e.g., "Program", "Expression")
     char value[50];  // Value associated with the node
-    struct ParseTreeNode* children[10]; // Pointers to child nodes
+    struct ParseTreeNode* children[MAX_CHILDREN]; // Pointers to child nodes
     int childCount;   // Number of children
 } ParseTreeNode;
 
