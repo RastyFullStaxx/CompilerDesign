@@ -6,7 +6,7 @@
 #include "parse_tree.h"
 
 // ---------------------------------------
-// Global Variables - Declaration
+// Global Variables - Declaration                   // Rasty
 // ---------------------------------------
 extern int currentTokenIndex;
 extern int totalTokens;
@@ -14,7 +14,7 @@ extern Token* tokenStream;
 extern Token tokens[MAX_TOKENS]; // Array of tokens
 
 // ---------------------------------------
-// Utility Functions - Defined in syntax_analyzer.c
+// Utility Functions - Defined in syntax_analyzer.c     // Rasty
 // ---------------------------------------
 void syntaxError(const char* message); // Report syntax errors
 Token* getNextToken();                 // Retrieve the next token
@@ -26,7 +26,7 @@ int loadTokensFromFile(const char* filename); // Load tokens from a file
 ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue); // Match token by type/value
 
 // ---------------------------------------
-// Parse Tree Handling - Defined in parse_tree.c
+// Parse Tree Handling - Defined in parse_tree.c    // Rasty
 // ---------------------------------------
 ParseTreeNode* createParseTreeNode(const char* type, const char* value); // Create a parse tree node
 void addChild(ParseTreeNode* parent, ParseTreeNode* child);             // Add a child node
