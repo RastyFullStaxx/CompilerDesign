@@ -26,8 +26,7 @@ Token* getNextToken() {
     if (currentTokenIndex < totalTokens) {
         Token* token = &tokens[currentTokenIndex++];
         printf("DEBUG: getNextToken: Retrieved Token[%d]: Type='%s', Value='%s', Line=%d\n",
-               currentTokenIndex - 1, // Index before increment
-               token->type, token->value, token->lineNumber);
+               currentTokenIndex - 1, token->type, token->value, token->lineNumber);
         return token;
     }
     printf("DEBUG: getNextToken: No more tokens. Current Index=%d, Total Tokens=%d\n",
@@ -38,9 +37,7 @@ Token* getNextToken() {
 Token* peekToken() {
     if (currentTokenIndex < totalTokens) {
         printf("DEBUG: peekToken: Current Token[%d]: Type='%s', Value='%s', Line=%d\n",
-               currentTokenIndex, // Current index
-               tokens[currentTokenIndex].type,
-               tokens[currentTokenIndex].value,
+               currentTokenIndex, tokens[currentTokenIndex].type, tokens[currentTokenIndex].value,
                tokens[currentTokenIndex].lineNumber);
         return &tokens[currentTokenIndex];
     }
@@ -48,6 +45,7 @@ Token* peekToken() {
            currentTokenIndex, totalTokens);
     return NULL;
 }
+
 
 
 
@@ -194,13 +192,14 @@ int loadTokensFromFile(const char *filename) {
 
     while (fgets(line, sizeof(line), file)) {
         // Debug: Print each line read
-        printf("Processing line: %s", line);
+        printf("DEBUG: Processing line: %s", line);
 
         // Trim whitespace from the line
         trimWhitespace(line);
 
         // Skip empty lines
         if (strlen(line) == 0) {
+            printf("DEBUG: Skipping empty line.\n");
             continue;
         }
 
@@ -209,7 +208,7 @@ int loadTokensFromFile(const char *filename) {
         char type[50] = {0}, value[50] = {0};
         int lineNumber = 0;
 
-        // Extract the fields using sscanf for type and line number and custom logic for the value
+        // Extract fields using comma as a delimiter
         char *firstComma = strchr(line, ',');
         char *lastComma = strrchr(line, ',');
 
@@ -223,7 +222,7 @@ int loadTokensFromFile(const char *filename) {
         strncpy(type, line, sizeof(type) - 1);
         type[sizeof(type) - 1] = '\0';
 
-        // Extract value
+        // Extract token value
         *lastComma = '\0';
         strncpy(value, firstComma + 1, sizeof(value) - 1);
         value[sizeof(value) - 1] = '\0';
@@ -238,13 +237,12 @@ int loadTokensFromFile(const char *filename) {
         token.value[sizeof(token.value) - 1] = '\0';
         token.lineNumber = lineNumber;
 
-        // Normalize the token type and value
-        mapToken(&token);
+        // Debug: Print the extracted token fields
+        printf("DEBUG: Extracted Token: Type='%s', Value='%s', Line=%d\n", token.type, token.value, token.lineNumber);
 
         // Add the token to the list
         if (tokenCount < MAX_TOKENS) {
             tokens[tokenCount++] = token;
-            printf("DEBUG: Loaded token: Type='%s', Value='%s', Line=%d\n", token.type, token.value, token.lineNumber);
         } else {
             printf("Error: Token limit exceeded. Increase MAX_TOKENS.\n");
             break;
@@ -253,16 +251,18 @@ int loadTokensFromFile(const char *filename) {
 
     fclose(file);
 
-    // Debug: Print all loaded tokens
-    printf("DEBUG: Loaded Tokens:\n");
-    for (int i = 0; i < tokenCount; i++) {
-        printf("  Token %d: Type='%s', Value='%s', Line=%d\n",
-               i + 1, tokens[i].type, tokens[i].value, tokens[i].lineNumber);
+    // Update totalTokens and print all loaded tokens
+    totalTokens = tokenCount;
+    printf("DEBUG: Total Tokens Loaded: %d\n", totalTokens);
+    for (int i = 0; i < totalTokens; i++) {
+        printf("DEBUG: Token[%d]: Type='%s', Value='%s', Line=%d\n",
+               i, tokens[i].type, tokens[i].value, tokens[i].lineNumber);
     }
 
     printf("DEBUG: Completed loading tokens. Total loaded: %d from %s.\n", tokenCount, filename);
-    return tokenCount;
+    return totalTokens;
 }
+
 
 
 
@@ -296,68 +296,39 @@ void syntaxError(const char* message) {
 ParseTreeNode* parseProgram() {
     printf("DEBUG: Starting parseProgram...\n");
 
-    // Create the root node for the program
-    ParseTreeNode* programNode = createParseTreeNode("Program", "");
-
+    // Peek at the first token
     Token* token = peekToken();
+    if (!token) {
+        printf("DEBUG: No tokens available at the start of parseProgram.\n");
+        return NULL;
+    }
+
     printf("DEBUG: First token in program: Type='%s', Value='%s', Line=%d\n",
-           token ? token->type : "NULL",
-           token ? token->value : "NULL",
-           token ? token->lineNumber : -1);
+           token->type, token->value, token->lineNumber);
 
-    // Parse any declaration statements at the beginning of the program
-    while (token && strcmp(token->type, "Keyword") == 0) {
-        printf("DEBUG: Parsing declaration. Current Token: Type='%s', Value='%s', Line=%d\n",
+    // Check for 'void' keyword
+    if (strcmp(token->type, "Keyword") != 0 || strcmp(token->value, "void") != 0) {
+        printf("Syntax Error: Expected 'void' keyword but got Type='%s', Value='%s', Line=%d\n",
                token->type, token->value, token->lineNumber);
-
-        // Ensure the keyword is valid for a declaration
-        if (strcmp(token->value, "int") == 0 || strcmp(token->value, "float") == 0 ||
-            strcmp(token->value, "char") == 0 || strcmp(token->value, "bool") == 0 ||
-            strcmp(token->value, "string") == 0 || strcmp(token->value, "void") == 0 ||
-            strcmp(token->value, "array") == 0) {
-            printf("DEBUG: Valid declaration keyword found: '%s'\n", token->value);
-            addChild(programNode, parseDeclarationStatement());
-        } else {
-            printf("DEBUG: Invalid declaration keyword: '%s'. Breaking out of loop.\n", token->value);
-            break; // Stop if it's not a valid declaration keyword
-        }
-
-        token = peekToken(); // Update the token after parsing
+        return NULL;
     }
 
-    // Parse the main function
-    printf("DEBUG: Parsing main function...\n");
-    token = peekToken();
-    if (token) {
-        printf("DEBUG: Token before parsing main function: Type='%s', Value='%s', Line=%d\n",
-               token->type, token->value, token->lineNumber);
-    } else {
-        printf("DEBUG: No tokens available before parsing main function.\n");
-    }
+    // Consume 'void' keyword
+    getNextToken();
 
+    printf("DEBUG: Successfully matched 'void' keyword.\n");
+
+    // Continue parsing the main function
     ParseTreeNode* mainFunctionNode = parseMainFunction();
-    if (mainFunctionNode) {
-        addChild(programNode, mainFunctionNode);
-        printf("DEBUG: Main function successfully parsed.\n");
-    } else {
-        printf("DEBUG: Error parsing main function.\n");
-    }
-
-    // Debug remaining tokens
-    token = peekToken();
-    if (token) {
-        printf("DEBUG: Remaining tokens after parsing main function:\n");
-        for (int i = currentTokenIndex; i < totalTokens; i++) {
-            printf("  Token %d: Type='%s', Value='%s', Line=%d\n",
-                   i + 1, tokens[i].type, tokens[i].value, tokens[i].lineNumber);
-        }
-    } else {
-        printf("DEBUG: No remaining tokens after parsing main function.\n");
+    if (!mainFunctionNode) {
+        printf("DEBUG: Failed to parse main function.\n");
+        return NULL;
     }
 
     printf("DEBUG: Completed parseProgram.\n");
-    return programNode;
+    return mainFunctionNode;
 }
+
 
 
 
@@ -2634,122 +2605,106 @@ ParseTreeNode* parseConditionalStatement() {
 
 
 
-// Placeholder implementations
 ParseTreeNode* parseMainFunction() {
     printf("DEBUG: Parsing Main Function...\n");
 
     // Create the main function node
-    ParseTreeNode* mainNode = createParseTreeNode("MainFunction", "");
+    ParseTreeNode* mainFunctionNode = createParseTreeNode("MainFunction", NULL);
 
-    // Match "void" keyword
-    Token* token = peekToken();
-    printf("DEBUG: Checking for 'void' keyword. Current Token: Type='%s', Value='%s', Line=%d\n",
-           token ? token->type : "NULL",
-           token ? token->value : "NULL",
-           token ? token->lineNumber : -1);
-
-    if (token && strcmp(token->type, "Keyword") == 0 && strcmp(token->value, "void") == 0) {
-        printf("DEBUG: Matched 'void' keyword.\n");
-        addChild(mainNode, matchToken("Keyword", "void"));
-    } else {
-        syntaxError("Expected 'void' keyword.");
-        return mainNode; // Return with partial parse tree
+    // Match 'void' keyword
+    Token* token = peekToken(); // Check the token without consuming
+    if (!token || strcmp(token->type, "Keyword") != 0 || strcmp(token->value, "void") != 0) {
+        syntaxError("Expected 'void' keyword at the beginning of the main function");
+        return NULL;
     }
+    printf("DEBUG: Peeked and found 'void': Type='%s', Value='%s', Line=%d\n",
+           token->type, token->value, token->lineNumber);
 
-    // Match "main" keyword
-    token = peekToken();
-    printf("DEBUG: Checking for 'main' keyword. Current Token: Type='%s', Value='%s', Line=%d\n",
-           token ? token->type : "NULL",
-           token ? token->value : "NULL",
-           token ? token->lineNumber : -1);
+    token = getNextToken();  // Consume 'void'
+    addChild(mainFunctionNode, createParseTreeNode("Keyword", "void"));
 
-    if (token && strcmp(token->type, "Keyword") == 0 && strcmp(token->value, "main") == 0) {
-        printf("DEBUG: Matched 'main' keyword.\n");
-        addChild(mainNode, matchToken("Keyword", "main"));
-    } else {
-        syntaxError("Expected 'main' keyword.");
-        return mainNode; // Return with partial parse tree
+    // Match 'main' identifier
+    token = peekToken(); // Check the token without consuming
+    if (!token || strcmp(token->type, "Keyword") != 0 || strcmp(token->value, "main") != 0) {
+        syntaxError("Expected 'main' identifier after 'void'");
+        return NULL;
     }
+    printf("DEBUG: Peeked and found 'main': Type='%s', Value='%s', Line=%d\n",
+           token->type, token->value, token->lineNumber);
 
-    // Match "(" delimiter
-    token = peekToken();
-    printf("DEBUG: Checking for '('. Current Token: Type='%s', Value='%s', Line=%d\n",
-           token ? token->type : "NULL",
-           token ? token->value : "NULL",
-           token ? token->lineNumber : -1);
+    token = getNextToken();  // Consume 'main'
+    addChild(mainFunctionNode, createParseTreeNode("Identifier", "main"));
 
-    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "(") == 0) {
-        printf("DEBUG: Matched '('.\n");
-        addChild(mainNode, matchToken("Delimiter", "("));
-    } else {
-        syntaxError("Expected '(' after 'main'.");
-        return mainNode; // Return with partial parse tree
+    // Match '(' delimiter
+    token = peekToken(); // Check the token without consuming
+    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "(") != 0) {
+        syntaxError("Expected '(' after 'main'");
+        return NULL;
     }
+    printf("DEBUG: Peeked and found '(': Type='%s', Value='%s', Line=%d\n",
+           token->type, token->value, token->lineNumber);
 
-    // Match ")" delimiter
-    token = peekToken();
-    printf("DEBUG: Checking for ')'. Current Token: Type='%s', Value='%s', Line=%d\n",
-           token ? token->type : "NULL",
-           token ? token->value : "NULL",
-           token ? token->lineNumber : -1);
+    token = getNextToken();  // Consume '('
+    addChild(mainFunctionNode, createParseTreeNode("Delimiter", "("));
 
-    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, ")") == 0) {
-        printf("DEBUG: Matched ')'.\n");
-        addChild(mainNode, matchToken("Delimiter", ")"));
-    } else {
-        syntaxError("Expected ')' after '('.");
-        return mainNode; // Return with partial parse tree
+    // Match ')' delimiter
+    token = peekToken(); // Check the token without consuming
+    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ")") != 0) {
+        syntaxError("Expected ')' after '('");
+        return NULL;
     }
+    printf("DEBUG: Peeked and found ')': Type='%s', Value='%s', Line=%d\n",
+           token->type, token->value, token->lineNumber);
 
-    // Match "{" delimiter
-    token = peekToken();
-    printf("DEBUG: Checking for '{'. Current Token: Type='%s', Value='%s', Line=%d\n",
-           token ? token->type : "NULL",
-           token ? token->value : "NULL",
-           token ? token->lineNumber : -1);
+    token = getNextToken();  // Consume ')'
+    addChild(mainFunctionNode, createParseTreeNode("Delimiter", ")"));
 
-    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "{") == 0) {
-        printf("DEBUG: Matched '{'.\n");
-        addChild(mainNode, matchToken("Delimiter", "{"));
-    } else {
-        syntaxError("Expected '{' after ')'.");
-        return mainNode; // Return with partial parse tree
+    // Match '{' delimiter
+    token = peekToken(); // Check the token without consuming
+    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "{") != 0) {
+        syntaxError("Expected '{' to start the main function body");
+        return NULL;
     }
+    printf("DEBUG: Peeked and found '{': Type='%s', Value='%s', Line=%d\n",
+           token->type, token->value, token->lineNumber);
 
-    // Parse statements inside the block
-    printf("DEBUG: Parsing statements inside main block...\n");
-    while ((token = peekToken()) &&
-           !(strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "}") == 0)) {
-        printf("DEBUG: Parsing statement. Current Token: Type='%s', Value='%s', Line=%d\n",
-               token->type, token->value, token->lineNumber);
+    token = getNextToken();  // Consume '{'
+    addChild(mainFunctionNode, createParseTreeNode("Delimiter", "{"));
 
-        ParseTreeNode* statementNode = parseStatement();
-        if (statementNode) {
-            addChild(mainNode, statementNode);
-        } else {
-            syntaxError("Error parsing statement inside main function.");
-            break; // Exit the loop on error
-        }
+    // Parse the block inside the main function
+    printf("DEBUG: Parsing block inside main function...\n");
+    ParseTreeNode* blockNode = parseBlock();  // Ensure parseBlock is implemented correctly
+    if (!blockNode) {
+        syntaxError("Failed to parse main function block");
+        return NULL;
     }
+    addChild(mainFunctionNode, blockNode);
 
-    // Match "}" delimiter
-    token = peekToken();
-    printf("DEBUG: Checking for '}'. Current Token: Type='%s', Value='%s', Line=%d\n",
-           token ? token->type : "NULL",
-           token ? token->value : "NULL",
-           token ? token->lineNumber : -1);
-
-    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "}") == 0) {
-        printf("DEBUG: Matched '}'.\n");
-        addChild(mainNode, matchToken("Delimiter", "}"));
-    } else {
-        syntaxError("Expected '}' at the end of main function block.");
+    // Match '}' delimiter
+    token = peekToken(); // Check the token without consuming
+    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "}") != 0) {
+        syntaxError("Expected '}' to close the main function body");
+        return NULL;
     }
+    printf("DEBUG: Peeked and found '}': Type='%s', Value='%s', Line=%d\n",
+           token->type, token->value, token->lineNumber);
 
-    // Final debug statement
+    token = getNextToken();  // Consume '}'
+    addChild(mainFunctionNode, createParseTreeNode("Delimiter", "}"));
+
     printf("DEBUG: Completed parsing Main Function.\n");
-    return mainNode;
+    return mainFunctionNode;
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
