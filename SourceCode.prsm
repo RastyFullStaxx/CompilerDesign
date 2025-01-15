@@ -8,11 +8,13 @@ printf("%f");
 ~~ printf("%f", value); 
 ~~ printf("Value is " + value);
 
-~/
-    a = 10;
-    ~~ b += 20;
-    c = d = 30;
 
+a = 10;
+~~ b += 20;
+c = d = 30;
+
+
+~/
     if (a > 0) {
         printf("Positive number");
     }
