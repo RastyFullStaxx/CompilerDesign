@@ -22,3 +22,36 @@ Delimiter,,,5
 SpecifierIdentifier,&value,5
 Delimiter,),5
 Delimiter,;,5
+Keyword,printf,7
+Delimiter,(,7
+STRING_LITERAL,"%f",7
+Delimiter,),7
+Delimiter,;,7
+Comment,~~,8
+Comment, printf("%f", value);,8
+Comment,~~,9
+Comment, printf("Value is " + value);,9
+Comment,~/,11
+Comment,a = 10;,12
+Comment,~~ b += 20;,13
+Comment,c = d = 30;,14
+Comment,if (a > 0) {,16
+Comment,printf("Positive number");,17
+Comment,},18
+Comment,/~,19
+Comment,~/,21
+Comment,if (a > b) {,22
+Comment,printf("a is greater");,23
+Comment,} else {,24
+Comment,printf("b is greater or equal");,25
+Comment,},26
+Comment,/~,27
+Comment,~/,29
+Comment,if (a > b) {,30
+Comment,printf("a is greater");,31
+Comment,} else if (a == b) {,32
+Comment,printf("a and b are equal");,33
+Comment,} else {,34
+Comment,printf("b is greater");,35
+Comment,},36
+Comment,/~,37
