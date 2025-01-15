@@ -68,7 +68,7 @@ ParseTreeNode* parseTypeSpecifier();
 // Statements
 // ---------------------------------------
 ParseTreeNode* parseStatement();                   // no recovery yet
-//ParseTreeNode* parseAssignmentStatement();
+ParseTreeNode* parseAssignmentStatement();
 ParseTreeNode* parseInputStatement();
 ParseTreeNode* parseOutputStatement();
 //ParseTreeNode* parseConditionalStatement();
