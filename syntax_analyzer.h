@@ -54,8 +54,8 @@ ParseTreeNode* parseComment();                  // norecovery yet
 // ---------------------------------------
 // Initializer and Lists                        // Rasty
 // ---------------------------------------
-ParseTreeNode* parseInitializer();              
-ParseTreeNode* parseInitializerList();          
+// ParseTreeNode* parseInitializer();              
+// ParseTreeNode* parseInitializerList();          
 
 // ---------------------------------------
 // Declaration Statements                       // Rasty
