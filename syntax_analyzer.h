@@ -44,7 +44,7 @@ void freeParseTree(ParseTreeNode* node);                                // Free 
 ParseTreeNode* parseProgram();
 ParseTreeNode* parseMainFunction();             
 ParseTreeNode* parseBlock();                    
-//ParseTreeNode* parseStatementList();
+ParseTreeNode* parseStatementList();
 
 // ---------------------------------------
 // Comments                                     // Rasty
@@ -155,7 +155,7 @@ ParseTreeNode* parseParameter();
 // ---------------------------------------
 // Error Handling                               // Rasty
 // ---------------------------------------
-void reportSyntaxError(const char *message);
-void recoverFromError(); // Error recovery mechanism
+int reportSyntaxError(const char *message);
+int recoverFromError(); // Error recovery mechanism
 
 #endif // SYNTAX_ANALYZER_H
