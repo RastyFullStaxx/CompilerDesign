@@ -4,7 +4,7 @@
 ParseTreeNode* createParseTreeNode(const char* type, const char* value) {
     ParseTreeNode* node = (ParseTreeNode*)malloc(sizeof(ParseTreeNode));
     if (!node) {
-        fprintf(stderr, "Memory allocation failed for ParseTreeNode\n");
+        fprintf(stderr, "[ERROR] Memory allocation failed for ParseTreeNode\n");
         exit(EXIT_FAILURE);
     }
     if (type) {
@@ -25,10 +25,13 @@ ParseTreeNode* createParseTreeNode(const char* type, const char* value) {
     return node;
 }
 
-
-
 // Function to add a child to a parse tree node
 void addChild(ParseTreeNode* parent, ParseTreeNode* child) {
+    if (!parent || !child) {
+        printf("Error: Invalid parent or child node.\n");
+        return; // Exit the function without returning a value
+    }
+
     if (parent->childCount < MAX_CHILDREN) {
         parent->children[parent->childCount++] = child;
     } else {
@@ -54,12 +57,15 @@ void printParseTree(ParseTreeNode* node, int depth) {
     }
 }
 
-
 // Function to write the parse tree in parenthesized format to a file
 void writeParseTreeToFile(ParseTreeNode* node, FILE* file) {
     if (!node) return;
 
     fprintf(file, "(%s", node->label); // Print the node's label
+
+    if (node->value[0] != '\0') {
+        fprintf(file, ":%s", node->value); // Include value if present
+    }
 
     for (int i = 0; i < node->childCount; i++) {
         writeParseTreeToFile(node->children[i], file); // Recursive call for each child
@@ -67,7 +73,6 @@ void writeParseTreeToFile(ParseTreeNode* node, FILE* file) {
 
     fprintf(file, ")"); // Close parentheses for this node
 }
-
 
 // Function to free the parse tree
 void freeParseTree(ParseTreeNode* node) {
@@ -80,13 +85,15 @@ void freeParseTree(ParseTreeNode* node) {
     free(node); // Free the current node
 }
 
+// Function to set the value of a parse tree node
 void setNodeValue(ParseTreeNode* node, const char* value) {
     if (!node) {
-        fprintf(stderr, "Cannot set value on a NULL node\n");
+        fprintf(stderr, "[ERROR] Cannot set value on a NULL node\n");
         return;
     }
     if (value) {
-        strcpy(node->value, value);
+        strncpy(node->value, value, sizeof(node->value) - 1);
+        node->value[sizeof(node->value) - 1] = '\0'; // Null-terminate
     } else {
         node->value[0] = '\0'; // Initialize as empty string
     }

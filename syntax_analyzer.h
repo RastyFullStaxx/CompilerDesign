@@ -44,58 +44,59 @@ void freeParseTree(ParseTreeNode* node);                                // Free 
 ParseTreeNode* parseProgram();
 ParseTreeNode* parseMainFunction();             
 ParseTreeNode* parseBlock();                    
-ParseTreeNode* parseStatementList();
+//ParseTreeNode* parseStatementList();
 
 // ---------------------------------------
 // Comments                                     // Rasty
 // ---------------------------------------
-ParseTreeNode* parseComment();                  
+ParseTreeNode* parseComment();                  // norecovery yet
 
 // ---------------------------------------
 // Initializer and Lists                        // Rasty
 // ---------------------------------------
-ParseTreeNode* parseInitializer();              
-ParseTreeNode* parseInitializerList();          
+//ParseTreeNode* parseInitializer();              
+//ParseTreeNode* parseInitializerList();          
 
 // ---------------------------------------
 // Declaration Statements                       // Rasty
 // ---------------------------------------
 ParseTreeNode* parseDeclarationStatement();
-ParseTreeNode* parseVariableDeclaration();
+//ParseTreeNode* parseVariableDeclaration();
 ParseTreeNode* parseTypeSpecifier();
 
 // ---------------------------------------
 // Statements
 // ---------------------------------------
-ParseTreeNode* parseStatement();                
-ParseTreeNode* parseAssignmentStatement();
+ParseTreeNode* parseStatement();                   // no recovery yet
+//ParseTreeNode* parseAssignmentStatement();
 ParseTreeNode* parseInputStatement();
 ParseTreeNode* parseOutputStatement();
-ParseTreeNode* parseConditionalStatement();
-ParseTreeNode* parseIterativeStatement();
-ParseTreeNode* parseArrayStatement();           
+//ParseTreeNode* parseConditionalStatement();
+//ParseTreeNode* parseIterativeStatement();
+//ParseTreeNode* parseArrayStatement();           
 ParseTreeNode* parseFunctionStatement();
 ParseTreeNode* parseExpressionStatement();      
-ParseTreeNode* parseJumpStatement();
+//ParseTreeNode* parseJumpStatement();
 
 // ---------------------------------------
 // Conditional                                  // Lei
 // ---------------------------------------
-ParseTreeNode* parseCompoundStatement();        
-ParseTreeNode* parseIfStatement();              // alraedy has <if-else-statement>,<else-if-statement>
-ParseTreeNode* parseCaseList();                 
-ParseTreeNode* parseSwitchStatement();
-ParseTreeNode* parseCaseStatement();
-ParseTreeNode* parseDefaultCase();
-ParseTreeNode* parseStatementBlock() 
+//ParseTreeNode* parseCompoundStatement();        
+//ParseTreeNode* parseIfStatement();              // alraedy has <if-else-statement>,<else-if-statement>
+//ParseTreeNode* parseCaseList();                 
+//ParseTreeNode* parseSwitchStatement();
+//ParseTreeNode* parseCaseStatement();
+//ParseTreeNode* parseDefaultCase();
+//ParseTreeNode* parseStatementBlock() 
 
 // ---------------------------------------
 // Loop                                         // Alexa
 // ---------------------------------------
-ParseTreeNode* parseForInit();
-ParseTreeNode* parseForLoop();
-ParseTreeNode* parseWhileLoop();
-ParseTreeNode* parseDoWhileLoop();
+//ParseTreeNode* parseForInit();
+//ParseTreeNode* parseForLoop();
+//ParseTreeNode* parseWhileLoop();
+//ParseTreeNode* parseDoWhileLoop();
+//ParseTreeNode* parseForUpdate();                // for-loops ata e2
 
 // ---------------------------------------
 // Expressions and Operators                    // Kurt
@@ -110,37 +111,36 @@ ParseTreeNode* parseMultiplicativeExpr();
 ParseTreeNode* parseExponentialExpr();
 ParseTreeNode* parseUnaryExpr();
 ParseTreeNode* parsePostfixExpr();              
-ParseTreeNode* parseIncDec();
+//ParseTreeNode* parseIncDec();
 
 // ---------------------------------------
 // Literals and Identifiers                     // Rasty
 // ---------------------------------------
-ParseTreeNode* parseLiteral();
-ParseTreeNode* parseBoolLiteral();
+//ParseTreeNode* parseLiteral();
+//ParseTreeNode* parseBoolLiteral();
 ParseTreeNode* parsePrimaryExpr();
 
 // ---------------------------------------
 // Input and Output Specific Functions          // Kurt
 // ---------------------------------------
-ParseTreeNode* parseInputList();
-ParseTreeNode* parseFormatVariablePair();
-ParseTreeNode* parseFormatSpecifier();          
-ParseTreeNode* parseAddressVariable();          
+//ParseTreeNode* parseInputList();
+//ParseTreeNode* parseFormatVariablePair();
+//ParseTreeNode* parseFormatSpecifier();          
+//ParseTreeNode* parseAddressVariable();          
 ParseTreeNode* parseOutputList();
-ParseTreeNode* parseStringConcat();
-ParseTreeNode* parseExpressionList();
+//ParseTreeNode* parseStringConcat();
+//ParseTreeNode* parseExpressionList();
 
 // ---------------------------------------
-// Array Handling                               // Anne
+// Array Handling                               // Rasty
 // ---------------------------------------
-ParseTreeNode* parseArrayDeclaration();         //
-ParseTreeNode* parseArrayOperations();          //
+//ParseTreeNode* parseArrayDeclaration();         //
+//ParseTreeNode* parseArrayOperations();          //
 ParseTreeNode* parseArrayAccess();              //
-ParseTreeNode* parseArrayAssignment();          //
-ParseTreeNode* parseArrayDimensions();          // 
-ParseTreeNode* parseArrayIndex();               // 
-ParseTreeNode* parseForUpdate();                // for-loops ata e2
-ParseTreeNode* parseArrayType();
+//ParseTreeNode* parseArrayAssignment();          //
+//ParseTreeNode* parseArrayDimensions();          // 
+//ParseTreeNode* parseArrayIndex();               // 
+//ParseTreeNode* parseArrayType();
 
 // ---------------------------------------
 // Functions                                    // Rasty
@@ -149,7 +149,7 @@ ParseTreeNode* parseFunctionDeclaration();
 ParseTreeNode* parseFunctionCall();             
 ParseTreeNode* parseParameterList();            
 ParseTreeNode* parseArgumentList();             
-ParseTreeNode* parseReturnType();               // <return-type>
+//ParseTreeNode* parseReturnType();               // <return-type>
 ParseTreeNode* parseParameter();
 
 // ---------------------------------------
