@@ -1,57 +1,19 @@
-Keyword,int,1
-IDENTIFIER,a,1
+Keyword,printf,1
+Delimiter,(,1
+STRING_LITERAL,"Hello",1
+Delimiter,),1
 Delimiter,;,1
-Keyword,int,2
-IDENTIFIER,a,2
-AssignmentOperator,=,2
-INT_LITERAL,5,2
+Keyword,printf,2
+Delimiter,(,2
+STRING_LITERAL,"%f",2
+Delimiter,,,2
+IDENTIFIER,value,2
+Delimiter,),2
 Delimiter,;,2
-Keyword,int,3
-IDENTIFIER,a,3
+Keyword,printf,3
+Delimiter,(,3
+STRING_LITERAL,"Value is %d",3
 Delimiter,,,3
-IDENTIFIER,b,3
-AssignmentOperator,=,3
-INT_LITERAL,10,3
-Delimiter,,,3
-IDENTIFIER,c,3
+IDENTIFIER,value,3
+Delimiter,),3
 Delimiter,;,3
-Keyword,input,5
-Delimiter,(,5
-STRING_LITERAL,"%f",5
-Delimiter,,,5
-SpecifierIdentifier,&value,5
-Delimiter,),5
-Delimiter,;,5
-Keyword,printf,7
-Delimiter,(,7
-STRING_LITERAL,"%f",7
-Delimiter,),7
-Delimiter,;,7
-Comment,~~,8
-Comment, printf("%f", value);,8
-Comment,~~,9
-Comment, printf("Value is " + value);,9
-Comment,~/,11
-Comment,a = 10;,12
-Comment,~~ b += 20;,13
-Comment,c = d = 30;,14
-Comment,if (a > 0) {,16
-Comment,printf("Positive number");,17
-Comment,},18
-Comment,/~,19
-Comment,~/,21
-Comment,if (a > b) {,22
-Comment,printf("a is greater");,23
-Comment,} else {,24
-Comment,printf("b is greater or equal");,25
-Comment,},26
-Comment,/~,27
-Comment,~/,29
-Comment,if (a > b) {,30
-Comment,printf("a is greater");,31
-Comment,} else if (a == b) {,32
-Comment,printf("a and b are equal");,33
-Comment,} else {,34
-Comment,printf("b is greater");,35
-Comment,},36
-Comment,/~,37

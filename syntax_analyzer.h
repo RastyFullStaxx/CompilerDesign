@@ -130,6 +130,7 @@ ParseTreeNode* parseAddressVariable();
 ParseTreeNode* parseOutputList();
 ParseTreeNode* parseStringConcat();
 ParseTreeNode* parseExpressionList();
+ParseTreeNode* parseFormatString();
 
 // ---------------------------------------
 // Array Handling                               // Rasty
