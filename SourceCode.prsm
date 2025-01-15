@@ -1,3 +1,1 @@
 printf("Hello");
-printf("%f", value);
-printf("Value is %d", value);

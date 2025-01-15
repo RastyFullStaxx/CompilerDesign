@@ -128,7 +128,6 @@ ParseTreeNode* parseFormatVariablePair();
 ParseTreeNode* parseFormatSpecifier();          
 ParseTreeNode* parseAddressVariable();          
 ParseTreeNode* parseOutputList();
-ParseTreeNode* parseStringConcat();
 ParseTreeNode* parseExpressionList();
 ParseTreeNode* parseFormatString();
 

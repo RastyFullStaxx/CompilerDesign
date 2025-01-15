@@ -57,10 +57,25 @@ Token* getNextToken() {
 }
 
 Token* peekToken() {
+    static int previousTokenIndex = -1;
+    static int repeatCounter = 0;
+
     if (currentTokenIndex < totalTokens) {
-        // Map token to handle any necessary updates (e.g., parentheses or other delimiter handling)
         Token* token = &tokens[currentTokenIndex];
-        mapToken(token);
+
+        // Detect repetitive token peeks
+        if (currentTokenIndex == previousTokenIndex) {
+            repeatCounter++;
+            if (repeatCounter > 10) { // Threshold to detect endless loops
+                printf("[CRITICAL] Endless loop detected at Token[%d]: Type='%s', Value='%s', Line=%d\n",
+                       currentTokenIndex, token->type, token->value, token->lineNumber);
+                exit(1); // Forcefully terminate to analyze the issue
+            }
+        } else {
+            repeatCounter = 0; // Reset counter if token index changes
+        }
+
+        previousTokenIndex = currentTokenIndex;
 
         // Debug output
         printf("[DEBUG] peekToken: Current Token[%d]: Type='%s', Value='%s', Line=%d\n",
@@ -72,6 +87,7 @@ Token* peekToken() {
            currentTokenIndex, totalTokens);
     return NULL;
 }
+
 
 
 // Function to trim leading and trailing whitespace from a string
@@ -226,7 +242,6 @@ void mapToken(Token* token) {
 
 
 
-
 // Function to load tokens from a file
 int loadTokensFromFile(const char *filename) {
     FILE *file = fopen(filename, "r");
@@ -303,12 +318,12 @@ int loadTokensFromFile(const char *filename) {
 
 
 
-
 ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue) {
     printf("[DEBUG] Matching Token. Expected Type='%s', Value='%s'\n", expectedType, expectedValue);
 
     Token* token = peekToken(); // Peek the current token without advancing
     if (!token) {
+        printf("[CRITICAL] No tokens left to match. Expected Type='%s', Value='%s'\n", expectedType, expectedValue);
         reportSyntaxError("No more tokens available when matching.");
         recoverFromError(); // Attempt recovery if no token is available
         return NULL;
@@ -319,12 +334,18 @@ ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue) {
 
     // Check if the token matches the expected type and value
     if (strcmp(token->type, expectedType) != 0 || strcmp(token->value, expectedValue) != 0) {
+        printf("[ERROR] Token mismatch. Current Token: Type='%s', Value='%s', Line=%d\n",
+               token->type, token->value, token->lineNumber);
+
         char errorMessage[200];
         snprintf(errorMessage, sizeof(errorMessage),
                  "Syntax Error at line %d: Expected '%s' of type '%s' but found '%s' of type '%s'.",
                  token->lineNumber, expectedValue, expectedType, token->value, token->type);
         reportSyntaxError(errorMessage);
-        recoverFromError(); // Attempt recovery if token doesn't match
+
+        // Force consume the mismatched token and attempt recovery
+        getNextToken();
+        recoverFromError();
         return NULL;
     }
 
@@ -1044,26 +1065,24 @@ ParseTreeNode* parseOutputStatement() {
     ParseTreeNode* outputNode = createParseTreeNode("OutputStatement", "");
 
     // Match "printf"
-    Token* token = peekToken();
-    if (!token || strcmp(token->type, "Keyword") != 0 || strcmp(token->value, "printf") != 0) {
+    if (!matchToken("Keyword", "printf")) {
         reportSyntaxError("Expected 'printf' in output statement.");
         recoverFromError();
         freeParseTree(outputNode);
         return NULL;
     }
-    addChild(outputNode, matchToken("Keyword", "printf"));
+    addChild(outputNode, createParseTreeNode("Keyword", "printf"));
 
     // Match '('
-    token = peekToken();
-    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "(") != 0) {
+    if (!matchToken("Delimiter", "(")) {
         reportSyntaxError("Expected '(' after 'printf'.");
         recoverFromError();
         freeParseTree(outputNode);
         return NULL;
     }
-    addChild(outputNode, matchToken("Delimiter", "("));
+    addChild(outputNode, createParseTreeNode("Delimiter", "("));
 
-    // Match output-list
+    // Parse the output list
     ParseTreeNode* outputListNode = parseOutputList();
     if (!outputListNode) {
         reportSyntaxError("Invalid output list in output statement.");
@@ -1074,29 +1093,26 @@ ParseTreeNode* parseOutputStatement() {
     addChild(outputNode, outputListNode);
 
     // Match ')'
-    token = peekToken();
-    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ")") != 0) {
-        reportSyntaxError("Expected ')' to close output statement.");
+    if (!matchToken("Delimiter", ")")) {
+        reportSyntaxError("Expected ')' after output list.");
         recoverFromError();
         freeParseTree(outputNode);
         return NULL;
     }
-    addChild(outputNode, matchToken("Delimiter", ")"));
+    addChild(outputNode, createParseTreeNode("Delimiter", ")"));
 
     // Match ';'
-    token = peekToken();
-    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ";") != 0) {
+    if (!matchToken("Delimiter", ";")) {
         reportSyntaxError("Expected ';' after output statement.");
         recoverFromError();
         freeParseTree(outputNode);
         return NULL;
     }
-    addChild(outputNode, matchToken("Delimiter", ";"));
+    addChild(outputNode, createParseTreeNode("Delimiter", ";"));
 
     printf("[DEBUG] Successfully parsed Output Statement.\n");
     return outputNode;
 }
-
 
 
 
@@ -2565,29 +2581,29 @@ ParseTreeNode* parsePrimaryExpr() {
         printf("[DEBUG] SpecifierIdentifier detected: %s\n", token->value);
         addChild(primaryNode, matchToken("SpecifierIdentifier", token->value)); // Match and add the specifier identifier
     } else if (strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "(") == 0) {
-        // It's a grouped expression
-        printf("[DEBUG] Detected '(' indicating a grouped expression.\n");
-        addChild(primaryNode, matchToken("Delimiter", "(")); // Match and add '('
+    printf("[DEBUG] Detected '(' indicating a grouped expression.\n");
+    addChild(primaryNode, matchToken("Delimiter", "(")); // Match and add '('
 
-        // Parse the inner expression
-        ParseTreeNode* innerExpr = parseExpression();
-        if (!innerExpr) {
-            reportSyntaxError("Failed to parse inner expression in grouped expression.");
-            recoverFromError();
-            freeParseTree(primaryNode);
-            return NULL;
-        }
-        addChild(primaryNode, innerExpr);
+    // Parse the inner expression
+    ParseTreeNode* innerExpr = parseExpression();
+    if (!innerExpr) {
+        reportSyntaxError("Failed to parse inner expression in grouped expression.");
+        recoverFromError();
+        freeParseTree(primaryNode);
+        return NULL;
+    }
+    addChild(primaryNode, innerExpr);
 
-        // Match the closing ')'
-        if (!matchToken("Delimiter", ")")) {
-            reportSyntaxError("Expected ')' to close the grouped expression.");
-            recoverFromError();
-            freeParseTree(primaryNode);
-            return NULL;
+    // Match the closing ')'
+    token = peekToken();
+    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ")") != 0) {
+        reportSyntaxError("Expected ')' to close the grouped expression.");
+        recoverFromError();
+        freeParseTree(primaryNode);
+        return NULL;
         }
-        addChild(primaryNode, createParseTreeNode("Delimiter", ")"));
-        printf("[DEBUG] Detected closing ')' for grouped expression.\n");
+    addChild(primaryNode, matchToken("Delimiter", ")"));
+    printf("[DEBUG] Detected closing ')' for grouped expression.\n");
     } else {
         // Unexpected token type
         reportSyntaxError("Expected a literal, identifier, specifier identifier, or grouped expression.");
@@ -2732,25 +2748,24 @@ ParseTreeNode* parseOutputList() {
 
     ParseTreeNode* outputListNode = createParseTreeNode("OutputList", "");
 
-    // Match the format string
+    // Parse the format string
     ParseTreeNode* formatStringNode = parseFormatString();
     if (!formatStringNode) {
-        reportSyntaxError("Expected format string in output list.");
+        reportSyntaxError("Invalid format string in output list.");
         recoverFromError();
         freeParseTree(outputListNode);
         return NULL;
     }
     addChild(outputListNode, formatStringNode);
 
-    // Check for optional expression list
+    // Match optional ',' and parse expression list
     Token* token = peekToken();
     if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, ",") == 0) {
         addChild(outputListNode, matchToken("Delimiter", ",")); // Consume ','
 
-        // Parse expression list
         ParseTreeNode* expressionListNode = parseExpressionList();
         if (!expressionListNode) {
-            reportSyntaxError("Expected expression list after ',' in output list.");
+            reportSyntaxError("Invalid expression list in output list.");
             recoverFromError();
             freeParseTree(outputListNode);
             return NULL;
@@ -2761,6 +2776,7 @@ ParseTreeNode* parseOutputList() {
     printf("[DEBUG] Successfully parsed Output List.\n");
     return outputListNode;
 }
+
 
 
 
