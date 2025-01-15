@@ -41,10 +41,16 @@ Token* peekNextToken() {
 Token* getNextToken() {
     if (currentTokenIndex < totalTokens) {
         Token* token = &tokens[currentTokenIndex++];
+        
+        // Map token to handle any necessary updates (e.g., parentheses or other delimiter handling)
+        mapToken(token);
+
+        // Debug output
         printf("[DEBUG] getNextToken: Retrieved Token[%d]: Type='%s', Value='%s', Line=%d\n",
                currentTokenIndex - 1, token->type, token->value, token->lineNumber);
         return token;
     }
+
     printf("[DEBUG] getNextToken: End of token stream reached. Current Index=%d, Total Tokens=%d\n",
            currentTokenIndex, totalTokens);
     return NULL;
@@ -52,15 +58,21 @@ Token* getNextToken() {
 
 Token* peekToken() {
     if (currentTokenIndex < totalTokens) {
+        // Map token to handle any necessary updates (e.g., parentheses or other delimiter handling)
+        Token* token = &tokens[currentTokenIndex];
+        mapToken(token);
+
+        // Debug output
         printf("[DEBUG] peekToken: Current Token[%d]: Type='%s', Value='%s', Line=%d\n",
-               currentTokenIndex, tokens[currentTokenIndex].type, tokens[currentTokenIndex].value,
-               tokens[currentTokenIndex].lineNumber);
-        return &tokens[currentTokenIndex];
+               currentTokenIndex, token->type, token->value, token->lineNumber);
+        return token;
     }
+
     printf("[DEBUG] peekToken: End of token stream reached. Current Index=%d, Total Tokens=%d\n",
            currentTokenIndex, totalTokens);
     return NULL;
 }
+
 
 // Function to trim leading and trailing whitespace from a string
 void trimWhitespace(char *str) {
@@ -89,126 +101,129 @@ void trimWhitespace(char *str) {
 
 // Token maper function = Match the tokens from the symbol table and load them using the loadTokenFromFile
 void mapToken(Token* token) {
-    if (strcmp(token->type, "Right Parenthesis") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, ")");
-    } else if (strcmp(token->type, "Left Parenthesis") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, "(");
-    } else if (strcmp(token->type, "Left Curly Brace") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, "{");
-    } else if (strcmp(token->type, "Right Curly Brace") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, "}");
-    } else if (strcmp(token->type, "Left Bracket") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, "[");
-    } else if (strcmp(token->type, "Right Bracket") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, "]");
-    } else if (strcmp(token->type, "Semicolon") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, ";");
-    } else if (strcmp(token->type, "Colon") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, ":");
-    } else if (strcmp(token->type, "Comma") == 0) {
-        strcpy(token->type, "Delimiter");
-        strcpy(token->value, ",");
-    } else if (strcmp(token->type, "Arithmetic Operator (Addition)") == 0) {
-        strcpy(token->type, "ArithmeticOperator");
-        strcpy(token->value, "+");
-    } else if (strcmp(token->type, "Arithmetic Operator (Subtraction)") == 0) {
-        strcpy(token->type, "ArithmeticOperator");
-        strcpy(token->value, "-");
-    } else if (strcmp(token->type, "Arithmetic Operator (Multiplication)") == 0) {
-        strcpy(token->type, "ArithmeticOperator");
-        strcpy(token->value, "*");
-    } else if (strcmp(token->type, "Arithmetic Operator (Division)") == 0) {
-        strcpy(token->type, "ArithmeticOperator");
-        strcpy(token->value, "/");
-    } else if (strcmp(token->type, "Arithmetic Operator (Modulo)") == 0) {
-        strcpy(token->type, "ArithmeticOperator");
-        strcpy(token->value, "%");
-    } else if (strcmp(token->type, "Arithmetic Operator (Exponentiation)") == 0) {
-        strcpy(token->type, "ArithmeticOperator");
-        strcpy(token->value, "^");
-    } else if (strcmp(token->type, "Arithmetic Operator (Integer Division)") == 0) {
-        strcpy(token->type, "ArithmeticOperator");
-        strcpy(token->value, "//");
-    } else if (strcmp(token->type, "Assignment Operator (Simple)") == 0) {
-        strcpy(token->type, "AssignmentOperator");
-        strcpy(token->value, "=");
-    } else if (strcmp(token->type, "Assignment Operator (Add)") == 0) {
-        strcpy(token->type, "AssignmentOperator");
-        strcpy(token->value, "+=");
-    } else if (strcmp(token->type, "Assignment Operator (Subtract)") == 0) {
-        strcpy(token->type, "AssignmentOperator");
-        strcpy(token->value, "-=");
-    } else if (strcmp(token->type, "Assignment Operator (Multiply)") == 0) {
-        strcpy(token->type, "AssignmentOperator");
-        strcpy(token->value, "*=");
-    } else if (strcmp(token->type, "Assignment Operator (Divide)") == 0) {
-        strcpy(token->type, "AssignmentOperator");
-        strcpy(token->value, "/=");
-    } else if (strcmp(token->type, "Assignment Operator (Modulo)") == 0) {
-        strcpy(token->type, "AssignmentOperator");
-        strcpy(token->value, "%=");
-    } else if (strcmp(token->type, "Assignment Operator (Integer Division)") == 0) {
-        strcpy(token->type, "AssignmentOperator");
-        strcpy(token->value, "//=");
-    } else if (strcmp(token->type, "Logical Operator (NOT)") == 0) {
-        strcpy(token->type, "LogicalOperator");
-        strcpy(token->value, "!");
-    } else if (strcmp(token->type, "Logical Operator (OR)") == 0) {
-        strcpy(token->type, "LogicalOperator");
-        strcpy(token->value, "||");
-    } else if (strcmp(token->type, "Logical Operator (AND)") == 0) {
-        strcpy(token->type, "LogicalOperator");
-        strcpy(token->value, "&&");
-    } else if (strcmp(token->type, "Relational Operator (Equal To)") == 0) {
-        strcpy(token->type, "RelationalOperator");
-        strcpy(token->value, "==");
-    } else if (strcmp(token->type, "Relational Operator (Not Equal To)") == 0) {
-        strcpy(token->type, "RelationalOperator");
-        strcpy(token->value, "!=");
-    } else if (strcmp(token->type, "Relational Operator (Greater Than)") == 0) {
-        strcpy(token->type, "RelationalOperator");
-        strcpy(token->value, ">");
-    } else if (strcmp(token->type, "Relational Operator (Less Than)") == 0) {
-        strcpy(token->type, "RelationalOperator");
-        strcpy(token->value, "<");
-    } else if (strcmp(token->type, "Relational Operator (Greater Than or Equal To)") == 0) {
-        strcpy(token->type, "RelationalOperator");
-        strcpy(token->value, ">=");
-    } else if (strcmp(token->type, "Relational Operator (Less Than or Equal To)") == 0) {
-        strcpy(token->type, "RelationalOperator");
-        strcpy(token->value, "<=");
-    } else if (strcmp(token->type, "Integer Literal") == 0) {
+    if (strcmp(token->type, "Delimiter") == 0) {
+        if (strcmp(token->value, "(") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, "(");
+        } else if (strcmp(token->value, ")") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, ")");
+        } else if (strcmp(token->value, "{") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, "{");
+        } else if (strcmp(token->value, "}") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, "}");
+        } else if (strcmp(token->value, "[") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, "[");
+        } else if (strcmp(token->value, "]") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, "]");
+        } else if (strcmp(token->value, ";") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, ";");
+        } else if (strcmp(token->value, ":") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, ":");
+        } else if (strcmp(token->value, ",") == 0) {
+            strcpy(token->type, "Delimiter");
+            strcpy(token->value, ",");
+        }
+    } else if (strcmp(token->type, "ArithmeticOperator") == 0) {
+        if (strcmp(token->value, "+") == 0) {
+            strcpy(token->type, "ArithmeticOperator");
+            strcpy(token->value, "+");
+        } else if (strcmp(token->value, "-") == 0) {
+            strcpy(token->type, "ArithmeticOperator");
+            strcpy(token->value, "-");
+        } else if (strcmp(token->value, "*") == 0) {
+            strcpy(token->type, "ArithmeticOperator");
+            strcpy(token->value, "*");
+        } else if (strcmp(token->value, "/") == 0) {
+            strcpy(token->type, "ArithmeticOperator");
+            strcpy(token->value, "/");
+        } else if (strcmp(token->value, "%") == 0) {
+            strcpy(token->type, "ArithmeticOperator");
+            strcpy(token->value, "%");
+        } else if (strcmp(token->value, "^") == 0) {
+            strcpy(token->type, "ArithmeticOperator");
+            strcpy(token->value, "^");
+        } else if (strcmp(token->value, "//") == 0) {
+            strcpy(token->type, "ArithmeticOperator");
+            strcpy(token->value, "//");
+        }
+    } else if (strcmp(token->type, "AssignmentOperator") == 0) {
+        if (strcmp(token->value, "=") == 0) {
+            strcpy(token->type, "AssignmentOperator");
+            strcpy(token->value, "=");
+        } else if (strcmp(token->value, "+=") == 0) {
+            strcpy(token->type, "AssignmentOperator");
+            strcpy(token->value, "+=");
+        } else if (strcmp(token->value, "-=") == 0) {
+            strcpy(token->type, "AssignmentOperator");
+            strcpy(token->value, "-=");
+        } else if (strcmp(token->value, "*=") == 0) {
+            strcpy(token->type, "AssignmentOperator");
+            strcpy(token->value, "*=");
+        } else if (strcmp(token->value, "/=") == 0) {
+            strcpy(token->type, "AssignmentOperator");
+            strcpy(token->value, "/=");
+        } else if (strcmp(token->value, "%=") == 0) {
+            strcpy(token->type, "AssignmentOperator");
+            strcpy(token->value, "%=");
+        } else if (strcmp(token->value, "//=") == 0) {
+            strcpy(token->type, "AssignmentOperator");
+            strcpy(token->value, "//=");
+        }
+    } else if (strcmp(token->type, "LogicalOperator") == 0) {
+        if (strcmp(token->value, "!") == 0) {
+            strcpy(token->type, "LogicalOperator");
+            strcpy(token->value, "!");
+        } else if (strcmp(token->value, "||") == 0) {
+            strcpy(token->type, "LogicalOperator");
+            strcpy(token->value, "||");
+        } else if (strcmp(token->value, "&&") == 0) {
+            strcpy(token->type, "LogicalOperator");
+            strcpy(token->value, "&&");
+        }
+    } else if (strcmp(token->type, "RelationalOperator") == 0) {
+        if (strcmp(token->value, "==") == 0) {
+            strcpy(token->type, "RelationalOperator");
+            strcpy(token->value, "==");
+        } else if (strcmp(token->value, "!=") == 0) {
+            strcpy(token->type, "RelationalOperator");
+            strcpy(token->value, "!=");
+        } else if (strcmp(token->value, ">") == 0) {
+            strcpy(token->type, "RelationalOperator");
+            strcpy(token->value, ">");
+        } else if (strcmp(token->value, "<") == 0) {
+            strcpy(token->type, "RelationalOperator");
+            strcpy(token->value, "<");
+        } else if (strcmp(token->value, ">=") == 0) {
+            strcpy(token->type, "RelationalOperator");
+            strcpy(token->value, ">=");
+        } else if (strcmp(token->value, "<=") == 0) {
+            strcpy(token->type, "RelationalOperator");
+            strcpy(token->value, "<=");
+        }
+    } else if (strcmp(token->type, "INT_LITERAL") == 0) {
         strcpy(token->type, "INT_LITERAL");
-    } else if (strcmp(token->type, "Float Literal") == 0) {
+    } else if (strcmp(token->type, "FLOAT_LITERAL") == 0) {
         strcpy(token->type, "FLOAT_LITERAL");
-    } else if (strcmp(token->type, "Character Literal") == 0) {
+    } else if (strcmp(token->type, "CHAR_LITERAL") == 0) {
         strcpy(token->type, "CHAR_LITERAL");
-    } else if (strcmp(token->type, "String Literal") == 0) {
+    } else if (strcmp(token->type, "STRING_LITERAL") == 0) {
         strcpy(token->type, "STRING_LITERAL");
-    } else if (strcmp(token->type, "Unary Operator (Increment)") == 0) {
-        strcpy(token->type, "UnaryOperator");
-        strcpy(token->value, "++");
-    } else if (strcmp(token->type, "Unary Operator (Decrement)") == 0) {
-        strcpy(token->type, "UnaryOperator");
-        strcpy(token->value, "--");
-    } else if (strcmp(token->type, "SpecifierIdentifier") == 0) {
-        strcpy(token->type, "SpecifierIdentifier");
-    } else if (strcmp(token->type, "Reserved Word") == 0) {
+    } else if (strcmp(token->type, "ReservedWord") == 0) {
         strcpy(token->type, "ReservedWord");
-    } else if (strcmp(token->type, "Noise Word") == 0) {
+    } else if (strcmp(token->type, "NoiseWord") == 0) {
         strcpy(token->type, "NoiseWord");
     } else if (strstr(token->type, "Comment") != NULL) {
         strcpy(token->type, "Comment");
     }
 }
+
 
 
 
@@ -261,6 +276,9 @@ int loadTokensFromFile(const char *filename) {
         strncpy(token.value, value, sizeof(token.value) - 1);
         token.lineNumber = lineNumber;
 
+        // Map the token to handle value-specific tokens
+        mapToken(&token);
+
         // Add the token to the list
         if (totalTokens < MAX_TOKENS) {
             tokens[totalTokens++] = token;
@@ -285,14 +303,19 @@ int loadTokensFromFile(const char *filename) {
 
 
 
+
 ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue) {
     printf("[DEBUG] Matching Token. Expected Type='%s', Value='%s'\n", expectedType, expectedValue);
 
     Token* token = peekToken(); // Peek the current token without advancing
     if (!token) {
         reportSyntaxError("No more tokens available when matching.");
+        recoverFromError(); // Attempt recovery if no token is available
         return NULL;
     }
+
+    // Apply token mapping before comparison
+    mapToken(token);
 
     // Check if the token matches the expected type and value
     if (strcmp(token->type, expectedType) != 0 || strcmp(token->value, expectedValue) != 0) {
@@ -301,6 +324,7 @@ ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue) {
                  "Syntax Error at line %d: Expected '%s' of type '%s' but found '%s' of type '%s'.",
                  token->lineNumber, expectedValue, expectedType, token->value, token->type);
         reportSyntaxError(errorMessage);
+        recoverFromError(); // Attempt recovery if token doesn't match
         return NULL;
     }
 
@@ -313,11 +337,13 @@ ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue) {
     ParseTreeNode* node = createParseTreeNode(token->type, token->value);
     if (!node) {
         reportSyntaxError("Failed to create parse tree node.");
+        recoverFromError(); // Attempt recovery if node creation fails
         return NULL;
     }
 
     return node;
 }
+
 
 
 
@@ -330,6 +356,9 @@ void reportSyntaxError(const char* message) {
     Token* token = peekToken();
 
     if (token) {
+        // Apply token mapping if necessary
+        mapToken(token); // Ensure the token is correctly mapped before displaying
+
         printf("Syntax Error at line %d: %s\n", token->lineNumber, message);
         printf("DEBUG: Current Token - Type='%s', Value='%s'\n",
                token->type, token->value);
@@ -350,6 +379,9 @@ void recoverFromError() {
 
     Token* token;
     while ((token = peekToken()) != NULL) {
+        // Ensure token is mapped before using
+        mapToken(token);
+
         if (strcmp(token->type, "Delimiter") == 0) {
             for (int i = 0; recoveryDelimiters[i] != NULL; i++) {
                 if (strcmp(token->value, recoveryDelimiters[i]) == 0) {
@@ -369,6 +401,7 @@ void recoverFromError() {
             }
         }
 
+        // If no delimiter or keyword matched, skip the token and try again
         printf("DEBUG: Skipping Token: Type='%s', Value='%s', Line=%d\n",
                token->type, token->value, token->lineNumber);
         getNextToken();
@@ -376,6 +409,7 @@ void recoverFromError() {
 
     printf("ERROR: Unable to recover from syntax error. Reached end of input.\n");
 }
+
 
 
 
@@ -529,14 +563,41 @@ ParseTreeNode* parseBlock() {
             continue; // Move to the next token after parsing the comment
         }
 
-        // Parse a single statement
-        ParseTreeNode* statementNode = parseStatement();
-        if (statementNode) {
-            addChild(blockNode, statementNode);
-        } else {
-            reportSyntaxError("Error parsing statement inside block.");
-            recoverFromError();
-            // Continue recovery to parse subsequent statements
+        // Check for a valid statement and parse it accordingly
+        if (strcmp(token->type, "Keyword") == 0 &&
+            (strcmp(token->value, "int") == 0 || strcmp(token->value, "float") == 0 ||
+             strcmp(token->value, "char") == 0 || strcmp(token->value, "bool") == 0 ||
+             strcmp(token->value, "string") == 0)) {
+            // Declaration statement
+            ParseTreeNode* declarationNode = parseDeclarationStatement();
+            if (declarationNode) {
+                addChild(blockNode, declarationNode);
+            } else {
+                reportSyntaxError("Error parsing declaration statement inside block.");
+                recoverFromError();
+            }
+        }
+        // Check if it's an assignment
+        else if (strcmp(token->type, "IDENTIFIER") == 0) {
+            ParseTreeNode* assignmentNode = parseAssignmentStatement();
+            if (assignmentNode) {
+                addChild(blockNode, assignmentNode);
+            } else {
+                reportSyntaxError("Error parsing assignment statement inside block.");
+                recoverFromError();
+            }
+        }
+        // Handle expression or other statements
+        else {
+            ParseTreeNode* statementNode = parseStatement();
+            if (statementNode) {
+                addChild(blockNode, statementNode);
+            } else {
+                reportSyntaxError("Error parsing statement inside block.");
+                recoverFromError();
+                // Skip the current token and continue parsing subsequent statements
+                getNextToken(); 
+            }
         }
     }
 
@@ -544,7 +605,7 @@ ParseTreeNode* parseBlock() {
     token = peekToken();
     if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "}") == 0) {
         printf("[DEBUG] Matched closing '}'.\n");
-        matchToken("Delimiter", "}");
+        getNextToken(); // Consume '}'
         addChild(blockNode, createParseTreeNode("Delimiter", "}"));
     } else {
         reportSyntaxError("Expected '}' at the end of block.");
@@ -556,6 +617,9 @@ ParseTreeNode* parseBlock() {
     printf("[DEBUG] Completed parsing Block.\n");
     return blockNode;
 }
+
+
+
 
 
 // ---------------------------------------
