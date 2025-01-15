@@ -2,3 +2,10 @@ Keyword,void,1
 Keyword,main,1
 Delimiter,(,1
 Delimiter,),1
+Delimiter,{,1
+Keyword,int,2
+IDENTIFIER,a,2
+AssignmentOperator,=,2
+INT_LITERAL,10,2
+Delimiter,;,2
+Delimiter,},3

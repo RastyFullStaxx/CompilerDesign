@@ -354,6 +354,7 @@ void recoverFromError() {
             for (int i = 0; recoveryDelimiters[i] != NULL; i++) {
                 if (strcmp(token->value, recoveryDelimiters[i]) == 0) {
                     printf("DEBUG: Recovered at delimiter: '%s' on line %d\n", token->value, token->lineNumber);
+                    getNextToken(); // Skip over the delimiter
                     return;
                 }
             }
@@ -375,6 +376,7 @@ void recoverFromError() {
 
     printf("ERROR: Unable to recover from syntax error. Reached end of input.\n");
 }
+
 
 
 
@@ -416,7 +418,7 @@ ParseTreeNode* parseProgram() {
 
 
 ParseTreeNode* parseMainFunction() {
-    printf("[DEBUG] Parsing Main Function...\n");
+    printf("DEBUG: Parsing Main Function...\n");
 
     ParseTreeNode* mainFunctionNode = createParseTreeNode("MainFunction", NULL);
 
@@ -429,16 +431,16 @@ ParseTreeNode* parseMainFunction() {
     }
     addChild(mainFunctionNode, createParseTreeNode("Keyword", "void"));
 
-    // Match 'main' keyword
+    // Match 'main' identifier
     if (!matchToken("Keyword", "main")) {
         reportSyntaxError("Expected 'main' keyword after 'void'.");
         recoverFromError();
         freeParseTree(mainFunctionNode);
         return NULL;
     }
-    addChild(mainFunctionNode, createParseTreeNode("Keyword", "main"));
+    addChild(mainFunctionNode, createParseTreeNode("IDENTIFIER", "main"));
 
-    // Match '('
+    // Match '(' and ')'
     if (!matchToken("Delimiter", "(")) {
         reportSyntaxError("Expected '(' after 'main'.");
         recoverFromError();
@@ -447,7 +449,6 @@ ParseTreeNode* parseMainFunction() {
     }
     addChild(mainFunctionNode, createParseTreeNode("Delimiter", "("));
 
-    // Match ')'
     if (!matchToken("Delimiter", ")")) {
         reportSyntaxError("Expected ')' after '('.");
         recoverFromError();
@@ -466,7 +467,6 @@ ParseTreeNode* parseMainFunction() {
     addChild(mainFunctionNode, createParseTreeNode("Delimiter", "{"));
 
     // Parse the block inside main function
-    printf("[DEBUG] Parsing block inside main function...\n");
     ParseTreeNode* blockNode = parseBlock();
     if (!blockNode) {
         reportSyntaxError("Failed to parse main function block.");
@@ -476,10 +476,30 @@ ParseTreeNode* parseMainFunction() {
     }
     addChild(mainFunctionNode, blockNode);
 
-    // Closing '}' should be matched by parseBlock
-    printf("[DEBUG] Completed parsing Main Function.\n");
+    // Ensure the closing '}'
+    Token* token = peekToken();
+    if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "}") == 0) {
+        printf("DEBUG: Matched closing '}' for main function.\n");
+        matchToken("Delimiter", "}");
+        addChild(mainFunctionNode, createParseTreeNode("Delimiter", "}"));
+    } else {
+        reportSyntaxError("Expected closing '}' for main function.");
+        recoverFromError();
+        freeParseTree(mainFunctionNode);
+        return NULL;
+    }
+
+    // After parsing the function body, ensure we don’t enter an infinite loop
+    if (peekToken() == NULL) {
+        printf("DEBUG: Main function parsed successfully with no further tokens.\n");
+    } else {
+        printf("DEBUG: Unexpected tokens after the main function.\n");
+    }
+
+    printf("DEBUG: Completed parsing Main Function.\n");
     return mainFunctionNode;
 }
+
 
 
 
@@ -766,6 +786,11 @@ ParseTreeNode* parseStatement() {
         reportSyntaxError("Failed to parse statement.");
         recoverFromError();
         return NULL;
+    }
+
+    // After parsing, ensure to move past the semicolon
+    if (peekToken() && strcmp(peekToken()->value, ";") == 0) {
+        getNextToken();  // Skip over the semicolon
     }
 
     printf("[DEBUG] Successfully parsed a statement.\n");
