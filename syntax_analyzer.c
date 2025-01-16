@@ -929,14 +929,16 @@ ParseTreeNode* parseStatement() {
     // Check if the statement needs a semicolon
     Token* delimiter = peekToken();
     if (delimiter && strcmp(delimiter->type, "Delimiter") == 0 && strcmp(delimiter->value, ";") == 0) {
+        // If semicolon is found, match it and add it to the node
         ParseTreeNode* semicolonNode = matchToken("Delimiter", ";");
         if (semicolonNode) {
             addChild(statementNode, semicolonNode);
             printf("[DEBUG] Successfully matched and added semicolon to statement node.\n");
         }
     } else {
-        // Only report an error if the statement type requires a semicolon
-        if (strcmp(statementNode->label, "CompoundStatement") != 0) {
+        // Only report an error if the statement requires a semicolon and hasn't been consumed already
+        if (strcmp(statementNode->label, "CompoundStatement") != 0 &&
+            strcmp(statementNode->label, "OutputStatement") != 0) {
             reportSyntaxError("Expected ';' after statement.");
             recoverFromError();
         }
@@ -1183,19 +1185,25 @@ ParseTreeNode* parseOutputStatement() {
     }
     addChild(outputNode, createParseTreeNode("Delimiter", ")"));
 
-    // Match ';'
-    if (!matchToken("Delimiter", ";")) {
+    // Check and match semicolon
+    Token* delimiter = peekToken();
+    if (delimiter && strcmp(delimiter->type, "Delimiter") == 0 && strcmp(delimiter->value, ";") == 0) {
+        ParseTreeNode* semicolonNode = matchToken("Delimiter", ";");
+        if (semicolonNode) {
+            addChild(outputNode, semicolonNode);
+            printf("[DEBUG] Successfully matched and added semicolon to output statement node.\n");
+        }
+    } else {
+        // Only report an error if semicolon is expected and not found
         reportSyntaxError("Expected ';' after output statement.");
         recoverFromError();
         freeParseTree(outputNode);
         return NULL;
     }
-    addChild(outputNode, createParseTreeNode("Delimiter", ";"));
 
     printf("[DEBUG] Successfully parsed Output Statement.\n");
     return outputNode;
 }
-
 
 
 
