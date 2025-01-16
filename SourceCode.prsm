@@ -1,3 +1,5 @@
-totalGWA = 2;
-totalNum += addedPrice;
-midtermScore = exam + quizzes;
+~~ Declaration Statements
+int x;
+int x, y, z;
+int x, y = 20, z = x + y;
+

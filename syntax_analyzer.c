@@ -4,6 +4,7 @@
 #include <ctype.h>     // Character classification and conversion
 #include <wctype.h>    // Wide character functions
 #include <dirent.h>    // Directory operations
+#include <stdbool.h>
 
 #include "syntax_analyzer.h" // Custom syntax analyzer header
 #include "token.h"           // Custom token header
@@ -765,75 +766,43 @@ int main(int argc, char* argv[]) {
 ParseTreeNode* parseDeclarationStatement() {
     printf("[DEBUG] Parsing Declaration Statement...\n");
 
-    // Create a node for the declaration statement
     ParseTreeNode* declarationNode = createParseTreeNode("DeclarationStatement", "");
 
-    // Match a type-specifier (e.g., int, float, etc.)
+    // Match the type specifier (e.g., int, float, etc.)
     Token* token = peekToken();
-    if (!token || strcmp(token->type, "Keyword") != 0 ||
-        !(strcmp(token->value, "int") == 0 ||
-          strcmp(token->value, "float") == 0 ||
-          strcmp(token->value, "char") == 0 ||
-          strcmp(token->value, "bool") == 0 ||
-          strcmp(token->value, "string") == 0)) {
-        reportSyntaxError("Expected a valid type-specifier (e.g., int, float, etc.) in declaration statement.");
+    if (!token || strcmp(token->type, "Keyword") != 0) {
+        reportSyntaxError("Expected type specifier in declaration statement.");
         recoverFromError();
-        freeParseTree(declarationNode); // Cleanup memory
+        freeParseTree(declarationNode);
         return NULL;
     }
     addChild(declarationNode, matchToken("Keyword", token->value));
 
-    // Parse the declarator list (IDENTIFIER with optional initialization)
-    do {
-        // Match an identifier
-        token = peekToken();
-        if (!token || strcmp(token->type, "IDENTIFIER") != 0) {
-            reportSyntaxError("Expected an identifier in declaration statement.");
+    // Parse declarators separated by commas
+    while (true) {
+        ParseTreeNode* declaratorNode = parseDeclarator();
+        if (!declaratorNode) {
+            reportSyntaxError("Expected valid declarator in declaration statement.");
             recoverFromError();
-            freeParseTree(declarationNode); // Cleanup memory
+            freeParseTree(declarationNode);
             return NULL;
         }
-        ParseTreeNode* declaratorNode = createParseTreeNode("Declarator", token->value);
-        addChild(declarationNode, matchToken("IDENTIFIER", token->value));
-
-        // Check for optional initialization
-        token = peekToken();
-        if (token && strcmp(token->type, "AssignmentOperator") == 0) {
-            addChild(declaratorNode, matchToken("AssignmentOperator", token->value));
-
-            // Match the initializer (literal or expression)
-            token = peekToken();
-            if (!token || (strcmp(token->type, "INT_LITERAL") != 0 &&
-                           strcmp(token->type, "FLOAT_LITERAL") != 0 &&
-                           strcmp(token->type, "CHAR_LITERAL") != 0 &&
-                           strcmp(token->type, "STRING_LITERAL") != 0 &&
-                           strcmp(token->type, "IDENTIFIER") != 0)) {
-                reportSyntaxError("Expected a valid initializer (literal or identifier).");
-                recoverFromError();
-                freeParseTree(declaratorNode); // Cleanup memory
-                return NULL;
-            }
-            addChild(declaratorNode, matchToken(token->type, token->value));
-        }
-
         addChild(declarationNode, declaratorNode);
 
-        // Check for a comma to continue the declaration list
         token = peekToken();
         if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, ",") == 0) {
-            addChild(declarationNode, matchToken("Delimiter", ","));
+            matchToken("Delimiter", ","); // Consume the comma
         } else {
-            break; // No more declarators
+            break; // Exit the loop if no more declarators
         }
+    }
 
-    } while (1);
-
-    // Match the semicolon (';') at the end
+    // Match the ending semicolon
     token = peekToken();
     if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ";") != 0) {
-        reportSyntaxError("Expected ';' at the end of the declaration statement.");
+        reportSyntaxError("Expected ';' at the end of declaration statement.");
         recoverFromError();
-        freeParseTree(declarationNode); // Cleanup memory
+        freeParseTree(declarationNode);
         return NULL;
     }
     addChild(declarationNode, matchToken("Delimiter", ";"));
@@ -841,6 +810,7 @@ ParseTreeNode* parseDeclarationStatement() {
     printf("[DEBUG] Successfully parsed Declaration Statement.\n");
     return declarationNode;
 }
+
 
 
 
@@ -1973,8 +1943,8 @@ ParseTreeNode* parseDeclarator() {
     if (token && strcmp(token->type, "AssignmentOperator") == 0) {
         addChild(declaratorNode, matchToken("AssignmentOperator", token->value)); // Match '='
 
-        // Match expression for initialization
-        ParseTreeNode* exprNode = parseExpression();
+        // Parse expression for initialization
+        ParseTreeNode* exprNode = parseExpression(); // Extend parseExpression for complex expressions
         if (!exprNode) {
             reportSyntaxError("Expected expression for initialization in declarator.");
             recoverFromError();
