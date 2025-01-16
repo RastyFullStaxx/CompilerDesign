@@ -1,19 +1,14 @@
-Keyword,printf,1
-Delimiter,(,1
-STRING_LITERAL,"Hello, rasty",1
-Delimiter,),1
+IDENTIFIER,totalGWA,1
+AssignmentOperator,=,1
+INT_LITERAL,2,1
 Delimiter,;,1
-Keyword,printf,2
-Delimiter,(,2
-STRING_LITERAL,"%f",2
-Delimiter,,,2
-IDENTIFIER,value,2
-Delimiter,),2
+IDENTIFIER,totalNum,2
+AssignmentOperator,+=,2
+IDENTIFIER,addedPrice,2
 Delimiter,;,2
-Keyword,printf,3
-Delimiter,(,3
-STRING_LITERAL,"Value is %d",3
-Delimiter,,,3
-IDENTIFIER,value,3
-Delimiter,),3
+IDENTIFIER,midtermScore,3
+AssignmentOperator,=,3
+IDENTIFIER,exam,3
+ArithmeticOperator,+,3
+IDENTIFIER,quizzes,3
 Delimiter,;,3
