@@ -1,1 +1,5 @@
-printf("Hello");
+int x = 0;
+
+while (x > 0) {
+    printf("HELLO");
+}

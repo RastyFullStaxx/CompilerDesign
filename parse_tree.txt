@@ -1,1 +1,1 @@
-(Program(OutputStatement(Keyword:printf)(Delimiter:()(OutputList(FormatString:"Hello"))(Delimiter:))(Delimiter:;)))
+(Program(DeclarationStatement(Keyword:int)(IDENTIFIER:x)(Declarator:x(AssignmentOperator:=)(INT_LITERAL:0))(Delimiter:;))(OutputStatement(Keyword:printf)(Delimiter:()(OutputList(FormatString:"HELLO"))(Delimiter:))(Delimiter:;)))

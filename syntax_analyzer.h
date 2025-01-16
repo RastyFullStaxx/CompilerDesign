@@ -97,7 +97,9 @@ ParseTreeNode* parseForLoop();
 ParseTreeNode* parseWhileLoop();
 ParseTreeNode* parseDoWhileLoop();
 ParseTreeNode* parseForUpdate();                // for-loops ata e2
+ParseTreeNode* parseDecList();
 ParseTreeNode* parseIncDec();
+ParseTreeNode* parseDeclarator();
 
 // ---------------------------------------
 // Expressions and Operators                    // Kurt
@@ -111,7 +113,8 @@ ParseTreeNode* parseAdditiveExpr();
 ParseTreeNode* parseMultiplicativeExpr();
 ParseTreeNode* parseExponentialExpr();
 ParseTreeNode* parseUnaryExpr();
-ParseTreeNode* parsePostfixExpr();              
+ParseTreeNode* parsePostfixExpr();      
+ParseTreeNode* parseAssignmentExpr();      
 
 // ---------------------------------------
 // Literals and Identifiers                     // Rasty

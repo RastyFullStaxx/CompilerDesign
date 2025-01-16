@@ -28,17 +28,26 @@ ParseTreeNode* createParseTreeNode(const char* type, const char* value) {
 // Function to add a child to a parse tree node
 void addChild(ParseTreeNode* parent, ParseTreeNode* child) {
     if (!parent || !child) {
-        printf("Error: Invalid parent or child node.\n");
-        return; // Exit the function without returning a value
+        printf("[ERROR] Invalid parent or child node. Cannot add child.\n");
+        return; // Exit the function
     }
 
     if (parent->childCount < MAX_CHILDREN) {
         parent->children[parent->childCount++] = child;
+
+        // Debug: Log successful addition of child
+        printf("[DEBUG] Added child to parent.\n");
+        printf("[DEBUG] Parent Node: Label='%s', Value='%s', Current Children=%d\n",
+               parent->label, parent->value, parent->childCount);
+        printf("[DEBUG] Child Node: Label='%s', Value='%s'\n", 
+               child->label, child->value);
+
     } else {
-        printf("Error: Too many children for node %s (childCount=%d)\n",
+        printf("[ERROR] Too many children for node %s (childCount=%d)\n",
                parent->label, parent->childCount);
     }
 }
+
 
 
 // Function to print the parse tree (preorder traversal)
