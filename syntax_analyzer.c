@@ -768,48 +768,56 @@ ParseTreeNode* parseDeclarationStatement() {
 
     ParseTreeNode* declarationNode = createParseTreeNode("DeclarationStatement", "");
 
-    // Match the type specifier (e.g., int, float, etc.)
+    // Match type keyword (e.g., int, float, etc.)
     Token* token = peekToken();
-    if (!token || strcmp(token->type, "Keyword") != 0) {
-        reportSyntaxError("Expected type specifier in declaration statement.");
+    if (!token || strcmp(token->type, "Keyword") != 0 ||
+        (strcmp(token->value, "int") != 0 && strcmp(token->value, "float") != 0 &&
+         strcmp(token->value, "char") != 0 && strcmp(token->value, "bool") != 0 &&
+         strcmp(token->value, "string") != 0)) {
+        reportSyntaxError("Expected type keyword in declaration statement.");
         recoverFromError();
         freeParseTree(declarationNode);
         return NULL;
     }
     addChild(declarationNode, matchToken("Keyword", token->value));
 
-    // Parse declarators separated by commas
+    // Parse declarators
     while (true) {
         ParseTreeNode* declaratorNode = parseDeclarator();
         if (!declaratorNode) {
-            reportSyntaxError("Expected valid declarator in declaration statement.");
+            reportSyntaxError("Expected declarator in declaration statement.");
             recoverFromError();
             freeParseTree(declarationNode);
             return NULL;
         }
         addChild(declarationNode, declaratorNode);
 
+        // Check for comma delimiter or end of declaration
         token = peekToken();
-        if (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, ",") == 0) {
-            matchToken("Delimiter", ","); // Consume the comma
+        if (token && strcmp(token->type, "Delimiter") == 0) {
+            if (strcmp(token->value, ",") == 0) {
+                addChild(declarationNode, matchToken("Delimiter", ",")); // Add comma to parse tree
+            } else if (strcmp(token->value, ";") == 0) {
+                addChild(declarationNode, matchToken("Delimiter", ";")); // End declaration
+                break;
+            } else {
+                reportSyntaxError("Unexpected delimiter in declaration statement.");
+                recoverFromError();
+                freeParseTree(declarationNode);
+                return NULL;
+            }
         } else {
-            break; // Exit the loop if no more declarators
+            reportSyntaxError("Expected ',' or ';' in declaration statement.");
+            recoverFromError();
+            freeParseTree(declarationNode);
+            return NULL;
         }
     }
-
-    // Match the ending semicolon
-    token = peekToken();
-    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ";") != 0) {
-        reportSyntaxError("Expected ';' at the end of declaration statement.");
-        recoverFromError();
-        freeParseTree(declarationNode);
-        return NULL;
-    }
-    addChild(declarationNode, matchToken("Delimiter", ";"));
 
     printf("[DEBUG] Successfully parsed Declaration Statement.\n");
     return declarationNode;
 }
+
 
 
 
@@ -1941,10 +1949,10 @@ ParseTreeNode* parseDeclarator() {
     // Check for optional initialization
     token = peekToken();
     if (token && strcmp(token->type, "AssignmentOperator") == 0) {
-        addChild(declaratorNode, matchToken("AssignmentOperator", token->value)); // Match '='
+        addChild(declaratorNode, matchToken("AssignmentOperator", token->value)); // Match assignment operator
 
-        // Parse expression for initialization
-        ParseTreeNode* exprNode = parseExpression(); // Extend parseExpression for complex expressions
+        // Match expression for initialization
+        ParseTreeNode* exprNode = parseExpression();
         if (!exprNode) {
             reportSyntaxError("Expected expression for initialization in declarator.");
             recoverFromError();
@@ -1957,6 +1965,7 @@ ParseTreeNode* parseDeclarator() {
     printf("[DEBUG] Successfully parsed Declarator.\n");
     return declaratorNode;
 }
+
 
 
 

@@ -1,5 +1,24 @@
-~~ Declaration Statements
+~~ Declaration Statements 1/1
 int x;
 int x, y, z;
 int x, y = 20, z = x + y;
+
+~~ Input Statements 1/1
+input("%f", &value);
+
+~~ Output Statements 3/3
+printf("Hello");
+printf("%f", value);
+printf("Value is %d", value);
+
+~~ Assignment Statements 3/3
+totalGWA = 2;
+totalNum += addedPrice;
+midtermScore = exam + quizzes;
+
+~~ Conditional Statements 0/3
+
+
+~~ Iterative Statements 0/2
+
 
