@@ -49,10 +49,10 @@ ParseTreeNode* parseStatementList();
 // ---------------------------------------
 // Comments                                     // Rasty
 // ---------------------------------------
-ParseTreeNode* parseComment();                  // norecovery yet
+ParseTreeNode* parseComment();                   
 
 // ---------------------------------------
-// Initializer and Lists                        // Rasty
+// Initializer and Lists                         
 // ---------------------------------------
 // ParseTreeNode* parseInitializer();              
 // ParseTreeNode* parseInitializerList();          
@@ -67,7 +67,7 @@ ParseTreeNode* parseTypeSpecifier();
 // ---------------------------------------
 // Statements
 // ---------------------------------------
-ParseTreeNode* parseStatement();                   // no recovery yet
+ParseTreeNode* parseStatement();                   // rasty
 ParseTreeNode* parseAssignmentStatement();
 ParseTreeNode* parseInputStatement();
 ParseTreeNode* parseOutputStatement();
@@ -79,10 +79,10 @@ ParseTreeNode* parseExpressionStatement();
 //ParseTreeNode* parseJumpStatement();
 
 // ---------------------------------------
-// Conditional                                  // Lei
+// Conditional                                  // ryan
 // ---------------------------------------
 ParseTreeNode* parseCompoundStatement();        
-ParseTreeNode* parseIfStatement();              // alraedy has <if-else-statement>,<else-if-statement>
+ParseTreeNode* parseIfStatement();               
 //ParseTreeNode* parseCaseList();                 
 //ParseTreeNode* parseSwitchStatement();
 //ParseTreeNode* parseCaseStatement();
@@ -90,19 +90,19 @@ ParseTreeNode* parseIfStatement();              // alraedy has <if-else-statemen
 ParseTreeNode* parseStatementBlock();
 
 // ---------------------------------------
-// Loop                                         // Alexa
+// Loop                                         // kurt
 // ---------------------------------------
 ParseTreeNode* parseForInit();
 ParseTreeNode* parseForLoop();
 ParseTreeNode* parseWhileLoop();
 ParseTreeNode* parseDoWhileLoop();
-ParseTreeNode* parseForUpdate();                // for-loops ata e2
+ParseTreeNode* parseForUpdate();                
 ParseTreeNode* parseDecList();
 ParseTreeNode* parseIncDec();
 ParseTreeNode* parseDeclarator();
 
 // ---------------------------------------
-// Expressions and Operators                    // Kurt
+// Expressions and Operators                    // rasty
 // ---------------------------------------
 ParseTreeNode* parseExpression();
 ParseTreeNode* parseLogicalOrExpr();
@@ -117,14 +117,14 @@ ParseTreeNode* parsePostfixExpr();
 ParseTreeNode* parseAssignmentExpr();      
 
 // ---------------------------------------
-// Literals and Identifiers                     // Rasty
+// Literals and Identifiers                     
 // ---------------------------------------
 ParseTreeNode* parseLiteral();
 ParseTreeNode* parseBoolLiteral();
 ParseTreeNode* parsePrimaryExpr();
 
 // ---------------------------------------
-// Input and Output Specific Functions          // Kurt
+// Input and Output Specific Functions          // anne
 // ---------------------------------------
 ParseTreeNode* parseInputList();
 ParseTreeNode* parseFormatVariablePair();
@@ -137,22 +137,22 @@ ParseTreeNode* parseFormatString();
 // ---------------------------------------
 // Array Handling                               // Rasty
 // ---------------------------------------
-//ParseTreeNode* parseArrayDeclaration();         //
-//ParseTreeNode* parseArrayOperations();          //
-ParseTreeNode* parseArrayAccess();              //
-//ParseTreeNode* parseArrayAssignment();          //
-//ParseTreeNode* parseArrayDimensions();          // 
-//ParseTreeNode* parseArrayIndex();               // 
+//ParseTreeNode* parseArrayDeclaration();         
+//ParseTreeNode* parseArrayOperations();          
+ParseTreeNode* parseArrayAccess();              
+//ParseTreeNode* parseArrayAssignment();          
+//ParseTreeNode* parseArrayDimensions();          
+//ParseTreeNode* parseArrayIndex();               
 //ParseTreeNode* parseArrayType();
 
 // ---------------------------------------
-// Functions                                    // Rasty
+// Functions                                    // ryan
 // ---------------------------------------
 ParseTreeNode* parseFunctionDeclaration();      
 ParseTreeNode* parseFunctionCall();             
 ParseTreeNode* parseParameterList();            
 ParseTreeNode* parseArgumentList();             
-ParseTreeNode* parseReturnType();               // <return-type>
+ParseTreeNode* parseReturnType();               
 ParseTreeNode* parseParameter();
 
 // ---------------------------------------

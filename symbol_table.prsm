@@ -1,75 +1,75 @@
 Comment,~~,1
-Comment, Input Statements 1/1,1
-Keyword,input,2
-Delimiter,(,2
-STRING_LITERAL,"%f",2
-Delimiter,,,2
-SpecifierIdentifier,&value,2
-Delimiter,),2
+Comment, Declaration Statements 1/1,1
+Keyword,int,2
+IDENTIFIER,x,2
 Delimiter,;,2
-Comment,~~,4
-Comment, Output Statements 3/3,4
-Keyword,printf,5
-Delimiter,(,5
-STRING_LITERAL,"Hello",5
-Delimiter,),5
-Delimiter,;,5
-Keyword,printf,6
-Delimiter,(,6
-STRING_LITERAL,"%f",6
-Delimiter,,,6
-IDENTIFIER,value,6
-Delimiter,),6
-Delimiter,;,6
-Keyword,printf,7
+Keyword,int,3
+IDENTIFIER,x,3
+Delimiter,,,3
+IDENTIFIER,y,3
+Delimiter,,,3
+IDENTIFIER,z,3
+Delimiter,;,3
+Keyword,int,4
+IDENTIFIER,x,4
+Delimiter,,,4
+IDENTIFIER,y,4
+AssignmentOperator,=,4
+INT_LITERAL,20,4
+Delimiter,,,4
+IDENTIFIER,z,4
+AssignmentOperator,=,4
+IDENTIFIER,x,4
+ArithmeticOperator,+,4
+IDENTIFIER,y,4
+Delimiter,;,4
+Comment,~~,6
+Comment, Input Statements 1/1,6
+Keyword,input,7
 Delimiter,(,7
-STRING_LITERAL,"Value is %d",7
+STRING_LITERAL,"%f",7
 Delimiter,,,7
-IDENTIFIER,value,7
+SpecifierIdentifier,&value,7
 Delimiter,),7
 Delimiter,;,7
 Comment,~~,9
-Comment, Assignment Statements 3/3,9
-IDENTIFIER,totalGWA,10
-AssignmentOperator,=,10
-INT_LITERAL,2,10
+Comment, Output Statements 3/3,9
+Keyword,printf,10
+Delimiter,(,10
+STRING_LITERAL,"Hello",10
+Delimiter,),10
 Delimiter,;,10
-IDENTIFIER,totalNum,11
-AssignmentOperator,+=,11
-IDENTIFIER,addedPrice,11
+Keyword,printf,11
+Delimiter,(,11
+STRING_LITERAL,"%f",11
+Delimiter,,,11
+IDENTIFIER,value,11
+Delimiter,),11
 Delimiter,;,11
-IDENTIFIER,midtermScore,12
-AssignmentOperator,=,12
-IDENTIFIER,exam,12
-ArithmeticOperator,+,12
-IDENTIFIER,quizzes,12
+Keyword,printf,12
+Delimiter,(,12
+STRING_LITERAL,"Value is %d",12
+Delimiter,,,12
+IDENTIFIER,value,12
+Delimiter,),12
 Delimiter,;,12
 Comment,~~,14
-Comment, Conditional Statements 0/3,14
-Comment,~~,17
-Comment, Iterative Statements 0/2,17
-Comment,~~,20
-Comment, Declaration Statements 1/1,20
-Keyword,int,21
-IDENTIFIER,x,21
-Delimiter,;,21
-Keyword,int,22
-IDENTIFIER,x,22
-Delimiter,,,22
-IDENTIFIER,y,22
-Delimiter,,,22
-IDENTIFIER,z,22
-Delimiter,;,22
-Keyword,int,23
-IDENTIFIER,x,23
-Delimiter,,,23
-IDENTIFIER,y,23
-AssignmentOperator,=,23
-INT_LITERAL,20,23
-Delimiter,,,23
-IDENTIFIER,z,23
-AssignmentOperator,=,23
-IDENTIFIER,x,23
-ArithmeticOperator,+,23
-IDENTIFIER,y,23
-Delimiter,;,23
+Comment, Assignment Statements 3/3,14
+IDENTIFIER,totalGWA,15
+AssignmentOperator,=,15
+INT_LITERAL,2,15
+Delimiter,;,15
+IDENTIFIER,totalNum,16
+AssignmentOperator,+=,16
+IDENTIFIER,addedPrice,16
+Delimiter,;,16
+IDENTIFIER,midtermScore,17
+AssignmentOperator,=,17
+IDENTIFIER,exam,17
+ArithmeticOperator,+,17
+IDENTIFIER,quizzes,17
+Delimiter,;,17
+Comment,~~,19
+Comment, Conditional Statements 0/3,19
+Comment,~~,22
+Comment, Iterative Statements 0/2,22

@@ -403,7 +403,6 @@ int reportSyntaxError(const char* message) {
 }
 
 // Panic Mode Recovery
-// Enhanced Panic Mode Recovery
 int recoverFromError() {
     printf("DEBUG: Initiating error recovery...\n");
 
