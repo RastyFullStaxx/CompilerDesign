@@ -16,9 +16,30 @@ totalGWA = 2;
 totalNum += addedPrice;
 midtermScore = exam + quizzes;
 
-~~ Conditional Statements 0/3
+~~ Assignment Statements 2/2
+for (int i = 0; i < 5; i++) {
+    printf("hello");
+}
 
+for (int i = 0; i < 3; i++)  {
+       for (int j = 0; j < 3; j++) {
+              print(“hello");
+       }
+}
 
-~~ Iterative Statements 0/2
+~~ Conditional Statememts 0/3
+if (x > 5) {
+  printf("x is greater than 5");
+}
 
+if (x > 0) {
+    printf("Positive");
+} else {
+    printf("Non-Positive");
+}
 
+if (x > 0) {
+    	if (x < 10) {
+            printf("x is a positive single-digit number");
+    	}
+}
