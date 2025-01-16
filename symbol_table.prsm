@@ -1,18 +1,19 @@
-Keyword,int,1
-IDENTIFIER,x,1
-AssignmentOperator,=,1
-INT_LITERAL,0,1
+Keyword,printf,1
+Delimiter,(,1
+STRING_LITERAL,"Hello, rasty",1
+Delimiter,),1
 Delimiter,;,1
-Keyword,while,3
+Keyword,printf,2
+Delimiter,(,2
+STRING_LITERAL,"%f",2
+Delimiter,,,2
+IDENTIFIER,value,2
+Delimiter,),2
+Delimiter,;,2
+Keyword,printf,3
 Delimiter,(,3
-IDENTIFIER,x,3
-RelationalOperator,>,3
-INT_LITERAL,0,3
+STRING_LITERAL,"Value is %d",3
+Delimiter,,,3
+IDENTIFIER,value,3
 Delimiter,),3
-Delimiter,{,3
-Keyword,printf,4
-Delimiter,(,4
-STRING_LITERAL,"HELLO",4
-Delimiter,),4
-Delimiter,;,4
-Delimiter,},5
+Delimiter,;,3

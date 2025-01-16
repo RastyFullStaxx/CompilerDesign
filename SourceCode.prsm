@@ -1,5 +1,3 @@
-int x = 0;
-
-while (x > 0) {
-    printf("HELLO");
-}
+printf("Hello, rasty");
+printf("%f", value);
+printf("Value is %d", value);
