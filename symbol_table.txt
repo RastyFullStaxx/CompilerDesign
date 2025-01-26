@@ -1,0 +1,8 @@
+Comment,~~ Input Statements 1/1,1
+Keyword,input,2
+Delimiter,(,2
+STRING_LITERAL,"%f",2
+Delimiter,,,2
+SpecifierIdentifier,&value,2
+Delimiter,),2
+Delimiter,;,2

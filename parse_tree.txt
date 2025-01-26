@@ -1,66 +1,6 @@
 (Program
   (Comment
-    (CommentContent: ~~ Assignment Statements
-    )
-  )
-  (AssignmentStatement
-    (IDENTIFIER: x
-    )
-    (AssignmentOperator: +=
-    )
-    (AssignExpr
-      (Literal: 5
-      )
-    )
-    (Delimiter: ;
-    )
-  )
-  (AssignmentStatement
-    (IDENTIFIER: x
-    )
-    (AssignmentOperator: *=
-    )
-    (AssignExpr
-      (Literal: 2
-      )
-    )
-    (Delimiter: ;
-    )
-  )
-  (AssignmentStatement
-    (IDENTIFIER: x
-    )
-    (AssignmentOperator: /=
-    )
-    (AssignExpr
-      (Literal: 2
-      )
-    )
-    (Delimiter: ;
-    )
-  )
-  (AssignmentStatement
-    (IDENTIFIER: x
-    )
-    (AssignmentOperator: %=
-    )
-    (AssignExpr
-      (Literal: 3
-      )
-    )
-    (Delimiter: ;
-    )
-  )
-  (AssignmentStatement
-    (IDENTIFIER: x
-    )
-    (AssignmentOperator: //=
-    )
-    (AssignExpr
-      (Literal: 2
-      )
-    )
-    (Delimiter: ;
+    (CommentContent: ~~ Input Statements 1/1
     )
   )
 )

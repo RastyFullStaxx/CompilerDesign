@@ -57,7 +57,7 @@ FileHandles* initializeFiles() {
     }
 
     // Open the symbol table file
-    handles->symbolTable = fopen("symbol_table.prsm", "w");
+    handles->symbolTable = fopen("symbol_table.txt", "w");
     if (!handles->symbolTable) {
         perror("Error opening symbol table file");
         fclose(handles->sourceFile);

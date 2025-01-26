@@ -581,13 +581,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // List .prsm files
+    // List .txt files
     char prsmFiles[100][256]; // Fixed buffer for simplicity
     int fileCount = 0;
 
-    printf("Available .prsm files in directory '%s':\n", directory);
+    printf("Available .txt files in directory '%s':\n", directory);
     while ((entry = readdir(dp))) {
-        if (strstr(entry->d_name, ".prsm") && strlen(entry->d_name) > 5) {
+        if (strstr(entry->d_name, ".txt") && strlen(entry->d_name) > 5) {
             printf("%d. %s\n", fileCount + 1, entry->d_name);
             snprintf(prsmFiles[fileCount], sizeof(prsmFiles[fileCount]), "%s/%s", directory, entry->d_name);
             fileCount++;
@@ -596,7 +596,7 @@ int main(int argc, char* argv[]) {
     closedir(dp);
 
     if (fileCount == 0) {
-        printf("No .prsm files found in directory %s.\n", directory);
+        printf("No .txt files found in directory %s.\n", directory);
         return 1;
     }
 
