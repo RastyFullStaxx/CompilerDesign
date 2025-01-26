@@ -21,7 +21,7 @@ ParseTreeNode* createParseTreeNode(const char* type, const char* value);
 void setNodeValue(ParseTreeNode* node, const char* value);
 void addChild(ParseTreeNode* parent, ParseTreeNode* child);
 void printParseTree(ParseTreeNode* node, int depth);
-void writeParseTreeToFile(ParseTreeNode* node, FILE* file);
+void writeParseTreeToFile(ParseTreeNode* node, FILE* file, int depth); 
 void freeParseTree(ParseTreeNode* node);
 
 #endif // PARSE_TREE_H

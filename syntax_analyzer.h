@@ -30,7 +30,7 @@ ParseTreeNode* matchToken(const char* expectedType, const char* expectedValue); 
 // ---------------------------------------
 ParseTreeNode* createParseTreeNode(const char* type, const char* value); // Create a parse tree node
 void addChild(ParseTreeNode* parent, ParseTreeNode* child);             // Add a child node
-void writeParseTreeToFile(ParseTreeNode* node, FILE* file);             // Write parse tree to a file
+void writeParseTreeToFile(ParseTreeNode* node, FILE* file, int depth);  // Write parse tree to a file
 void freeParseTree(ParseTreeNode* node);                                // Free parse tree memory
 
 

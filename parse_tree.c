@@ -66,22 +66,35 @@ void printParseTree(ParseTreeNode* node, int depth) {
     }
 }
 
-// Function to write the parse tree in parenthesized format to a file
-void writeParseTreeToFile(ParseTreeNode* node, FILE* file) {
+// Function to write the parse tree in a vertical syntax tree format to a file
+void writeParseTreeToFile(ParseTreeNode* node, FILE* file, int depth) {
     if (!node) return;
 
-    fprintf(file, "(%s", node->label); // Print the node's label
+    // Indentation for pretty print
+    for (int i = 0; i < depth; i++) {
+        fprintf(file, "  ");
+    }
 
+    // Write the current node
+    fprintf(file, "(%s", node->label);
     if (node->value[0] != '\0') {
-        fprintf(file, ":%s", node->value); // Include value if present
+        fprintf(file, ": %s", node->value);
     }
+    fprintf(file, "\n");
 
+    // Write child nodes recursively
     for (int i = 0; i < node->childCount; i++) {
-        writeParseTreeToFile(node->children[i], file); // Recursive call for each child
+        writeParseTreeToFile(node->children[i], file, depth + 1);
     }
 
-    fprintf(file, ")"); // Close parentheses for this node
+    // Close parentheses for this node
+    for (int i = 0; i < depth; i++) {
+        fprintf(file, "  ");
+    }
+    fprintf(file, ")\n");
 }
+
+
 
 // Function to free the parse tree
 void freeParseTree(ParseTreeNode* node) {

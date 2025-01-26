@@ -744,7 +744,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    writeParseTreeToFile(root, parseTreeFile);
+    writeParseTreeToFile(root, parseTreeFile, 0);
     fclose(parseTreeFile);
 
     printf("\nParse tree written to parse_tree.txt\n");
@@ -902,7 +902,7 @@ ParseTreeNode* parseStatement() {
         return NULL;
     }
 
-    // Check and consume semicolon if required
+    // Check if the statement needs a semicolon
     Token* delimiter = peekToken();
     if (delimiter && strcmp(delimiter->type, "Delimiter") == 0 && strcmp(delimiter->value, ";") == 0) {
         // Only append semicolon if the statement is not block-based
@@ -914,11 +914,13 @@ ParseTreeNode* parseStatement() {
             ParseTreeNode* semicolonNode = matchToken("Delimiter", ";");
             if (semicolonNode) {
                 addChild(statementNode, semicolonNode);
+                printf("[DEBUG] Successfully matched and added semicolon to statement node.\n");
             }
         }
     } else {
-        // Don't report missing semicolon for block-based constructs
-        if (strcmp(statementNode->label, "StatementBlock") != 0 &&
+        // Only report an error if the statement requires a semicolon
+        if (strcmp(statementNode->label, "CompoundStatement") != 0 &&
+            strcmp(statementNode->label, "OutputStatement") != 0 &&
             strcmp(statementNode->label, "IfStatement") != 0 &&
             strcmp(statementNode->label, "ForLoop") != 0 &&
             strcmp(statementNode->label, "WhileLoop") != 0) {
@@ -930,6 +932,7 @@ ParseTreeNode* parseStatement() {
     printf("[DEBUG] Successfully parsed a statement. Returning Node.\n");
     return statementNode;
 }
+
 
 
 

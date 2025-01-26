@@ -1,1 +1,124 @@
-(Program(DeclarationStatement(Keyword:int)(Declarator(IDENTIFIER:x))(Delimiter:,)(Declarator(IDENTIFIER:y)(AssignmentOperator:=)(PrimaryExpr(INT_LITERAL:20)))(Delimiter:,)(Declarator(IDENTIFIER:z)(AssignmentOperator:=)(AdditiveExpr:+(PrimaryExpr(IDENTIFIER:x))(ArithmeticOperator:+)(PrimaryExpr(IDENTIFIER:y))))(Delimiter:;))(InputStatement(Keyword:input)(Delimiter:()(InputList(FormatVariablePair(STRING_LITERAL:"%f")(Delimiter:,)(AddressVariable(SpecifierIdentifier:&value))))(Delimiter:))(Delimiter:;))(OutputStatement(Keyword:printf)(Delimiter:()(OutputList(FormatString:"Hello"))(Delimiter:))(Delimiter:;))(OutputStatement(Keyword:printf)(Delimiter:()(OutputList(FormatString:"%f")(Delimiter:,)(ExpressionList(PrimaryExpr(IDENTIFIER:value))))(Delimiter:))(Delimiter:;))(OutputStatement(Keyword:printf)(Delimiter:()(OutputList(FormatString:"Value is %d")(Delimiter:,)(ExpressionList(PrimaryExpr(IDENTIFIER:value))))(Delimiter:))(Delimiter:;))(AssignmentStatement(IDENTIFIER:midtermScore)(AssignmentOperator:=)(AdditiveExpr:+(PrimaryExpr(IDENTIFIER:exam))(ArithmeticOperator:+)(PrimaryExpr(IDENTIFIER:quizzes)))(Delimiter:;))(ForLoop(Keyword:for)(Delimiter:()(ForInit(Keyword:int)(DecList(Declarator(IDENTIFIER:i)(AssignmentOperator:=)(PrimaryExpr(INT_LITERAL:0)))))(Delimiter:;)(RelationalExpr:<(PrimaryExpr(IDENTIFIER:i))(RelationalOperator:<)(PrimaryExpr(INT_LITERAL:5)))(Delimiter:;)(PrimaryExpr(IDENTIFIER:i))(StatementBlock(Delimiter:{)(OutputStatement(Keyword:printf)(Delimiter:()(OutputList(FormatString:"hello"))(Delimiter:))(Delimiter:;))(Delimiter:})))(ForLoop(Keyword:for)(Delimiter:()(ForInit(Keyword:int)(DecList(Declarator(IDENTIFIER:i)(AssignmentOperator:=)(PrimaryExpr(INT_LITERAL:0)))))(Delimiter:;)(RelationalExpr:<(PrimaryExpr(IDENTIFIER:i))(RelationalOperator:<)(PrimaryExpr(INT_LITERAL:3)))(Delimiter:;)(PrimaryExpr(IDENTIFIER:i))(StatementBlock(Delimiter:{)(ForLoop(Keyword:for)(Delimiter:()(ForInit(Keyword:int)(DecList(Declarator(IDENTIFIER:j)(AssignmentOperator:=)(PrimaryExpr(INT_LITERAL:0)))))(Delimiter:;)(RelationalExpr:<(PrimaryExpr(IDENTIFIER:j))(RelationalOperator:<)(PrimaryExpr(INT_LITERAL:3)))(Delimiter:;)(PrimaryExpr(IDENTIFIER:j))(StatementBlock(Delimiter:{))))))
+(Program
+  (DeclarationStatement
+    (Keyword: int
+    )
+    (Declarator
+      (IDENTIFIER: x
+      )
+    )
+    (Delimiter: ,
+    )
+    (Declarator
+      (IDENTIFIER: y
+      )
+      (AssignmentOperator: =
+      )
+      (PrimaryExpr
+        (INT_LITERAL: 20
+        )
+      )
+    )
+    (Delimiter: ,
+    )
+    (Declarator
+      (IDENTIFIER: z
+      )
+      (AssignmentOperator: =
+      )
+      (AdditiveExpr: +
+        (PrimaryExpr
+          (IDENTIFIER: x
+          )
+        )
+        (ArithmeticOperator: +
+        )
+        (PrimaryExpr
+          (IDENTIFIER: y
+          )
+        )
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (InputStatement
+    (Keyword: input
+    )
+    (Delimiter: (
+    )
+    (InputList
+      (FormatVariablePair
+        (STRING_LITERAL: "%f"
+        )
+        (Delimiter: ,
+        )
+        (AddressVariable
+          (SpecifierIdentifier: &value
+          )
+        )
+      )
+    )
+    (Delimiter: )
+    )
+    (Delimiter: ;
+    )
+  )
+  (OutputStatement
+    (Keyword: printf
+    )
+    (Delimiter: (
+    )
+    (OutputList
+      (FormatString: "Hello"
+      )
+    )
+    (Delimiter: )
+    )
+    (Delimiter: ;
+    )
+  )
+  (OutputStatement
+    (Keyword: printf
+    )
+    (Delimiter: (
+    )
+    (OutputList
+      (FormatString: "%f"
+      )
+      (Delimiter: ,
+      )
+      (ExpressionList
+        (PrimaryExpr
+          (IDENTIFIER: value
+          )
+        )
+      )
+    )
+    (Delimiter: )
+    )
+    (Delimiter: ;
+    )
+  )
+  (OutputStatement
+    (Keyword: printf
+    )
+    (Delimiter: (
+    )
+    (OutputList
+      (FormatString: "Value is %d"
+      )
+      (Delimiter: ,
+      )
+      (ExpressionList
+        (PrimaryExpr
+          (IDENTIFIER: value
+          )
+        )
+      )
+    )
+    (Delimiter: )
+    )
+    (Delimiter: ;
+    )
+  )
+)

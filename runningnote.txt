@@ -28,6 +28,3 @@ gcc -c syntax_analyzer.c parse_tree.c
 gcc syntax_analyzer.o parse_tree.o -o syntax_analyzer -mconsole
 
 ./syntax_analyzer
-
-
-
