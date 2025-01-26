@@ -6,9 +6,9 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
+    (AssignmentOperator: +=
+    )
     (AssignExpr
-      (AssignmentOperator: +=
-      )
       (Literal: 5
       )
     )
@@ -18,21 +18,9 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
-    (AssignExpr
-      (AssignmentOperator: -=
-      )
-      (Literal: 3
-      )
-    )
-    (Delimiter: ;
-    )
-  )
-  (AssignmentStatement
-    (IDENTIFIER: x
+    (AssignmentOperator: *=
     )
     (AssignExpr
-      (AssignmentOperator: *=
-      )
       (Literal: 2
       )
     )
@@ -42,9 +30,9 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
+    (AssignmentOperator: /=
+    )
     (AssignExpr
-      (AssignmentOperator: /=
-      )
       (Literal: 2
       )
     )
@@ -54,9 +42,9 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
+    (AssignmentOperator: %=
+    )
     (AssignExpr
-      (AssignmentOperator: %=
-      )
       (Literal: 3
       )
     )
@@ -66,9 +54,9 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
+    (AssignmentOperator: //=
+    )
     (AssignExpr
-      (AssignmentOperator: //=
-      )
       (Literal: 2
       )
     )

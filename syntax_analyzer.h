@@ -33,29 +33,17 @@ void addChild(ParseTreeNode* parent, ParseTreeNode* child);             // Add a
 void writeParseTreeToFile(ParseTreeNode* node, FILE* file, int depth);  // Write parse tree to a file
 void freeParseTree(ParseTreeNode* node);                                // Free parse tree memory
 
-
-
-// !!!! All lines below are defined in syntax_analyzer.c
-
-
 // ---------------------------------------
 // Top-Level Grammar Rules                      // Rasty
 // ---------------------------------------
 ParseTreeNode* parseProgram();
-ParseTreeNode* parseMainFunction();             
-ParseTreeNode* parseBlock();                    
+ParseTreeNode* parseMainFunction();                              
 ParseTreeNode* parseStatementList();
 
 // ---------------------------------------
 // Comments                                     // Rasty
 // ---------------------------------------
-ParseTreeNode* parseComment();                   
-
-// ---------------------------------------
-// Initializer and Lists                         
-// ---------------------------------------
-// ParseTreeNode* parseInitializer();              
-// ParseTreeNode* parseInitializerList();          
+ParseTreeNode* parseComment();                       
 
 // ---------------------------------------
 // Declaration Statements                       // Rasty
@@ -72,21 +60,16 @@ ParseTreeNode* parseAssignmentStatement();
 ParseTreeNode* parseInputStatement();
 ParseTreeNode* parseOutputStatement();
 ParseTreeNode* parseConditionalStatement();
-ParseTreeNode* parseIterativeStatement();
-//ParseTreeNode* parseArrayStatement();           
+ParseTreeNode* parseIterativeStatement();         
 ParseTreeNode* parseFunctionStatement();
 ParseTreeNode* parseExpressionStatement();      
-//ParseTreeNode* parseJumpStatement();
+ParseTreeNode* parseJumpStatement();
 
 // ---------------------------------------
 // Conditional                                  // ryan
 // ---------------------------------------
 ParseTreeNode* parseCompoundStatement();        
 ParseTreeNode* parseIfStatement();               
-//ParseTreeNode* parseCaseList();                 
-//ParseTreeNode* parseSwitchStatement();
-//ParseTreeNode* parseCaseStatement();
-//ParseTreeNode* parseDefaultCase();
 ParseTreeNode* parseStatementBlock();
 
 // ---------------------------------------
@@ -94,18 +77,12 @@ ParseTreeNode* parseStatementBlock();
 // ---------------------------------------
 ParseTreeNode* parseForInit();
 ParseTreeNode* parseForLoop();
-ParseTreeNode* parseWhileLoop();
-ParseTreeNode* parseDoWhileLoop();
 ParseTreeNode* parseForUpdate();                
-ParseTreeNode* parseDecList();
-ParseTreeNode* parseIncDec();
-ParseTreeNode* parseDeclarator();
 
 // ---------------------------------------
 // Expressions and Operators                    // rasty
 // ---------------------------------------
 ParseTreeNode* parseExpression();
-ParseTreeNode* parseJumpStatement();
 ParseTreeNode* parseRelationalExpr();     
 ParseTreeNode* parseBoolExpr(); 
 ParseTreeNode* parseAssignmentExpr();     
@@ -138,27 +115,6 @@ ParseTreeNode* parseFormatString();
 ParseTreeNode* parseIdentifierExpr();
 ParseTreeNode* parseTerm();
 ParseTreeNode* parseFactor();
-
-// ---------------------------------------
-// Array Handling                               // Rasty
-// ---------------------------------------
-//ParseTreeNode* parseArrayDeclaration();         
-//ParseTreeNode* parseArrayOperations();          
-ParseTreeNode* parseArrayAccess();              
-//ParseTreeNode* parseArrayAssignment();          
-//ParseTreeNode* parseArrayDimensions();          
-ParseTreeNode* parseArrayIndex();               
-//ParseTreeNode* parseArrayType();
-
-// ---------------------------------------
-// Functions                                    // ryan
-// ---------------------------------------
-ParseTreeNode* parseFunctionDeclaration();      
-ParseTreeNode* parseFunctionCall();             
-ParseTreeNode* parseParameterList();            
-ParseTreeNode* parseArgumentList();             
-ParseTreeNode* parseReturnType();               
-ParseTreeNode* parseParameter();
 
 // ---------------------------------------
 // Error Handling                               // Rasty
