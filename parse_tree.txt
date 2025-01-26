@@ -1,6 +1,6 @@
 (Program
   (Comment
-    (CommentContent: ~~ Input Statements 1/1
+    (CommentContent: ~~ Declaration Statements 1/1
     )
   )
 )

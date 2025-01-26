@@ -51,6 +51,7 @@ ParseTreeNode* parseComment();
 ParseTreeNode* parseDeclarationStatement();
 ParseTreeNode* parseVariableDeclaration();
 ParseTreeNode* parseTypeSpecifier();
+ParseTreeNode* parseInitializer();
 
 // ---------------------------------------
 // Statements
@@ -67,8 +68,7 @@ ParseTreeNode* parseJumpStatement();
 
 // ---------------------------------------
 // Conditional                                  // ryan
-// ---------------------------------------
-ParseTreeNode* parseCompoundStatement();        
+// ---------------------------------------    
 ParseTreeNode* parseIfStatement();               
 ParseTreeNode* parseStatementBlock();
 
