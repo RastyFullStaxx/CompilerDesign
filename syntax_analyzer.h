@@ -105,16 +105,18 @@ ParseTreeNode* parseDeclarator();
 // Expressions and Operators                    // rasty
 // ---------------------------------------
 ParseTreeNode* parseExpression();
-ParseTreeNode* parseLogicalOrExpr();
-ParseTreeNode* parseLogicalAndExpr();
-ParseTreeNode* parseEqualityExpr();
-ParseTreeNode* parseRelationalExpr();
-ParseTreeNode* parseAdditiveExpr();
-ParseTreeNode* parseMultiplicativeExpr();
-ParseTreeNode* parseExponentialExpr();
+ParseTreeNode* parseJumpStatement();
+ParseTreeNode* parseRelationalExpr();     
+ParseTreeNode* parseBoolExpr(); 
+ParseTreeNode* parseAssignmentExpr();     
+ParseTreeNode* parseArithmeticExpr();
+ParseTreeNode* parseAssignExpr();
+ParseTreeNode* parseBoolTerm();
+ParseTreeNode* parseBoolFactor();
 ParseTreeNode* parseUnaryExpr();
-ParseTreeNode* parsePostfixExpr();      
-ParseTreeNode* parseAssignmentExpr();      
+ParseTreeNode* parseExponentialExpr();
+ParseTreeNode* parseTerm();
+ParseTreeNode* parseBase();
 
 // ---------------------------------------
 // Literals and Identifiers                     
@@ -133,6 +135,9 @@ ParseTreeNode* parseAddressVariable();
 ParseTreeNode* parseOutputList();
 ParseTreeNode* parseExpressionList();
 ParseTreeNode* parseFormatString();
+ParseTreeNode* parseIdentifierExpr();
+ParseTreeNode* parseTerm();
+ParseTreeNode* parseFactor();
 
 // ---------------------------------------
 // Array Handling                               // Rasty
@@ -142,7 +147,7 @@ ParseTreeNode* parseFormatString();
 ParseTreeNode* parseArrayAccess();              
 //ParseTreeNode* parseArrayAssignment();          
 //ParseTreeNode* parseArrayDimensions();          
-//ParseTreeNode* parseArrayIndex();               
+ParseTreeNode* parseArrayIndex();               
 //ParseTreeNode* parseArrayType();
 
 // ---------------------------------------

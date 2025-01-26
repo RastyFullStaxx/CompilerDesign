@@ -3,17 +3,13 @@
     (CommentContent: ~~ Assignment Statements
     )
   )
-  (DeclarationStatement
-    (Keyword: int
+  (AssignmentStatement
+    (IDENTIFIER: x
     )
-    (Declarator
-      (IDENTIFIER: x
+    (AssignExpr
+      (AssignmentOperator: +=
       )
-      (AssignmentOperator: =
-      )
-      (PrimaryExpr
-        (INT_LITERAL: 10
-        )
+      (Literal: 5
       )
     )
     (Delimiter: ;
@@ -22,10 +18,10 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
-    (AssignmentOperator: +=
-    )
-    (PrimaryExpr
-      (INT_LITERAL: 5
+    (AssignExpr
+      (AssignmentOperator: -=
+      )
+      (Literal: 3
       )
     )
     (Delimiter: ;
@@ -34,10 +30,10 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
-    (AssignmentOperator: -=
-    )
-    (PrimaryExpr
-      (INT_LITERAL: 3
+    (AssignExpr
+      (AssignmentOperator: *=
+      )
+      (Literal: 2
       )
     )
     (Delimiter: ;
@@ -46,10 +42,10 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
-    (AssignmentOperator: *=
-    )
-    (PrimaryExpr
-      (INT_LITERAL: 2
+    (AssignExpr
+      (AssignmentOperator: /=
+      )
+      (Literal: 2
       )
     )
     (Delimiter: ;
@@ -58,10 +54,10 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
-    (AssignmentOperator: /=
-    )
-    (PrimaryExpr
-      (INT_LITERAL: 2
+    (AssignExpr
+      (AssignmentOperator: %=
+      )
+      (Literal: 3
       )
     )
     (Delimiter: ;
@@ -70,22 +66,10 @@
   (AssignmentStatement
     (IDENTIFIER: x
     )
-    (AssignmentOperator: %=
-    )
-    (PrimaryExpr
-      (INT_LITERAL: 3
+    (AssignExpr
+      (AssignmentOperator: //=
       )
-    )
-    (Delimiter: ;
-    )
-  )
-  (AssignmentStatement
-    (IDENTIFIER: x
-    )
-    (AssignmentOperator: //=
-    )
-    (PrimaryExpr
-      (INT_LITERAL: 2
+      (Literal: 2
       )
     )
     (Delimiter: ;
