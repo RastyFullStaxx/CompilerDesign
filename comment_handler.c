@@ -7,19 +7,21 @@
 // Function to handle comments (single-line and multi-line)
 int handleComments(char *line, int *inComment, int lineNumber, FILE *symbolTable) {
     int i = 0;
-    char commentBuffer[256] = {0}; // Buffer for comment content
+    char commentBuffer[256] = {0}; // Buffer for the entire comment content
     int bufferIndex = 0;
 
     while (line[i] != '\0') {
         if (*inComment) {
-            // Handle multi-line comment
+            // Handle multi-line comment continuation
             if (line[i] == '/' && line[i + 1] == '~') {
                 // Multi-line comment ends
-                if (bufferIndex > 0) {
-                    commentBuffer[bufferIndex] = '\0'; // Null-terminate content
-                    writeToken(symbolTable, "Comment", commentBuffer, lineNumber);
+                if (bufferIndex < sizeof(commentBuffer) - 3) {
+                    // Add the closing marker to the buffer
+                    commentBuffer[bufferIndex++] = '/';
+                    commentBuffer[bufferIndex++] = '~';
                 }
-                writeToken(symbolTable, "Comment", "/~", lineNumber);
+                commentBuffer[bufferIndex] = '\0'; // Null-terminate
+                writeToken(symbolTable, "Comment", commentBuffer, lineNumber);
                 *inComment = 0; // Exit multi-line comment mode
                 return 1; // Skip further processing
             } else {
@@ -32,7 +34,11 @@ int handleComments(char *line, int *inComment, int lineNumber, FILE *symbolTable
             }
         } else if (line[i] == '~' && line[i + 1] == '~') {
             // Single-line comment detected
-            writeToken(symbolTable, "Comment", "~~", lineNumber);
+            if (bufferIndex < sizeof(commentBuffer) - 3) {
+                // Add the opening marker to the buffer
+                commentBuffer[bufferIndex++] = '~';
+                commentBuffer[bufferIndex++] = '~';
+            }
             i += 2; // Skip the comment marker
             while (line[i] != '\0') {
                 if (bufferIndex < sizeof(commentBuffer) - 1) {
@@ -46,10 +52,14 @@ int handleComments(char *line, int *inComment, int lineNumber, FILE *symbolTable
             return 1; // Skip further processing
         } else if (line[i] == '~' && line[i + 1] == '/') {
             // Multi-line comment starts
-            writeToken(symbolTable, "Comment", "~/", lineNumber);
+            if (bufferIndex < sizeof(commentBuffer) - 3) {
+                // Add the opening marker to the buffer
+                commentBuffer[bufferIndex++] = '~';
+                commentBuffer[bufferIndex++] = '/';
+            }
             *inComment = 1; // Enter multi-line comment mode
             i += 2; // Skip the comment marker
-            bufferIndex = 0; // Reset the buffer
+            bufferIndex = bufferIndex; // Keep buffer index for accumulating content
         } else {
             break; // No comment found, exit
         }

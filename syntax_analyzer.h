@@ -1,6 +1,6 @@
 #ifndef SYNTAX_ANALYZER_H
 #define SYNTAX_ANALYZER_H
-#define MAX_TOKENS 1000 // Adjust size based on expected token count
+#define MAX_TOKENS 5000 // Adjust size based on expected token count
 
 #include "token.h"
 #include "parse_tree.h"
