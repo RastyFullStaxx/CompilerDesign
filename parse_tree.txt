@@ -1,10 +1,94 @@
 (Program
   (Comment
-    (CommentContent: ~~
+    (CommentContent: ~~ Assignment Statements
     )
   )
-  (Comment
-    (CommentContent: ~~ comment
+  (DeclarationStatement
+    (Keyword: int
+    )
+    (Declarator
+      (IDENTIFIER: x
+      )
+      (AssignmentOperator: =
+      )
+      (PrimaryExpr
+        (INT_LITERAL: 10
+        )
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: x
+    )
+    (AssignmentOperator: +=
+    )
+    (PrimaryExpr
+      (INT_LITERAL: 5
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: x
+    )
+    (AssignmentOperator: -=
+    )
+    (PrimaryExpr
+      (INT_LITERAL: 3
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: x
+    )
+    (AssignmentOperator: *=
+    )
+    (PrimaryExpr
+      (INT_LITERAL: 2
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: x
+    )
+    (AssignmentOperator: /=
+    )
+    (PrimaryExpr
+      (INT_LITERAL: 2
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: x
+    )
+    (AssignmentOperator: %=
+    )
+    (PrimaryExpr
+      (INT_LITERAL: 3
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: x
+    )
+    (AssignmentOperator: //=
+    )
+    (PrimaryExpr
+      (INT_LITERAL: 2
+      )
+    )
+    (Delimiter: ;
     )
   )
 )
