@@ -1,2 +1,112 @@
 (Program
+  (Comment
+    (CommentContent: ~~ nested iterative Statements
+    )
+  )
+  (ForLoop
+    (Keyword: for
+    )
+    (Delimiter: (
+    )
+    (ForInit
+      (IDENTIFIER: i
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (Literal: 0
+        )
+      )
+    )
+    (Delimiter: ;
+    )
+    (RelationalExpr: <
+      (Identifier: i
+        (IDENTIFIER: i
+        )
+      )
+      (Literal: 5
+      )
+    )
+    (Delimiter: ;
+    )
+    (ForUpdate
+      (UnaryExpr
+        (IDENTIFIER: i
+        )
+        (UnaryOperator: ++
+        )
+      )
+    )
+    (Delimiter: )
+    )
+    (Block
+      (Delimiter: {
+      )
+      (ForLoop
+        (Keyword: for
+        )
+        (Delimiter: (
+        )
+        (ForInit
+          (IDENTIFIER: j
+          )
+          (AssignmentOperator: =
+          )
+          (Expression
+            (Literal: 0
+            )
+          )
+        )
+        (Delimiter: ;
+        )
+        (RelationalExpr: <
+          (Identifier: j
+            (IDENTIFIER: j
+            )
+          )
+          (Identifier: i
+            (IDENTIFIER: i
+            )
+          )
+        )
+        (Delimiter: ;
+        )
+        (ForUpdate
+          (UnaryExpr
+            (IDENTIFIER: j
+            )
+            (UnaryOperator: ++
+            )
+          )
+        )
+        (Delimiter: )
+        )
+        (Block
+          (Delimiter: {
+          )
+          (OutputStatement
+            (Keyword: printf
+            )
+            (Delimiter: (
+            )
+            (ExpressionList
+              (Expression
+                (Literal: "Ulam, anong mama?"
+                )
+              )
+            )
+            (Delimiter: )
+            )
+            (Delimiter: ;
+            )
+          )
+          (Delimiter: }
+          )
+        )
+      )
+      (Delimiter: }
+      )
+    )
+  )
 )

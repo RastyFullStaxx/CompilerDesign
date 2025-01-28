@@ -960,26 +960,6 @@ ParseTreeNode* parseStatement() {
         return NULL;
     }
 
-    // Handle semicolon if required
-    Token* delimiter = peekToken();
-    if (delimiter && strcmp(delimiter->type, "Delimiter") == 0 && strcmp(delimiter->value, ";") == 0) {
-        if (strcmp(statementNode->label, "StatementBlock") != 0 &&
-            strcmp(statementNode->label, "ConditionalStatement") != 0 &&
-            strcmp(statementNode->label, "ForLoop") != 0 &&
-            strcmp(statementNode->label, "Comment") != 0) {
-            printf("[DEBUG] Matching and consuming semicolon after statement.\n");
-            ParseTreeNode* semicolonNode = matchToken("Delimiter", ";");
-            if (semicolonNode) {
-                addChild(statementNode, semicolonNode);
-            }
-        }
-    } else if (strcmp(statementNode->label, "StatementBlock") != 0 &&
-               strcmp(statementNode->label, "ConditionalStatement") != 0 &&
-               strcmp(statementNode->label, "ForLoop") != 0 &&
-               strcmp(statementNode->label, "Comment") != 0) {
-        reportSyntaxError("Expected ';' after statement.");
-    }
-
     printf("[DEBUG] Successfully parsed a statement.\n");
     return statementNode;
 }
