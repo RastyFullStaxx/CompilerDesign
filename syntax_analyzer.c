@@ -1877,7 +1877,7 @@ ParseTreeNode* parseForUpdate() {
     ParseTreeNode* forUpdateNode = createParseTreeNode("ForUpdate", "");
 
     // Parse the first assignment statement
-    ParseTreeNode* assignmentNode = parseUnaryExpr(); // ayos na to
+    ParseTreeNode* assignmentNode = parseUnaryExpr();
     if (!assignmentNode) {
         reportSyntaxError("Expected assignment statement in for-update.");
         recoverFromError();
