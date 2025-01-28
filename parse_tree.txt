@@ -1,6 +1,2 @@
 (Program
-  (Comment
-    (CommentContent: ~~ Declaration Statements 1/1
-    )
-  )
 )

@@ -1,4 +1,32 @@
-~~ Declaration Statements 1/1
-int x;
-int x, y, z;
-int x, y = 20, z = x + y;
+~~ conditional Statements
+
+if (i > 5) {
+   printf("Hello, World");
+}
+
+~~ nested conditional Statements
+
+if (i > 5) {
+   if (i > 10) {
+      printf("Hello, World");
+   } else if (i > 15) {
+      printf("Ma, anong ulam?");
+   } else {
+      printf("Ulam, anong mama?");
+   }
+}
+
+~~ iterative Statements
+
+for (i = 0; i < 5; i++) {
+   printf("Ulam, anong mama?");
+}
+
+~~ nested iterative Statements
+
+for (i = 0; i < 5; i++) {
+   for (j = 0; j < i; j++) {
+      printf("Ulam, anong mama?");
+   }
+}
+
