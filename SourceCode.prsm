@@ -1,2 +1,53 @@
-input("%f", &value);
-input("YUMMY", &valuee);
+~~ Declaration Statements
+
+int x = 1;
+int y;
+int z,v = 20, f = 3 + 1;
+
+~~ Input Statements
+
+input("hello pogi%", &value);
+
+~~ Output Statements
+
+printf("Hello");
+printf("%f", value);
+printf("Value is %d", value);
+
+~~ Assignment Statements
+
+totalGWA = 2;
+totalNum += addedPrice;
+midtermScore = exam = deptals;
+
+~~ conditional Statements
+
+if (i > 5) {
+   printf("Hello, World");
+}
+
+~~ nested conditional Statements
+
+if (i > 5) {
+   if (i > 10) {
+      printf("Hello, World");
+   } else if (i > 15) {
+      printf("Ma, anong ulam?");
+   } else {
+      printf("Ulam, anong mama?");
+   }
+}
+
+~~ iterative Statements
+
+for (i = 0; i < 5; i++) {
+   printf("Ulam, anong mama?");
+}
+
+~~ nested iterative Statements
+
+for (i = 0; i < 5; i++) {
+   for (j = 0; j < i; j++) {
+      printf("Ulam, anong mama?");
+   }
+}

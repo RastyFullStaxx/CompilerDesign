@@ -1337,7 +1337,7 @@ ParseTreeNode* parseAssignmentStatement() {
     printf("[DEBUG] Matching assignment operator: '%s'\n", token->value);
     addChild(assignmentNode, matchToken("AssignmentOperator", token->value));
 
-    // Delegate RHS parsing to parseExpression() instead of parseInitializer()
+    // Recursively parse expressions allowing chained assignments
     printf("[DEBUG] Parsing assignment expression for the assignment statement...\n");
     ParseTreeNode* exprNode = parseExpression();
     if (!exprNode) {
@@ -1347,6 +1347,35 @@ ParseTreeNode* parseAssignmentStatement() {
         return NULL;
     }
     addChild(assignmentNode, exprNode);
+
+    // **Handle Chained Assignments**
+    token = peekToken();
+    while (token && strcmp(token->type, "AssignmentOperator") == 0) {
+        printf("[DEBUG] Detected Chained Assignment Operator: '%s'\n", token->value);
+
+        // Create a new AssignmentStatement node
+        ParseTreeNode* chainedAssignNode = createParseTreeNode("AssignmentStatement", "");
+        addChild(chainedAssignNode, assignmentNode);  // Previous assignment becomes part of new assignment
+
+        // Match assignment operator
+        addChild(chainedAssignNode, matchToken("AssignmentOperator", token->value));
+
+        // Parse the next expression (right-hand side)
+        ParseTreeNode* nextExprNode = parseExpression();
+        if (!nextExprNode) {
+            reportSyntaxError("Expected expression after chained assignment operator.");
+            recoverFromError();
+            freeParseTree(chainedAssignNode);
+            return NULL;
+        }
+        addChild(chainedAssignNode, nextExprNode);
+
+        // Update the main assignment node
+        assignmentNode = chainedAssignNode;
+        
+        // Peek for further chaining
+        token = peekToken();
+    }
 
     // Match the semicolon (statement terminator)
     token = peekToken();

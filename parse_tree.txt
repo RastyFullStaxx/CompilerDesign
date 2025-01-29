@@ -1,4 +1,70 @@
 (Program
+  (Comment
+    (CommentContent: ~~ Declaration Statements
+    )
+  )
+  (DeclarationStatement
+    (VariableDeclaration
+      (Keyword: int
+      )
+      (IDENTIFIER: x
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (Literal: 1
+        )
+      )
+      (Delimiter: ;
+      )
+    )
+  )
+  (DeclarationStatement
+    (VariableDeclaration
+      (Keyword: int
+      )
+      (IDENTIFIER: y
+      )
+      (Delimiter: ;
+      )
+    )
+  )
+  (DeclarationStatement
+    (VariableDeclaration
+      (Keyword: int
+      )
+      (IDENTIFIER: z
+      )
+      (Delimiter: ,
+      )
+      (IDENTIFIER: v
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (Literal: 20
+        )
+      )
+      (Delimiter: ,
+      )
+      (IDENTIFIER: f
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (ArithmeticExpr
+          (Literal: 3
+          )
+          (ArithmeticOperator: +
+          )
+          (Literal: 1
+          )
+        )
+      )
+      (Delimiter: ;
+      )
+    )
+  )
   (InputStatement
     (Keyword: input
     )
@@ -6,7 +72,7 @@
     )
     (InputList
       (FormatVariablePair
-        (FormatString: "%f"
+        (FormatString: "hello pogi%"
         )
         (Delimiter: ,
         )
@@ -23,28 +89,404 @@
     (Delimiter: ;
     )
   )
-  (InputStatement
-    (Keyword: input
+  (OutputStatement
+    (Keyword: printf
     )
     (Delimiter: (
     )
-    (InputList
-      (FormatVariablePair
-        (FormatString: "YUMMY"
-        )
-        (Delimiter: ,
-        )
-        (AddressVariable
-          (Delimiter: &
-          )
-          (IDENTIFIER: valuee
-          )
-        )
+    (OutputList
+      (STRING_LITERAL: "Hello"
       )
     )
     (Delimiter: )
     )
     (Delimiter: ;
+    )
+  )
+  (OutputStatement
+    (Keyword: printf
+    )
+    (Delimiter: (
+    )
+    (OutputList
+      (STRING_LITERAL: "%f"
+      )
+      (Delimiter: ,
+      )
+      (IDENTIFIER: value
+      )
+    )
+    (Delimiter: )
+    )
+    (Delimiter: ;
+    )
+  )
+  (OutputStatement
+    (Keyword: printf
+    )
+    (Delimiter: (
+    )
+    (OutputList
+      (STRING_LITERAL: "Value is %d"
+      )
+      (Delimiter: ,
+      )
+      (IDENTIFIER: value
+      )
+    )
+    (Delimiter: )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: totalGWA
+    )
+    (AssignmentOperator: =
+    )
+    (Expression
+      (Literal: 2
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (IDENTIFIER: totalNum
+    )
+    (AssignmentOperator: +=
+    )
+    (Expression
+      (Identifier: addedPrice
+        (IDENTIFIER: addedPrice
+        )
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (AssignmentStatement
+    (AssignmentStatement
+      (IDENTIFIER: midtermScore
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (Identifier: exam
+          (IDENTIFIER: exam
+          )
+        )
+      )
+    )
+    (AssignmentOperator: =
+    )
+    (Expression
+      (Identifier: deptals
+        (IDENTIFIER: deptals
+        )
+      )
+    )
+    (Delimiter: ;
+    )
+  )
+  (ConditionalStatement
+    (Keyword: if
+    )
+    (Delimiter: (
+    )
+    (RelationalExpr: >
+      (Identifier: i
+        (IDENTIFIER: i
+        )
+      )
+      (Literal: 5
+      )
+    )
+    (Delimiter: )
+    )
+    (Block
+      (Delimiter: {
+      )
+      (OutputStatement
+        (Keyword: printf
+        )
+        (Delimiter: (
+        )
+        (OutputList
+          (STRING_LITERAL: "Hello, World"
+          )
+        )
+        (Delimiter: )
+        )
+        (Delimiter: ;
+        )
+      )
+      (Delimiter: }
+      )
+    )
+  )
+  (ConditionalStatement
+    (Keyword: if
+    )
+    (Delimiter: (
+    )
+    (RelationalExpr: >
+      (Identifier: i
+        (IDENTIFIER: i
+        )
+      )
+      (Literal: 5
+      )
+    )
+    (Delimiter: )
+    )
+    (Block
+      (Delimiter: {
+      )
+      (ConditionalStatement
+        (Keyword: if
+        )
+        (Delimiter: (
+        )
+        (RelationalExpr: >
+          (Identifier: i
+            (IDENTIFIER: i
+            )
+          )
+          (Literal: 10
+          )
+        )
+        (Delimiter: )
+        )
+        (Block
+          (Delimiter: {
+          )
+          (OutputStatement
+            (Keyword: printf
+            )
+            (Delimiter: (
+            )
+            (OutputList
+              (STRING_LITERAL: "Hello, World"
+              )
+            )
+            (Delimiter: )
+            )
+            (Delimiter: ;
+            )
+          )
+          (Delimiter: }
+          )
+        )
+        (Keyword: else
+        )
+        (Keyword: if
+        )
+        (Delimiter: (
+        )
+        (RelationalExpr: >
+          (Identifier: i
+            (IDENTIFIER: i
+            )
+          )
+          (Literal: 15
+          )
+        )
+        (Delimiter: )
+        )
+        (Block
+          (Delimiter: {
+          )
+          (OutputStatement
+            (Keyword: printf
+            )
+            (Delimiter: (
+            )
+            (OutputList
+              (STRING_LITERAL: "Ma, anong ulam?"
+              )
+            )
+            (Delimiter: )
+            )
+            (Delimiter: ;
+            )
+          )
+          (Delimiter: }
+          )
+        )
+        (Keyword: else
+        )
+        (Block
+          (Delimiter: {
+          )
+          (OutputStatement
+            (Keyword: printf
+            )
+            (Delimiter: (
+            )
+            (OutputList
+              (STRING_LITERAL: "Ulam, anong mama?"
+              )
+            )
+            (Delimiter: )
+            )
+            (Delimiter: ;
+            )
+          )
+          (Delimiter: }
+          )
+        )
+      )
+      (Delimiter: }
+      )
+    )
+  )
+  (ForLoop
+    (Keyword: for
+    )
+    (Delimiter: (
+    )
+    (ForInit
+      (IDENTIFIER: i
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (Literal: 0
+        )
+      )
+    )
+    (Delimiter: ;
+    )
+    (Expression
+      (Identifier: i
+        (IDENTIFIER: i
+        )
+      )
+    )
+    (ForUpdate
+      (UnaryExpr
+        (IDENTIFIER: i
+        )
+        (UnaryOperator: ++
+        )
+      )
+    )
+    (Delimiter: )
+    )
+    (Block
+      (Delimiter: {
+      )
+      (OutputStatement
+        (Keyword: printf
+        )
+        (Delimiter: (
+        )
+        (OutputList
+          (STRING_LITERAL: "Ulam, anong mama?"
+          )
+        )
+        (Delimiter: )
+        )
+        (Delimiter: ;
+        )
+      )
+      (Delimiter: }
+      )
+    )
+  )
+  (ForLoop
+    (Keyword: for
+    )
+    (Delimiter: (
+    )
+    (ForInit
+      (IDENTIFIER: i
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (Literal: 0
+        )
+      )
+    )
+    (Delimiter: ;
+    )
+    (Expression
+      (Identifier: i
+        (IDENTIFIER: i
+        )
+      )
+    )
+    (ForUpdate
+      (UnaryExpr
+        (IDENTIFIER: i
+        )
+        (UnaryOperator: ++
+        )
+      )
+    )
+    (Delimiter: )
+    )
+    (Block
+      (Delimiter: {
+      )
+      (ForLoop
+        (Keyword: for
+        )
+        (Delimiter: (
+        )
+        (ForInit
+          (IDENTIFIER: j
+          )
+          (AssignmentOperator: =
+          )
+          (Expression
+            (Literal: 0
+            )
+          )
+        )
+        (Delimiter: ;
+        )
+        (Expression
+          (Identifier: j
+            (IDENTIFIER: j
+            )
+          )
+        )
+        (ForUpdate
+          (UnaryExpr
+            (IDENTIFIER: j
+            )
+            (UnaryOperator: ++
+            )
+          )
+        )
+        (Delimiter: )
+        )
+        (Block
+          (Delimiter: {
+          )
+          (OutputStatement
+            (Keyword: printf
+            )
+            (Delimiter: (
+            )
+            (OutputList
+              (STRING_LITERAL: "Ulam, anong mama?"
+              )
+            )
+            (Delimiter: )
+            )
+            (Delimiter: ;
+            )
+          )
+          (Delimiter: }
+          )
+        )
+      )
+      (Delimiter: }
+      )
     )
   )
 )
