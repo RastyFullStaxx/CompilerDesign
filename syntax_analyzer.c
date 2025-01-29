@@ -1097,29 +1097,71 @@ ParseTreeNode* parseAddressVariable() {
     // Create a node for the address variable
     ParseTreeNode* addressNode = createParseTreeNode("AddressVariable", "");
 
-    // Match the '&' token
+    // Peek the token to check for '&'
     Token* token = peekToken();
-    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "&") != 0) {
-        reportSyntaxError("Expected '&' at the start of address variable.");
+    if (!token) {
+        reportSyntaxError("Unexpected end of input while parsing address variable.");
         recoverFromError();
         freeParseTree(addressNode);
         return NULL;
     }
-    addChild(addressNode, matchToken("Delimiter", "&"));
 
-    // Match the identifier following '&'
-    token = peekToken();
-    if (!token || strcmp(token->type, "IDENTIFIER") != 0) {
-        reportSyntaxError("Expected variable name after '&' in address variable.");
-        recoverFromError();
-        freeParseTree(addressNode);
-        return NULL;
+    // Check if the token is incorrectly recognized as a single "SpecifierIdentifier"
+    if (strcmp(token->type, "SpecifierIdentifier") == 0) {
+        printf("[DEBUG] Detected SpecifierIdentifier: '%s'\n", token->value);
+
+        // Manually extract the '&' and the actual identifier
+        if (token->value[0] == '&') {
+            addChild(addressNode, createParseTreeNode("Delimiter", "&")); // Add '&' symbol
+
+            // Extract the identifier from "&value" (skip '&' and use remaining string)
+            char identifier[50];
+            strcpy(identifier, token->value + 1); // Copy the rest after '&'
+
+            // Ensure there's an actual identifier
+            if (strlen(identifier) == 0) {
+                reportSyntaxError("Expected variable name after '&' in address variable.");
+                recoverFromError();
+                freeParseTree(addressNode);
+                return NULL;
+            }
+
+            // Add extracted identifier as a node
+            addChild(addressNode, createParseTreeNode("IDENTIFIER", identifier));
+
+            // Consume the "SpecifierIdentifier" token
+            getNextToken();
+        } else {
+            reportSyntaxError("Malformed address variable: Expected '&' at the start.");
+            recoverFromError();
+            freeParseTree(addressNode);
+            return NULL;
+        }
+    } else {
+        // Standard parsing if lexer is correctly splitting '&' and the identifier
+        if (strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "&") != 0) {
+            reportSyntaxError("Expected '&' at the start of address variable.");
+            recoverFromError();
+            freeParseTree(addressNode);
+            return NULL;
+        }
+        addChild(addressNode, matchToken("Delimiter", "&"));
+
+        // Match the identifier following '&'
+        token = peekToken();
+        if (!token || strcmp(token->type, "IDENTIFIER") != 0) {
+            reportSyntaxError("Expected variable name after '&' in address variable.");
+            recoverFromError();
+            freeParseTree(addressNode);
+            return NULL;
+        }
+        addChild(addressNode, matchToken("IDENTIFIER", token->value));
     }
-    addChild(addressNode, matchToken("IDENTIFIER", token->value));
 
     printf("[DEBUG] Successfully parsed Address Variable.\n");
     return addressNode;
 }
+
 
 ParseTreeNode* parseFormatVariablePair() {
     printf("[DEBUG] Parsing Format-Variable Pair...\n");

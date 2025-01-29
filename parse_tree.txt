@@ -1,64 +1,50 @@
 (Program
-  (DeclarationStatement
-    (VariableDeclaration
-      (Keyword: int
-      )
-      (IDENTIFIER: x
-      )
-      (AssignmentOperator: =
-      )
-      (Expression
-        (Literal: 1
+  (InputStatement
+    (Keyword: input
+    )
+    (Delimiter: (
+    )
+    (InputList
+      (FormatVariablePair
+        (FormatString: "%f"
         )
-      )
-      (Delimiter: ;
+        (Delimiter: ,
+        )
+        (AddressVariable
+          (Delimiter: &
+          )
+          (IDENTIFIER: value
+          )
+        )
       )
     )
-  )
-  (DeclarationStatement
-    (VariableDeclaration
-      (Keyword: int
-      )
-      (IDENTIFIER: y
-      )
-      (Delimiter: ;
-      )
+    (Delimiter: )
+    )
+    (Delimiter: ;
     )
   )
-  (DeclarationStatement
-    (VariableDeclaration
-      (Keyword: int
-      )
-      (IDENTIFIER: z
-      )
-      (Delimiter: ,
-      )
-      (IDENTIFIER: v
-      )
-      (AssignmentOperator: =
-      )
-      (Expression
-        (Literal: 20
+  (InputStatement
+    (Keyword: input
+    )
+    (Delimiter: (
+    )
+    (InputList
+      (FormatVariablePair
+        (FormatString: "YUMMY"
         )
-      )
-      (Delimiter: ,
-      )
-      (IDENTIFIER: f
-      )
-      (AssignmentOperator: =
-      )
-      (Expression
-        (ArithmeticExpr
-          (Literal: 3
+        (Delimiter: ,
+        )
+        (AddressVariable
+          (Delimiter: &
           )
-          (ArithmeticOperator: +
-          )
-          (Literal: 1
+          (IDENTIFIER: valuee
           )
         )
       )
-      (Delimiter: ;
-      )
+    )
+    (Delimiter: )
+    )
+    (Delimiter: ;
     )
   )
 )

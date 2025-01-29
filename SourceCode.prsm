@@ -1,3 +1,2 @@
-int x = 1;
-int y;
-int z,v = 20, f = 3 + 1;
+input("%f", &value);
+input("YUMMY", &valuee);
