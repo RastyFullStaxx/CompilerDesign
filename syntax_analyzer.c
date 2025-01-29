@@ -615,7 +615,7 @@ ParseTreeNode* parseVariableDeclaration() {
     }
     addChild(varDeclNode, typeSpecifierNode); // Add type specifier to parse tree
 
-    // Start parsing the <dec-list> manually
+    // Start parsing the <dec-list>
     while (true) {
         // Match identifier (variable name)
         Token* token = peekToken();
@@ -627,21 +627,21 @@ ParseTreeNode* parseVariableDeclaration() {
         }
         addChild(varDeclNode, matchToken("IDENTIFIER", token->value));
 
-        // Check for optional initialization
+        // Check for optional initialization (e.g., `= 10` or `= x + y`)
         token = peekToken();
         if (token && strcmp(token->type, "AssignmentOperator") == 0) {
             printf("[DEBUG] Detected assignment operator for initialization.\n");
             addChild(varDeclNode, matchToken("AssignmentOperator", token->value)); // Match '='
 
-            // Delegate to `parseInitializer()` for parsing the value assignment
-            ParseTreeNode* initializerNode = parseInitializer();
-            if (!initializerNode) {
-                reportSyntaxError("Failed to parse initializer in variable declaration.");
+            // Parse the full arithmetic or identifier expression
+            ParseTreeNode* exprNode = parseExpression();
+            if (!exprNode) {
+                reportSyntaxError("Expected an initializer value (expression, identifier, or literal).");
                 recoverFromError();
                 freeParseTree(varDeclNode);
                 return NULL;
             }
-            addChild(varDeclNode, initializerNode);
+            addChild(varDeclNode, exprNode);
         }
 
         // Check for a comma (to continue with another variable) or semicolon (to end declaration)
@@ -660,7 +660,7 @@ ParseTreeNode* parseVariableDeclaration() {
             } else if (strcmp(token->value, ";") == 0) {
                 printf("[DEBUG] Detected ';' to end variable declaration.\n");
                 addChild(varDeclNode, matchToken("Delimiter", ";")); // End parsing
-                break;
+                break; // Exit loop as declaration ends
             } else {
                 reportSyntaxError("Unexpected delimiter in variable declaration.");
                 recoverFromError();
@@ -678,6 +678,7 @@ ParseTreeNode* parseVariableDeclaration() {
     printf("[DEBUG] Successfully parsed Variable Declaration.\n");
     return varDeclNode;
 }
+
 
 
 ParseTreeNode* parseBlock() {
@@ -788,85 +789,6 @@ ParseTreeNode* parseStatementList() {
     return statementListNode;
 }
 
-ParseTreeNode* parseInitializer() {
-    printf("[DEBUG] Parsing Initializer...\n");
-
-    Token* token = peekToken();
-    if (!token) {
-        reportSyntaxError("Unexpected end of input while parsing initializer.");
-        recoverFromError();
-        return NULL;
-    }
-
-    // Check for compound initializer with `{`
-    if (strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "{") == 0) {
-        printf("[DEBUG] Detected compound initializer.\n");
-
-        ParseTreeNode* initializerNode = createParseTreeNode("CompoundInitializer", "");
-
-        // Match `{`
-        addChild(initializerNode, matchToken("Delimiter", "{"));
-
-        // Parse the first initializer
-        ParseTreeNode* innerInitializer = parseInitializer();
-        if (!innerInitializer) {
-            reportSyntaxError("Failed to parse initializer inside compound initializer.");
-            recoverFromError();
-            freeParseTree(initializerNode);
-            return NULL;
-        }
-        addChild(initializerNode, innerInitializer);
-
-        // Handle optional comma-separated initializers
-        token = peekToken();
-        while (token && strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, ",") == 0) {
-            printf("[DEBUG] Detected ',' in compound initializer.\n");
-
-            // Match `,`
-            addChild(initializerNode, matchToken("Delimiter", ","));
-
-            // Parse the next initializer
-            innerInitializer = parseInitializer();
-            if (!innerInitializer) {
-                reportSyntaxError("Failed to parse initializer after ',' in compound initializer.");
-                recoverFromError();
-                freeParseTree(initializerNode);
-                return NULL;
-            }
-            addChild(initializerNode, innerInitializer);
-
-            token = peekToken();
-        }
-
-        // Match `}`
-        token = peekToken();
-        if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "}") != 0) {
-            reportSyntaxError("Expected '}' to close compound initializer.");
-            recoverFromError();
-            freeParseTree(initializerNode);
-            return NULL;
-        }
-        addChild(initializerNode, matchToken("Delimiter", "}"));
-
-        printf("[DEBUG] Successfully parsed compound initializer.\n");
-        return initializerNode;
-    }
-
-    // Otherwise, delegate to parseExpression for single initializers
-    printf("[DEBUG] Parsing single initializer as expression.\n");
-
-    // Ensure parseExpression correctly parses both simple and complex initializations
-    ParseTreeNode* expressionNode = parseExpression();
-    if (!expressionNode) {
-        reportSyntaxError("Failed to parse expression for single initializer.");
-        recoverFromError();
-        return NULL;
-    }
-
-    printf("[DEBUG] Successfully parsed single initializer.\n");
-    return expressionNode;
-}
-
 ParseTreeNode* parseDeclarationStatement() {
     printf("[DEBUG] Parsing Declaration Statement...\n");
 
@@ -882,16 +804,6 @@ ParseTreeNode* parseDeclarationStatement() {
         return NULL;
     }
     addChild(declarationNode, varDeclNode);
-
-    // Match semicolon at the end of the declaration
-    Token* token = peekToken();
-    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ";") != 0) {
-        reportSyntaxError("Expected ';' after variable declaration.");
-        recoverFromError();
-        freeParseTree(declarationNode);
-        return NULL;
-    }
-    addChild(declarationNode, matchToken("Delimiter", ";"));
 
     printf("[DEBUG] Successfully parsed Declaration Statement.\n");
     return declarationNode;
@@ -1383,16 +1295,16 @@ ParseTreeNode* parseAssignmentStatement() {
     printf("[DEBUG] Matching assignment operator: '%s'\n", token->value);
     addChild(assignmentNode, matchToken("AssignmentOperator", token->value));
 
-    // Delegate parsing of the initializer (right-hand side) to parseInitializer
-    printf("[DEBUG] Parsing initializer for the assignment statement...\n");
-    ParseTreeNode* initializerNode = parseInitializer();
-    if (!initializerNode) {
-        reportSyntaxError("Expected an initializer in assignment statement.");
+    // Delegate RHS parsing to parseExpression() instead of parseInitializer()
+    printf("[DEBUG] Parsing assignment expression for the assignment statement...\n");
+    ParseTreeNode* exprNode = parseExpression();
+    if (!exprNode) {
+        reportSyntaxError("Expected an expression as the right-hand side of assignment.");
         recoverFromError();
         freeParseTree(assignmentNode);
         return NULL;
     }
-    addChild(assignmentNode, initializerNode);
+    addChild(assignmentNode, exprNode);
 
     // Match the semicolon (statement terminator)
     token = peekToken();

@@ -1,103 +1,63 @@
 (Program
-  (Comment
-    (CommentContent: ~~ nested iterative Statements
-    )
-  )
-  (ForLoop
-    (Keyword: for
-    )
-    (Delimiter: (
-    )
-    (ForInit
+  (DeclarationStatement
+    (VariableDeclaration
       (Keyword: int
       )
-      (IDENTIFIER: i
+      (IDENTIFIER: x
       )
       (AssignmentOperator: =
       )
       (Expression
-        (Literal: 0
+        (Literal: 1
         )
       )
-    )
-    (Delimiter: ;
-    )
-    (Expression
-      (Identifier: i
-        (IDENTIFIER: i
-        )
+      (Delimiter: ;
       )
     )
-    (ForUpdate
-      (UnaryExpr
-        (IDENTIFIER: i
-        )
-        (UnaryOperator: ++
-        )
+  )
+  (DeclarationStatement
+    (VariableDeclaration
+      (Keyword: int
+      )
+      (IDENTIFIER: y
+      )
+      (Delimiter: ;
       )
     )
-    (Delimiter: )
-    )
-    (Block
-      (Delimiter: {
+  )
+  (DeclarationStatement
+    (VariableDeclaration
+      (Keyword: int
       )
-      (ForLoop
-        (Keyword: for
+      (IDENTIFIER: z
+      )
+      (Delimiter: ,
+      )
+      (IDENTIFIER: v
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (Literal: 20
         )
-        (Delimiter: (
-        )
-        (ForInit
-          (Keyword: int
+      )
+      (Delimiter: ,
+      )
+      (IDENTIFIER: f
+      )
+      (AssignmentOperator: =
+      )
+      (Expression
+        (ArithmeticExpr
+          (Literal: 3
           )
-          (IDENTIFIER: j
+          (ArithmeticOperator: +
           )
-          (AssignmentOperator: =
-          )
-          (Expression
-            (Literal: 0
-            )
-          )
-        )
-        (Delimiter: ;
-        )
-        (Expression
-          (Identifier: j
-            (IDENTIFIER: j
-            )
-          )
-        )
-        (ForUpdate
-          (UnaryExpr
-            (IDENTIFIER: j
-            )
-            (UnaryOperator: ++
-            )
-          )
-        )
-        (Delimiter: )
-        )
-        (Block
-          (Delimiter: {
-          )
-          (OutputStatement
-            (Keyword: printf
-            )
-            (Delimiter: (
-            )
-            (OutputList
-              (STRING_LITERAL: "Ulam, anong mama?"
-              )
-            )
-            (Delimiter: )
-            )
-            (Delimiter: ;
-            )
-          )
-          (Delimiter: }
+          (Literal: 1
           )
         )
       )
-      (Delimiter: }
+      (Delimiter: ;
       )
     )
   )
