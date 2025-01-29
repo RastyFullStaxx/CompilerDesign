@@ -1,11 +1,11 @@
 Comment,~~ nested iterative Statements,3
 Keyword,for,5
 Delimiter,(,5
+Keyword,int,5
 IDENTIFIER,i,5
 AssignmentOperator,=,5
 INT_LITERAL,0,5
 Delimiter,;,5
-NoiseWord,until,5
 IDENTIFIER,i,5
 RelationalOperator,<,5
 INT_LITERAL,5,5
@@ -16,6 +16,7 @@ Delimiter,),5
 Delimiter,{,5
 Keyword,for,6
 Delimiter,(,6
+Keyword,int,6
 IDENTIFIER,j,6
 AssignmentOperator,=,6
 INT_LITERAL,0,6

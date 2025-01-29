@@ -9,6 +9,8 @@
     (Delimiter: (
     )
     (ForInit
+      (Keyword: int
+      )
       (IDENTIFIER: i
       )
       (AssignmentOperator: =
@@ -20,15 +22,11 @@
     )
     (Delimiter: ;
     )
-    (RelationalExpr: <
+    (Expression
       (Identifier: i
         (IDENTIFIER: i
         )
       )
-      (Literal: 5
-      )
-    )
-    (Delimiter: ;
     )
     (ForUpdate
       (UnaryExpr
@@ -49,6 +47,8 @@
         (Delimiter: (
         )
         (ForInit
+          (Keyword: int
+          )
           (IDENTIFIER: j
           )
           (AssignmentOperator: =
@@ -60,17 +60,11 @@
         )
         (Delimiter: ;
         )
-        (RelationalExpr: <
+        (Expression
           (Identifier: j
             (IDENTIFIER: j
             )
           )
-          (Identifier: i
-            (IDENTIFIER: i
-            )
-          )
-        )
-        (Delimiter: ;
         )
         (ForUpdate
           (UnaryExpr
@@ -90,10 +84,8 @@
             )
             (Delimiter: (
             )
-            (ExpressionList
-              (Expression
-                (Literal: "Ulam, anong mama?"
-                )
+            (OutputList
+              (STRING_LITERAL: "Ulam, anong mama?"
               )
             )
             (Delimiter: )
