@@ -72,7 +72,7 @@
     )
     (InputList
       (FormatVariablePair
-        (FormatString: "hello pogi%"
+        (FormatString: "hello %f float"
         )
         (Delimiter: ,
         )
@@ -216,6 +216,66 @@
         )
         (OutputList
           (STRING_LITERAL: "Hello, World"
+          )
+        )
+        (Delimiter: )
+        )
+        (Delimiter: ;
+        )
+      )
+      (Delimiter: }
+      )
+    )
+  )
+  (ConditionalStatement
+    (Keyword: if
+    )
+    (Delimiter: (
+    )
+    (RelationalExpr
+      (Identifier: x
+        (IDENTIFIER: x
+        )
+      )
+      (RelationalOperator: >
+      )
+      (Literal: 0
+      )
+    )
+    (Delimiter: )
+    )
+    (Block
+      (Delimiter: {
+      )
+      (OutputStatement
+        (Keyword: printf
+        )
+        (Delimiter: (
+        )
+        (OutputList
+          (STRING_LITERAL: "Positive"
+          )
+        )
+        (Delimiter: )
+        )
+        (Delimiter: ;
+        )
+      )
+      (Delimiter: }
+      )
+    )
+    (Keyword: else
+    )
+    (Block
+      (Delimiter: {
+      )
+      (OutputStatement
+        (Keyword: printf
+        )
+        (Delimiter: (
+        )
+        (OutputList
+          (STRING_LITERAL: "Non-Positive"
           )
         )
         (Delimiter: )

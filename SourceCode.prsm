@@ -6,7 +6,7 @@ int z,v = 20, f = 3 + 1;
 
 ~~ Input Statements
 
-input("hello pogi%", &value);
+input("hello %f float", &value);
 
 ~~ Output Statements
 
@@ -20,13 +20,21 @@ totalGWA = 2;
 totalNum += addedPrice;
 midtermScore = exam = deptals;
 
-~~ conditional Statements
+~~ If conditional Statement
 
 if (i > 5) {
    printf("Hello, World");
 }
 
-~~ nested conditional Statements
+~~ If-else conditional Statement
+
+if (x > 0) {
+    printf("Positive");
+} else {
+    printf("Non-Positive");
+}
+
+~~ nested if-else conditional Statements
 
 if (i > 5) {
    if (i > 10) {
@@ -38,7 +46,7 @@ if (i > 5) {
    }
 }
 
-~~ iterative Statements
+~~ iterative Statement
 
 for (int i = 0; i < 5; i++) {
    printf("Ulam, anong mama?");

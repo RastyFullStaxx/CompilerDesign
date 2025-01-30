@@ -1162,7 +1162,6 @@ ParseTreeNode* parseAddressVariable() {
     return addressNode;
 }
 
-
 ParseTreeNode* parseFormatVariablePair() {
     printf("[DEBUG] Parsing Format-Variable Pair...\n");
 
@@ -1595,7 +1594,6 @@ ParseTreeNode* parseJumpStatement() {
     printf("[DEBUG] Successfully parsed Jump Statement.\n");
     return jumpNode;
 }
-
 
 // ---------------------------------------
 // Conditional                                  
@@ -2037,8 +2035,6 @@ ParseTreeNode* parseExpression() {
     printf("[DEBUG] Successfully parsed Expression.\n");
     return expressionNode;
 }
-
-
 
 ParseTreeNode* parseBoolExpr() {
     printf("[DEBUG] Parsing Boolean Expression...\n");

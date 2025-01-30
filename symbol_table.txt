@@ -23,7 +23,7 @@ Delimiter,;,5
 Comment,~~ Input Statements,7
 Keyword,input,9
 Delimiter,(,9
-STRING_LITERAL,"hello pogi%",9
+STRING_LITERAL,"hello %f float",9
 Delimiter,,,9
 SpecifierIdentifier,&value,9
 Delimiter,),9
@@ -63,7 +63,7 @@ IDENTIFIER,exam,21
 AssignmentOperator,=,21
 IDENTIFIER,deptals,21
 Delimiter,;,21
-Comment,~~ conditional Statements,23
+Comment,~~ If conditional Statement,23
 Keyword,if,25
 Delimiter,(,25
 IDENTIFIER,i,25
@@ -77,107 +77,129 @@ STRING_LITERAL,"Hello, World",26
 Delimiter,),26
 Delimiter,;,26
 Delimiter,},27
-Comment,~~ nested conditional Statements,29
+Comment,~~ If-else conditional Statement,29
 Keyword,if,31
 Delimiter,(,31
-IDENTIFIER,i,31
+IDENTIFIER,x,31
 RelationalOperator,>,31
-INT_LITERAL,5,31
+INT_LITERAL,0,31
 Delimiter,),31
 Delimiter,{,31
-Keyword,if,32
+Keyword,printf,32
 Delimiter,(,32
-IDENTIFIER,i,32
-RelationalOperator,>,32
-INT_LITERAL,10,32
+STRING_LITERAL,"Positive",32
 Delimiter,),32
-Delimiter,{,32
-Keyword,printf,33
-Delimiter,(,33
-STRING_LITERAL,"Hello, World",33
-Delimiter,),33
-Delimiter,;,33
-Delimiter,},34
-Keyword,else,34
-Keyword,if,34
+Delimiter,;,32
+Delimiter,},33
+Keyword,else,33
+Delimiter,{,33
+Keyword,printf,34
 Delimiter,(,34
-IDENTIFIER,i,34
-RelationalOperator,>,34
-INT_LITERAL,15,34
+STRING_LITERAL,"Non-Positive",34
 Delimiter,),34
-Delimiter,{,34
-Keyword,printf,35
-Delimiter,(,35
-STRING_LITERAL,"Ma, anong ulam?",35
-Delimiter,),35
-Delimiter,;,35
-Delimiter,},36
-Keyword,else,36
-Delimiter,{,36
-Keyword,printf,37
-Delimiter,(,37
-STRING_LITERAL,"Ulam, anong mama?",37
-Delimiter,),37
-Delimiter,;,37
-Delimiter,},38
-Delimiter,},39
-Comment,~~ iterative Statements,41
-Keyword,for,43
+Delimiter,;,34
+Delimiter,},35
+Comment,~~ nested if-else conditional Statements,37
+Keyword,if,39
+Delimiter,(,39
+IDENTIFIER,i,39
+RelationalOperator,>,39
+INT_LITERAL,5,39
+Delimiter,),39
+Delimiter,{,39
+Keyword,if,40
+Delimiter,(,40
+IDENTIFIER,i,40
+RelationalOperator,>,40
+INT_LITERAL,10,40
+Delimiter,),40
+Delimiter,{,40
+Keyword,printf,41
+Delimiter,(,41
+STRING_LITERAL,"Hello, World",41
+Delimiter,),41
+Delimiter,;,41
+Delimiter,},42
+Keyword,else,42
+Keyword,if,42
+Delimiter,(,42
+IDENTIFIER,i,42
+RelationalOperator,>,42
+INT_LITERAL,15,42
+Delimiter,),42
+Delimiter,{,42
+Keyword,printf,43
 Delimiter,(,43
-Keyword,int,43
-IDENTIFIER,i,43
-AssignmentOperator,=,43
-INT_LITERAL,0,43
-Delimiter,;,43
-IDENTIFIER,i,43
-RelationalOperator,<,43
-INT_LITERAL,5,43
-Delimiter,;,43
-IDENTIFIER,i,43
-UnaryOperator,++,43
+STRING_LITERAL,"Ma, anong ulam?",43
 Delimiter,),43
-Delimiter,{,43
-Keyword,printf,44
-Delimiter,(,44
-STRING_LITERAL,"Ulam, anong mama?",44
-Delimiter,),44
-Delimiter,;,44
-Delimiter,},45
-Comment,~~ nested iterative Statements,47
-Keyword,for,49
-Delimiter,(,49
-Keyword,int,49
-IDENTIFIER,i,49
-AssignmentOperator,=,49
-INT_LITERAL,0,49
-Delimiter,;,49
-IDENTIFIER,i,49
-RelationalOperator,<,49
-INT_LITERAL,5,49
-Delimiter,;,49
-IDENTIFIER,i,49
-UnaryOperator,++,49
-Delimiter,),49
-Delimiter,{,49
-Keyword,for,50
-Delimiter,(,50
-Keyword,int,50
-IDENTIFIER,j,50
-AssignmentOperator,=,50
-INT_LITERAL,0,50
-Delimiter,;,50
-IDENTIFIER,j,50
-RelationalOperator,<,50
-IDENTIFIER,i,50
-Delimiter,;,50
-IDENTIFIER,j,50
-UnaryOperator,++,50
-Delimiter,),50
-Delimiter,{,50
-Keyword,printf,51
+Delimiter,;,43
+Delimiter,},44
+Keyword,else,44
+Delimiter,{,44
+Keyword,printf,45
+Delimiter,(,45
+STRING_LITERAL,"Ulam, anong mama?",45
+Delimiter,),45
+Delimiter,;,45
+Delimiter,},46
+Delimiter,},47
+Comment,~~ iterative Statement,49
+Keyword,for,51
 Delimiter,(,51
-STRING_LITERAL,"Ulam, anong mama?",51
-Delimiter,),51
+Keyword,int,51
+IDENTIFIER,i,51
+AssignmentOperator,=,51
+INT_LITERAL,0,51
 Delimiter,;,51
-Delimiter,},52
+IDENTIFIER,i,51
+RelationalOperator,<,51
+INT_LITERAL,5,51
+Delimiter,;,51
+IDENTIFIER,i,51
+UnaryOperator,++,51
+Delimiter,),51
+Delimiter,{,51
+Keyword,printf,52
+Delimiter,(,52
+STRING_LITERAL,"Ulam, anong mama?",52
+Delimiter,),52
+Delimiter,;,52
 Delimiter,},53
+Comment,~~ nested iterative Statements,55
+Keyword,for,57
+Delimiter,(,57
+Keyword,int,57
+IDENTIFIER,i,57
+AssignmentOperator,=,57
+INT_LITERAL,0,57
+Delimiter,;,57
+IDENTIFIER,i,57
+RelationalOperator,<,57
+INT_LITERAL,5,57
+Delimiter,;,57
+IDENTIFIER,i,57
+UnaryOperator,++,57
+Delimiter,),57
+Delimiter,{,57
+Keyword,for,58
+Delimiter,(,58
+Keyword,int,58
+IDENTIFIER,j,58
+AssignmentOperator,=,58
+INT_LITERAL,0,58
+Delimiter,;,58
+IDENTIFIER,j,58
+RelationalOperator,<,58
+IDENTIFIER,i,58
+Delimiter,;,58
+IDENTIFIER,j,58
+UnaryOperator,++,58
+Delimiter,),58
+Delimiter,{,58
+Keyword,printf,59
+Delimiter,(,59
+STRING_LITERAL,"Ulam, anong mama?",59
+Delimiter,),59
+Delimiter,;,59
+Delimiter,},60
+Delimiter,},61
