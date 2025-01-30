@@ -1309,7 +1309,7 @@ ParseTreeNode* parseAssignmentStatement() {
     // Create a node for the assignment statement
     ParseTreeNode* assignmentNode = createParseTreeNode("AssignmentStatement", "");
 
-    // Match an identifier (the left-hand side of the assignment)
+    // Match the left-hand identifier (LHS of the assignment)
     Token* token = peekToken();
     if (!token) {
         reportSyntaxError("Unexpected end of input while parsing assignment statement.");
@@ -1336,45 +1336,49 @@ ParseTreeNode* parseAssignmentStatement() {
     printf("[DEBUG] Matching assignment operator: '%s'\n", token->value);
     addChild(assignmentNode, matchToken("AssignmentOperator", token->value));
 
-    // Recursively parse expressions allowing chained assignments
-    printf("[DEBUG] Parsing assignment expression for the assignment statement...\n");
-    ParseTreeNode* exprNode = parseExpression();
-    if (!exprNode) {
+    // **Recursively Handle Right-to-Left Chained Assignments**
+    printf("[DEBUG] Parsing right-hand side of assignment...\n");
+    ParseTreeNode* rhsNode = parseExpression();
+    if (!rhsNode) {
         reportSyntaxError("Expected an expression as the right-hand side of assignment.");
         recoverFromError();
         freeParseTree(assignmentNode);
         return NULL;
     }
-    addChild(assignmentNode, exprNode);
 
-    // **Handle Chained Assignments**
+    // **Check for chained assignments**
     token = peekToken();
     while (token && strcmp(token->type, "AssignmentOperator") == 0) {
         printf("[DEBUG] Detected Chained Assignment Operator: '%s'\n", token->value);
 
-        // Create a new AssignmentStatement node
+        // Create a new node to handle the nested assignment
         ParseTreeNode* chainedAssignNode = createParseTreeNode("AssignmentStatement", "");
-        addChild(chainedAssignNode, assignmentNode);  // Previous assignment becomes part of new assignment
+
+        // The right-hand side of the previous assignment becomes the left-hand side of the new assignment
+        addChild(chainedAssignNode, rhsNode);
 
         // Match assignment operator
         addChild(chainedAssignNode, matchToken("AssignmentOperator", token->value));
 
-        // Parse the next expression (right-hand side)
-        ParseTreeNode* nextExprNode = parseExpression();
-        if (!nextExprNode) {
-            reportSyntaxError("Expected expression after chained assignment operator.");
+        // Recursively parse the next right-hand expression
+        rhsNode = parseExpression();
+        if (!rhsNode) {
+            reportSyntaxError("Expected an expression after chained assignment operator.");
             recoverFromError();
             freeParseTree(chainedAssignNode);
             return NULL;
         }
-        addChild(chainedAssignNode, nextExprNode);
+        addChild(chainedAssignNode, rhsNode);
 
-        // Update the main assignment node
-        assignmentNode = chainedAssignNode;
-        
-        // Peek for further chaining
+        // Update the right-hand side node for further chaining
+        rhsNode = chainedAssignNode;
+
+        // Peek for further chained assignments
         token = peekToken();
     }
+
+    // Add the final right-hand side expression to the original assignment node
+    addChild(assignmentNode, rhsNode);
 
     // Match the semicolon (statement terminator)
     token = peekToken();
@@ -2235,12 +2239,11 @@ ParseTreeNode* parseBoolFactor() {
     return NULL;
 }
 
-
 ParseTreeNode* parseArithmeticExpr() {
     printf("[DEBUG] Parsing Arithmetic Expression...\n");
 
-    // Parse the left-hand side as a term
-    ParseTreeNode* leftOperand = parseTerm(); // parseTerm() handles multiplication, division, modulo, etc.
+    // Parse the left-hand side as a term (handles *, /, //, %)
+    ParseTreeNode* leftOperand = parseTerm();
     if (!leftOperand) {
         reportSyntaxError("Failed to parse the left-hand side of an Arithmetic Expression.");
         recoverFromError();
@@ -2249,7 +2252,7 @@ ParseTreeNode* parseArithmeticExpr() {
 
     Token* token = peekToken();
 
-    // Recursively handle addition and subtraction operators
+    // Handle addition and subtraction (lower precedence than multiplication/division)
     while (token && strcmp(token->type, "ArithmeticOperator") == 0 &&
            (strcmp(token->value, "+") == 0 || strcmp(token->value, "-") == 0)) {
         printf("[DEBUG] Detected addition/subtraction operator '%s'.\n", token->value);
@@ -2263,8 +2266,8 @@ ParseTreeNode* parseArithmeticExpr() {
         // Match the operator and consume it
         addChild(arithmeticNode, matchToken("ArithmeticOperator", token->value));
 
-        // Recursively parse the right-hand side
-        ParseTreeNode* rightOperand = parseArithmeticExpr();
+        // Parse the right-hand side as another term (ensuring correct precedence)
+        ParseTreeNode* rightOperand = parseTerm();
         if (!rightOperand) {
             reportSyntaxError("Failed to parse the right-hand side of an Arithmetic Expression.");
             recoverFromError();
@@ -2496,53 +2499,102 @@ ParseTreeNode* parseBase() {
 ParseTreeNode* parseFactor() {
     printf("[DEBUG] Parsing Factor...\n");
 
-    // Parse the left-hand side as a base
-    ParseTreeNode* baseNode = parseBase();
-    if (!baseNode) {
-        reportSyntaxError("Expected a base in factor.");
+    Token* token = peekToken();
+    if (!token) {
+        reportSyntaxError("Unexpected end of input while parsing a Factor.");
         recoverFromError();
         return NULL;
     }
 
-    Token* token = peekToken();
-    // Check for an exponentiation operator
-    if (token && strcmp(token->type, "ArithmeticOperator") == 0 && strcmp(token->value, "^") == 0) {
-        printf("[DEBUG] Detected Exponentiation Operator '%s'.\n", token->value);
+    ParseTreeNode* factorNode = NULL;
 
-        // Create a node for the factor (with exponentiation)
-        ParseTreeNode* factorNode = createParseTreeNode("Factor", token->value);
+    // **Handle Parenthesized Expressions `(expr)`**
+    if (strcmp(token->type, "Delimiter") == 0 && strcmp(token->value, "(") == 0) {
+        printf("[DEBUG] Detected '(' indicating a grouped expression.\n");
+        factorNode = createParseTreeNode("GroupedExpr", "");
 
-        // Add the left base as a child
-        addChild(factorNode, baseNode);
+        // Match '('
+        addChild(factorNode, matchToken("Delimiter", "("));
 
-        // Match the exponentiation operator
-        addChild(factorNode, matchToken("ArithmeticOperator", "^"));
-
-        // Parse the right-hand side as another factor
-        ParseTreeNode* rightFactor = parseFactor();
-        if (!rightFactor) {
-            reportSyntaxError("Failed to parse the right-hand side of the factor.");
+        // Parse the inner expression
+        ParseTreeNode* innerExpr = parseExpression();
+        if (!innerExpr) {
+            reportSyntaxError("Failed to parse inner expression in grouped expression.");
             recoverFromError();
             freeParseTree(factorNode);
             return NULL;
         }
-        addChild(factorNode, rightFactor);
+        addChild(factorNode, innerExpr);
 
-        printf("[DEBUG] Successfully parsed Factor with Exponentiation.\n");
-        return factorNode;
+        // Match ')'
+        token = peekToken();
+        if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, ")") != 0) {
+            reportSyntaxError("Expected ')' to close grouped expression.");
+            recoverFromError();
+            freeParseTree(factorNode);
+            return NULL;
+        }
+        addChild(factorNode, matchToken("Delimiter", ")"));
+
+        printf("[DEBUG] Successfully parsed grouped expression.\n");
+    }
+    // **Handle Literals and Identifiers**
+    else if (strcmp(token->type, "INT_LITERAL") == 0 || strcmp(token->type, "FLOAT_LITERAL") == 0 ||
+             strcmp(token->type, "CHAR_LITERAL") == 0 || strcmp(token->type, "STRING_LITERAL") == 0 ||
+             (strcmp(token->type, "Keyword") == 0 &&
+              (strcmp(token->value, "true") == 0 || strcmp(token->value, "false") == 0))) {
+        printf("[DEBUG] Detected Literal: Type='%s', Value='%s'\n", token->type, token->value);
+        factorNode = matchToken(token->type, token->value);
+    }
+    else if (strcmp(token->type, "IDENTIFIER") == 0) {
+        printf("[DEBUG] Detected Identifier: '%s'\n", token->value);
+        factorNode = matchToken("IDENTIFIER", token->value);
+    }
+    else {
+        reportSyntaxError("Expected a valid Factor (literal, identifier, or grouped expression).");
+        recoverFromError();
+        return NULL;
     }
 
-    // If no exponentiation operator, return the base node
-    printf("[DEBUG] Successfully parsed Factor without Exponentiation.\n");
-    return baseNode;
+    // **Fix: Handle Right-Associative Exponentiation (`^`) Inside Factor**
+    token = peekToken();
+    if (token && strcmp(token->type, "ArithmeticOperator") == 0 && strcmp(token->value, "^") == 0) {
+        printf("[DEBUG] Detected Exponentiation Operator '%s'.\n", token->value);
+
+        // **Ensure exponentiation remains inside Factor**
+        ParseTreeNode* exponentNode = createParseTreeNode("Factor", "");  // <-- FIXED: Wrap it in `Factor`
+
+        // Add the base factor as a child
+        addChild(exponentNode, factorNode);
+
+        // Match the exponentiation operator
+        addChild(exponentNode, matchToken("ArithmeticOperator", "^"));
+
+        // **Parse the exponent (right-hand side) as another Factor**
+        ParseTreeNode* rightFactor = parseFactor();
+        if (!rightFactor) {
+            reportSyntaxError("Failed to parse the right-hand side of exponentiation.");
+            recoverFromError();
+            freeParseTree(exponentNode);
+            return NULL;
+        }
+        addChild(exponentNode, rightFactor);
+
+        printf("[DEBUG] Successfully parsed Factor with Exponentiation.\n");
+        return exponentNode;  // Return the correctly structured exponentiation inside Factor
+    }
+
+    printf("[DEBUG] Successfully parsed Factor.\n");
+    return factorNode;
 }
+
 
 ParseTreeNode* parseTerm() {
     printf("[DEBUG] Parsing Term...\n");
 
-    // Parse the left-hand side as a factor
-    ParseTreeNode* leftFactor = parseFactor();
-    if (!leftFactor) {
+    // Parse the left-hand side as a factor (handles exponentiation inside parseFactor)
+    ParseTreeNode* leftOperand = parseFactor();
+    if (!leftOperand) {
         reportSyntaxError("Expected a factor in term.");
         recoverFromError();
         return NULL;
@@ -2550,24 +2602,24 @@ ParseTreeNode* parseTerm() {
 
     Token* token = peekToken();
 
-    // Recursively handle multiplication, division, integer division, and modulo operators
+    // Handle multiplication, division, integer division, and modulo operators
     while (token && strcmp(token->type, "ArithmeticOperator") == 0 &&
            (strcmp(token->value, "*") == 0 || strcmp(token->value, "/") == 0 ||
             strcmp(token->value, "//") == 0 || strcmp(token->value, "%") == 0)) {
-        printf("[DEBUG] Detected Term Operator '%s'.\n", token->value);
+        printf("[DEBUG] Detected Multiplication/Division/Modulo operator '%s'.\n", token->value);
 
         // Create a node for the term operation
         ParseTreeNode* termNode = createParseTreeNode("Term", "");
 
-        // Add the left factor as a child
-        addChild(termNode, leftFactor);
+        // Add the left operand as a child
+        addChild(termNode, leftOperand);
 
         // Match the operator and consume it
         addChild(termNode, matchToken("ArithmeticOperator", token->value));
 
-        // Recursively parse the right-hand side (ensuring proper precedence)
-        ParseTreeNode* rightFactor = parseTerm();
-        if (!rightFactor) {
+        // Parse the right-hand side as a factor (ensuring proper precedence)
+        ParseTreeNode* rightOperand = parseFactor();
+        if (!rightOperand) {
             reportSyntaxError("Failed to parse the right-hand side of the term.");
             recoverFromError();
             freeParseTree(termNode);
@@ -2575,19 +2627,18 @@ ParseTreeNode* parseTerm() {
         }
 
         // Add the right operand as a child
-        addChild(termNode, rightFactor);
+        addChild(termNode, rightOperand);
 
         // Update the left operand for further chaining
-        leftFactor = termNode;
+        leftOperand = termNode;
 
         // Peek at the next token for further chaining
         token = peekToken();
     }
 
     printf("[DEBUG] Successfully parsed Term.\n");
-    return leftFactor;
+    return leftOperand;
 }
-
 
 ParseTreeNode* parseAssignExpr() {
     printf("[DEBUG] Parsing Assignment Expression...\n");
