@@ -194,10 +194,12 @@
     )
     (Delimiter: (
     )
-    (RelationalExpr: >
+    (RelationalExpr
       (Identifier: i
         (IDENTIFIER: i
         )
+      )
+      (RelationalOperator: >
       )
       (Literal: 5
       )
@@ -230,10 +232,12 @@
     )
     (Delimiter: (
     )
-    (RelationalExpr: >
+    (RelationalExpr
       (Identifier: i
         (IDENTIFIER: i
         )
+      )
+      (RelationalOperator: >
       )
       (Literal: 5
       )
@@ -248,10 +252,12 @@
         )
         (Delimiter: (
         )
-        (RelationalExpr: >
+        (RelationalExpr
           (Identifier: i
             (IDENTIFIER: i
             )
+          )
+          (RelationalOperator: >
           )
           (Literal: 10
           )
@@ -284,10 +290,12 @@
         )
         (Delimiter: (
         )
-        (RelationalExpr: >
+        (RelationalExpr
           (Identifier: i
             (IDENTIFIER: i
             )
+          )
+          (RelationalOperator: >
           )
           (Literal: 15
           )
@@ -347,6 +355,8 @@
     (Delimiter: (
     )
     (ForInit
+      (Keyword: int
+      )
       (IDENTIFIER: i
       )
       (AssignmentOperator: =
@@ -356,11 +366,15 @@
         )
       )
     )
-    (Delimiter: ;
-    )
     (Expression
-      (Identifier: i
-        (IDENTIFIER: i
+      (RelationalExpr
+        (Identifier: i
+          (IDENTIFIER: i
+          )
+        )
+        (RelationalOperator: <
+        )
+        (Literal: 5
         )
       )
     )
@@ -371,8 +385,6 @@
         (UnaryOperator: ++
         )
       )
-    )
-    (Delimiter: )
     )
     (Block
       (Delimiter: {
@@ -401,6 +413,8 @@
     (Delimiter: (
     )
     (ForInit
+      (Keyword: int
+      )
       (IDENTIFIER: i
       )
       (AssignmentOperator: =
@@ -410,11 +424,15 @@
         )
       )
     )
-    (Delimiter: ;
-    )
     (Expression
-      (Identifier: i
-        (IDENTIFIER: i
+      (RelationalExpr
+        (Identifier: i
+          (IDENTIFIER: i
+          )
+        )
+        (RelationalOperator: <
+        )
+        (Literal: 5
         )
       )
     )
@@ -426,8 +444,6 @@
         )
       )
     )
-    (Delimiter: )
-    )
     (Block
       (Delimiter: {
       )
@@ -437,6 +453,8 @@
         (Delimiter: (
         )
         (ForInit
+          (Keyword: int
+          )
           (IDENTIFIER: j
           )
           (AssignmentOperator: =
@@ -446,11 +464,17 @@
             )
           )
         )
-        (Delimiter: ;
-        )
         (Expression
-          (Identifier: j
-            (IDENTIFIER: j
+          (RelationalExpr
+            (Identifier: j
+              (IDENTIFIER: j
+              )
+            )
+            (RelationalOperator: <
+            )
+            (Identifier: i
+              (IDENTIFIER: i
+              )
             )
           )
         )
@@ -461,8 +485,6 @@
             (UnaryOperator: ++
             )
           )
-        )
-        (Delimiter: )
         )
         (Block
           (Delimiter: {

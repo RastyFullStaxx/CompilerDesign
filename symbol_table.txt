@@ -124,6 +124,7 @@ Delimiter,},39
 Comment,~~ iterative Statements,41
 Keyword,for,43
 Delimiter,(,43
+Keyword,int,43
 IDENTIFIER,i,43
 AssignmentOperator,=,43
 INT_LITERAL,0,43
@@ -145,6 +146,7 @@ Delimiter,},45
 Comment,~~ nested iterative Statements,47
 Keyword,for,49
 Delimiter,(,49
+Keyword,int,49
 IDENTIFIER,i,49
 AssignmentOperator,=,49
 INT_LITERAL,0,49
@@ -159,6 +161,7 @@ Delimiter,),49
 Delimiter,{,49
 Keyword,for,50
 Delimiter,(,50
+Keyword,int,50
 IDENTIFIER,j,50
 AssignmentOperator,=,50
 INT_LITERAL,0,50

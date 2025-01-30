@@ -1744,60 +1744,92 @@ ParseTreeNode* parseForLoop() {
     addChild(forLoopNode, matchToken("Keyword", "for"));
 
     // Match '('
-    token = peekToken();
-    if (!token || strcmp(token->type, "Delimiter") != 0 || strcmp(token->value, "(") != 0) {
-        reportSyntaxError("Expected '(' after 'for'.");
-        recoverFromError();
-        freeParseTree(forLoopNode);
-        return NULL;
-    }
     addChild(forLoopNode, matchToken("Delimiter", "("));
 
-    // Parse optional noise words "from"
+    // Optional "from" noise word before initialization
     token = peekToken();
     if (token && strcmp(token->type, "NoiseWord") == 0 && strcmp(token->value, "from") == 0) {
         addChild(forLoopNode, matchToken("NoiseWord", "from"));
     }
 
-    // Parse initialization (forInit)
+    // Parse optional initialization (forInit)
     ParseTreeNode* forInitNode = parseForInit();
     if (forInitNode) {
         addChild(forLoopNode, forInitNode);
     }
 
     // Match ';'
-    addChild(forLoopNode, matchToken("Delimiter", ";"));
+    if (!matchToken("Delimiter", ";")) {
+        reportSyntaxError("Expected ';' after for-loop initialization.");
+        recoverFromError();
+        freeParseTree(forLoopNode);
+        return NULL;
+    }
 
-    // Parse condition (Expression instead of BoolExpr)
+    // Parse optional condition (expression instead of BoolExpr)
     ParseTreeNode* conditionNode = parseExpression();
     if (conditionNode) {
         addChild(forLoopNode, conditionNode);
     }
 
-    // Match ';'
-    addChild(forLoopNode, matchToken("Delimiter", ";"));
-
-    // Parse optional noise words "until"
+    // Optional "until" noise word before second expression
     token = peekToken();
     if (token && strcmp(token->type, "NoiseWord") == 0 && strcmp(token->value, "until") == 0) {
         addChild(forLoopNode, matchToken("NoiseWord", "until"));
+
+        // Parse another condition if "until" is present
+        ParseTreeNode* secondConditionNode = parseExpression();
+        if (!secondConditionNode) {
+            reportSyntaxError("Expected an expression after 'until' in for-loop.");
+            recoverFromError();
+            freeParseTree(forLoopNode);
+            return NULL;
+        }
+        addChild(forLoopNode, secondConditionNode);
     }
 
-    // Parse optional update (forUpdate)
+    // Match ';'
+    if (!matchToken("Delimiter", ";")) {
+        reportSyntaxError("Expected ';' after for-loop condition.");
+        recoverFromError();
+        freeParseTree(forLoopNode);
+        return NULL;
+    }
+
+    // Optional "by" noise word before update expression
+    token = peekToken();
+    if (token && strcmp(token->type, "NoiseWord") == 0 && strcmp(token->value, "by") == 0) {
+        addChild(forLoopNode, matchToken("NoiseWord", "by"));
+    }
+
+    // Parse optional update expression (forUpdate)
     ParseTreeNode* forUpdateNode = parseForUpdate();
     if (forUpdateNode) {
         addChild(forLoopNode, forUpdateNode);
     }
 
     // Match ')'
-    addChild(forLoopNode, matchToken("Delimiter", ")"));
+    if (!matchToken("Delimiter", ")")) {
+        reportSyntaxError("Expected ')' to close for-loop header.");
+        recoverFromError();
+        freeParseTree(forLoopNode);
+        return NULL;
+    }
 
     // Parse block or single statement
-    addChild(forLoopNode, parseBlock());
+    ParseTreeNode* bodyNode = parseBlock();
+    if (!bodyNode) {
+        reportSyntaxError("Expected a statement block or single statement in for-loop body.");
+        recoverFromError();
+        freeParseTree(forLoopNode);
+        return NULL;
+    }
+    addChild(forLoopNode, bodyNode);
 
     printf("[DEBUG] Successfully parsed For Loop.\n");
     return forLoopNode;
 }
+
 
 
 ParseTreeNode* parseForInit() {
@@ -1963,37 +1995,43 @@ ParseTreeNode* parseExpression() {
         return NULL;
     }
 
-    // Delegate to appropriate parsing function based on token type
-    if (strcmp(token->type, "LogicalOperator") == 0 || strcmp(token->type, "RelationalOperator") == 0) {
-        printf("[DEBUG] Delegating to parseBoolExpr...\n");
-        ParseTreeNode* boolExprNode = parseBoolExpr();
-        if (!boolExprNode) {
-            reportSyntaxError("Failed to parse Boolean Expression.");
+    // Start by parsing a relational expression (since it includes arithmetic expressions)
+    printf("[DEBUG] Delegating to parseRelationalExpr...\n");
+    ParseTreeNode* relationalExprNode = parseRelationalExpr();
+    if (!relationalExprNode) {
+        reportSyntaxError("Failed to parse Relational Expression.");
+        recoverFromError();
+        freeParseTree(expressionNode);
+        return NULL;
+    }
+    addChild(expressionNode, relationalExprNode);
+
+    // Check if the next token is a Logical OR (`||`)
+    token = peekToken();
+    while (token && strcmp(token->type, "LogicalOperator") == 0 && strcmp(token->value, "||") == 0) {
+        printf("[DEBUG] Detected Logical OR Operator '||'.\n");
+
+        // Create a node for the Logical OR operation
+        ParseTreeNode* logicalOrNode = createParseTreeNode("LogicalOrExpr", token->value);
+        addChild(logicalOrNode, expressionNode);
+
+        // Match the `||` operator
+        addChild(logicalOrNode, matchToken("LogicalOperator", "||"));
+
+        // Parse the next relational expression
+        ParseTreeNode* nextRelationalExprNode = parseRelationalExpr();
+        if (!nextRelationalExprNode) {
+            reportSyntaxError("Expected relational expression after Logical OR.");
             recoverFromError();
-            freeParseTree(expressionNode);
+            freeParseTree(logicalOrNode);
             return NULL;
         }
-        addChild(expressionNode, boolExprNode);
-    } else if (strcmp(token->type, "UnaryOperator") == 0) {
-        printf("[DEBUG] Delegating to parseUnaryExpr...\n");
-        ParseTreeNode* unaryExprNode = parseUnaryExpr();
-        if (!unaryExprNode) {
-            reportSyntaxError("Failed to parse Unary Expression.");
-            recoverFromError();
-            freeParseTree(expressionNode);
-            return NULL;
-        }
-        addChild(expressionNode, unaryExprNode);
-    } else {
-        printf("[DEBUG] Delegating to parseArithmeticExpr...\n");
-        ParseTreeNode* arithmeticExprNode = parseArithmeticExpr();
-        if (!arithmeticExprNode) {
-            reportSyntaxError("Failed to parse Arithmetic Expression.");
-            recoverFromError();
-            freeParseTree(expressionNode);
-            return NULL;
-        }
-        addChild(expressionNode, arithmeticExprNode);
+        addChild(logicalOrNode, nextRelationalExprNode);
+
+        // Update the expressionNode for further logical OR chaining
+        expressionNode = logicalOrNode;
+
+        token = peekToken(); // Update token for the next iteration
     }
 
     printf("[DEBUG] Successfully parsed Expression.\n");
@@ -2001,11 +2039,12 @@ ParseTreeNode* parseExpression() {
 }
 
 
+
 ParseTreeNode* parseBoolExpr() {
     printf("[DEBUG] Parsing Boolean Expression...\n");
 
-    // Parse the left-hand side as a Boolean Term
-    ParseTreeNode* leftOperand = parseBoolTerm();
+    // Parse the left-hand side as a relational expression
+    ParseTreeNode* leftOperand = parseRelationalExpr();
     if (!leftOperand) {
         reportSyntaxError("Failed to parse the left-hand side of a Boolean Expression.");
         recoverFromError();
@@ -2015,6 +2054,8 @@ ParseTreeNode* parseBoolExpr() {
     Token* token = peekToken();
     // Continuously parse Logical OR (`||`) operations
     while (token && strcmp(token->type, "LogicalOperator") == 0 && strcmp(token->value, "||") == 0) {
+        printf("[DEBUG] Detected Logical OR Operator '||'.\n");
+
         // Create a new node for the Logical OR expression
         ParseTreeNode* boolOrNode = createParseTreeNode("LogicalOrExpr", token->value);
         addChild(boolOrNode, leftOperand);
@@ -2029,8 +2070,8 @@ ParseTreeNode* parseBoolExpr() {
         }
         addChild(boolOrNode, operatorNode);
 
-        // Parse the right-hand side as another Boolean Term
-        ParseTreeNode* rightOperand = parseBoolTerm();
+        // Parse the right-hand side as another relational expression
+        ParseTreeNode* rightOperand = parseRelationalExpr();
         if (!rightOperand) {
             reportSyntaxError("Failed to parse the right-hand side of a Logical OR Expression.");
             recoverFromError();
@@ -2049,6 +2090,7 @@ ParseTreeNode* parseBoolExpr() {
     printf("[DEBUG] Successfully parsed Boolean Expression.\n");
     return leftOperand;
 }
+
 
 ParseTreeNode* parseBoolTerm() {
     printf("[DEBUG] Parsing Boolean Term...\n");
@@ -2261,49 +2303,49 @@ ParseTreeNode* parseRelationalExpr() {
 
     Token* token = peekToken();
 
-    // Check and handle relational operators (==, !=, >, <, >=, <=)
-    while (token && strcmp(token->type, "RelationalOperator") == 0 &&
-           (strcmp(token->value, "==") == 0 || strcmp(token->value, "!=") == 0 ||
-            strcmp(token->value, ">") == 0 || strcmp(token->value, "<") == 0 ||
-            strcmp(token->value, ">=") == 0 || strcmp(token->value, "<=") == 0)) {
-        printf("[DEBUG] Detected Relational Operator '%s'.\n", token->value);
+    // Handle one or more relational operators (==, !=, >, <, >=, <=)
+    if (token && strcmp(token->type, "RelationalOperator") == 0) {
+        while (token && strcmp(token->type, "RelationalOperator") == 0) {
+            printf("[DEBUG] Detected Relational Operator '%s'.\n", token->value);
 
-        // Create a new node for the relational expression
-        ParseTreeNode* relationalNode = createParseTreeNode("RelationalExpr", token->value);
+            // Create a new node for the relational expression
+            ParseTreeNode* relationalNode = createParseTreeNode("RelationalExpr", "");
 
-        // Add the left operand as a child
-        addChild(relationalNode, leftOperand);
+            // Add the left operand as a child
+            addChild(relationalNode, leftOperand);
 
-        // Match and consume the relational operator
-        if (!matchToken("RelationalOperator", token->value)) {
-            reportSyntaxError("Failed to match Relational Operator.");
-            recoverFromError();
-            freeParseTree(relationalNode);
-            return NULL;
+            // Match and consume the relational operator
+            ParseTreeNode* operatorNode = matchToken("RelationalOperator", token->value);
+            if (!operatorNode) {
+                reportSyntaxError("Failed to match Relational Operator.");
+                recoverFromError();
+                freeParseTree(relationalNode);
+                return NULL;
+            }
+            addChild(relationalNode, operatorNode);
+
+            // Parse the right-hand side as another arithmetic expression
+            ParseTreeNode* rightOperand = parseArithmeticExpr();
+            if (!rightOperand) {
+                reportSyntaxError("Failed to parse the right-hand side of a Relational Expression.");
+                recoverFromError();
+                freeParseTree(relationalNode);
+                return NULL;
+            }
+            addChild(relationalNode, rightOperand);
+
+            // Update leftOperand for potential chaining
+            leftOperand = relationalNode;
+
+            // Peek at the next token for further relational operators
+            token = peekToken();
         }
-
-        // Parse the right-hand side as another arithmetic expression
-        ParseTreeNode* rightOperand = parseArithmeticExpr();
-        if (!rightOperand) {
-            reportSyntaxError("Failed to parse the right-hand side of a Relational Expression.");
-            recoverFromError();
-            freeParseTree(relationalNode);
-            return NULL;
-        }
-
-        // Add the right operand as a child
-        addChild(relationalNode, rightOperand);
-
-        // Update leftOperand for potential chaining
-        leftOperand = relationalNode;
-
-        // Peek at the next token for further relational operators
-        token = peekToken();
     }
 
     printf("[DEBUG] Successfully parsed Relational Expression.\n");
     return leftOperand;
 }
+
 
 ParseTreeNode* parseUnaryExpr() {
     printf("[DEBUG] Parsing Unary Expression...\n");

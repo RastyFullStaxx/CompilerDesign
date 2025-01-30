@@ -40,14 +40,14 @@ if (i > 5) {
 
 ~~ iterative Statements
 
-for (i = 0; i < 5; i++) {
+for (int i = 0; i < 5; i++) {
    printf("Ulam, anong mama?");
 }
 
 ~~ nested iterative Statements
 
-for (i = 0; i < 5; i++) {
-   for (j = 0; j < i; j++) {
+for (int i = 0; i < 5; i++) {
+   for (int j = 0; j < i; j++) {
       printf("Ulam, anong mama?");
    }
 }
