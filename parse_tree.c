@@ -36,10 +36,10 @@ void addChild(ParseTreeNode* parent, ParseTreeNode* child) {
         parent->children[parent->childCount++] = child;
 
         // Debug: Log successful addition of child
-        printf("[DEBUG] Added child to parent.\n");
-        printf("[DEBUG] Parent Node: Label='%s', Value='%s', Current Children=%d\n",
+        //printf("[DEBUG] Added child to parent.\n");
+        //printf("[DEBUG] Parent Node: Label='%s', Value='%s', Current Children=%d\n",
                parent->label, parent->value, parent->childCount);
-        printf("[DEBUG] Child Node: Label='%s', Value='%s'\n", 
+        //printf("[DEBUG] Child Node: Label='%s', Value='%s'\n", 
                child->label, child->value);
 
     } else {
